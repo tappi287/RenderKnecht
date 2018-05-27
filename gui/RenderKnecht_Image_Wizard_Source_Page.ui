@@ -1,0 +1,477 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>wizardPage0</class>
+ <widget class="QWizardPage" name="wizardPage0">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>1039</width>
+    <height>830</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Quellen</string>
+  </property>
+  <property name="title">
+   <string>Preset Assistent QOB 9000</string>
+  </property>
+  <property name="subTitle">
+   <string>Dieser Assistent führt Schritt für Schritt durch die Preset Erstellung auf Basis der DeltaGen POS Varianten XML und einem V Plus Browser Auszug.&lt;br&gt;Diese Methode verhindert dass PR-Optionen sich gegenseitig überschrieben und damit falsch dargestellt werden.</string>
+  </property>
+  <layout class="QVBoxLayout" name="verticalLayout_3">
+   <property name="leftMargin">
+    <number>0</number>
+   </property>
+   <property name="topMargin">
+    <number>0</number>
+   </property>
+   <property name="rightMargin">
+    <number>0</number>
+   </property>
+   <property name="bottomMargin">
+    <number>9</number>
+   </property>
+   <item>
+    <widget class="QGroupBox" name="grpBox2">
+     <property name="title">
+      <string>1. Schritt</string>
+     </property>
+     <layout class="QVBoxLayout" name="verticalLayout">
+      <property name="spacing">
+       <number>0</number>
+      </property>
+      <item>
+       <layout class="QHBoxLayout" name="horizontalLayout">
+        <property name="spacing">
+         <number>9</number>
+        </property>
+        <property name="bottomMargin">
+         <number>13</number>
+        </property>
+        <item>
+         <widget class="QCheckBox" name="fakomCheckbox">
+          <property name="enabled">
+           <bool>false</bool>
+          </property>
+          <property name="maximumSize">
+           <size>
+            <width>20</width>
+            <height>20</height>
+           </size>
+          </property>
+          <property name="text">
+           <string/>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QPushButton" name="fakomLutscherBtn">
+          <property name="text">
+           <string>FaKom Lutscher</string>
+          </property>
+          <property name="checked">
+           <bool>false</bool>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </item>
+      <item>
+       <widget class="QLabel" name="fakomLabel">
+        <property name="styleSheet">
+         <string notr="true">color: rgb(200,20,20);</string>
+        </property>
+        <property name="text">
+         <string>Keine passenden Daten gefunden.</string>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item>
+    <widget class="QGroupBox" name="grpBox3">
+     <property name="title">
+      <string>2. Schritt</string>
+     </property>
+     <layout class="QVBoxLayout" name="verticalLayout_2">
+      <property name="spacing">
+       <number>0</number>
+      </property>
+      <item>
+       <layout class="QHBoxLayout" name="horizontalLayout_2">
+        <property name="spacing">
+         <number>9</number>
+        </property>
+        <property name="bottomMargin">
+         <number>13</number>
+        </property>
+        <item>
+         <widget class="QCheckBox" name="vplusCheckbox">
+          <property name="enabled">
+           <bool>false</bool>
+          </property>
+          <property name="maximumSize">
+           <size>
+            <width>20</width>
+            <height>20</height>
+           </size>
+          </property>
+          <property name="text">
+           <string/>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QPushButton" name="vplusBtn">
+          <property name="enabled">
+           <bool>false</bool>
+          </property>
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+          <property name="text">
+           <string>V Plus Browser Import</string>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </item>
+      <item>
+       <widget class="QLabel" name="vplusLabel">
+        <property name="styleSheet">
+         <string notr="true">color: rgb(200,20,20);</string>
+        </property>
+        <property name="text">
+         <string>Keine passenden Daten gefunden.</string>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item>
+    <widget class="QLabel" name="label_SrcTree">
+     <property name="text">
+      <string>Quelldaten Ansicht</string>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="TreeInternalDrop" name="treeWidget_Src">
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Expanding" vsizetype="MinimumExpanding">
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
+     <property name="minimumSize">
+      <size>
+       <width>500</width>
+       <height>0</height>
+      </size>
+     </property>
+     <property name="palette">
+      <palette>
+       <active>
+        <colorrole role="Base">
+         <brush brushstyle="SolidPattern">
+          <color alpha="255">
+           <red>230</red>
+           <green>230</green>
+           <blue>230</blue>
+          </color>
+         </brush>
+        </colorrole>
+       </active>
+       <inactive>
+        <colorrole role="Base">
+         <brush brushstyle="SolidPattern">
+          <color alpha="255">
+           <red>230</red>
+           <green>230</green>
+           <blue>230</blue>
+          </color>
+         </brush>
+        </colorrole>
+       </inactive>
+       <disabled>
+        <colorrole role="Base">
+         <brush brushstyle="SolidPattern">
+          <color alpha="255">
+           <red>240</red>
+           <green>240</green>
+           <blue>240</blue>
+          </color>
+         </brush>
+        </colorrole>
+       </disabled>
+      </palette>
+     </property>
+     <property name="mouseTracking">
+      <bool>true</bool>
+     </property>
+     <property name="statusTip">
+      <string>Zeigt die eingelesenen Preset Daten.</string>
+     </property>
+     <property name="frameShape">
+      <enum>QFrame::StyledPanel</enum>
+     </property>
+     <property name="frameShadow">
+      <enum>QFrame::Plain</enum>
+     </property>
+     <property name="lineWidth">
+      <number>0</number>
+     </property>
+     <property name="dragDropMode">
+      <enum>QAbstractItemView::DragOnly</enum>
+     </property>
+     <property name="defaultDropAction">
+      <enum>Qt::IgnoreAction</enum>
+     </property>
+     <property name="alternatingRowColors">
+      <bool>true</bool>
+     </property>
+     <property name="selectionMode">
+      <enum>QAbstractItemView::ExtendedSelection</enum>
+     </property>
+     <property name="selectionBehavior">
+      <enum>QAbstractItemView::SelectRows</enum>
+     </property>
+     <property name="uniformRowHeights">
+      <bool>true</bool>
+     </property>
+     <property name="sortingEnabled">
+      <bool>true</bool>
+     </property>
+     <property name="animated">
+      <bool>true</bool>
+     </property>
+     <property name="wordWrap">
+      <bool>true</bool>
+     </property>
+     <property name="headerHidden">
+      <bool>true</bool>
+     </property>
+     <attribute name="headerCascadingSectionResizes">
+      <bool>true</bool>
+     </attribute>
+     <attribute name="headerDefaultSectionSize">
+      <number>100</number>
+     </attribute>
+     <attribute name="headerShowSortIndicator" stdset="0">
+      <bool>true</bool>
+     </attribute>
+     <column>
+      <property name="text">
+       <string>Order</string>
+      </property>
+     </column>
+     <column>
+      <property name="text">
+       <string>Name</string>
+      </property>
+     </column>
+     <column>
+      <property name="text">
+       <string>Wert</string>
+      </property>
+     </column>
+     <column>
+      <property name="text">
+       <string>Typ</string>
+      </property>
+     </column>
+     <column>
+      <property name="text">
+       <string>Referenz</string>
+      </property>
+     </column>
+     <column>
+      <property name="text">
+       <string>Id</string>
+      </property>
+     </column>
+    </widget>
+   </item>
+   <item>
+    <widget class="QGroupBox" name="groupBoxFilter">
+     <property name="title">
+      <string>Filter</string>
+     </property>
+     <layout class="QVBoxLayout" name="verticalLayout_4">
+      <item>
+       <widget class="QLabel" name="label_2">
+        <property name="text">
+         <string>Dieser Filter ermöglicht den Ausschluß meist unbenötigter und redundanter Pakete für einzelne, länderspezifische Märkte. Die gefilterten Pakete bleiben sicht- und zuweisbar. Sie werden aber als verwendet markiert so dass die automagische Zuweisung sie ignoriert.</string>
+        </property>
+        <property name="wordWrap">
+         <bool>true</bool>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <layout class="QHBoxLayout" name="horizontalLayout_5">
+        <property name="spacing">
+         <number>0</number>
+        </property>
+        <item alignment="Qt::AlignLeft|Qt::AlignVCenter">
+         <widget class="QCheckBox" name="checkBoxCountryPkg">
+          <property name="text">
+           <string>Landesspezifische Pakete als verwendet markieren</string>
+          </property>
+          <property name="checked">
+           <bool>true</bool>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QLabel" name="label">
+          <property name="maximumSize">
+           <size>
+            <width>35</width>
+            <height>35</height>
+           </size>
+          </property>
+          <property name="text">
+           <string/>
+          </property>
+          <property name="pixmap">
+           <pixmap resource="res/preset_editor_rsc.qrc">:/type/pkg.png</pixmap>
+          </property>
+          <property name="scaledContents">
+           <bool>true</bool>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </item>
+      <item>
+       <widget class="QPushButton" name="pushButtonShowFilter">
+        <property name="text">
+         <string>Filter anzeigen/bearbeiten</string>
+        </property>
+        <property name="icon">
+         <iconset resource="res/preset_editor_rsc.qrc">
+          <normaloff>:/type/options.png</normaloff>:/type/options.png</iconset>
+        </property>
+        <property name="checkable">
+         <bool>true</bool>
+        </property>
+        <property name="checked">
+         <bool>false</bool>
+        </property>
+        <property name="flat">
+         <bool>true</bool>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QPlainTextEdit" name="plainTextEditFilter"/>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item>
+    <widget class="QLabel" name="QobQuote">
+     <property name="wordWrap">
+      <bool>true</bool>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <layout class="QHBoxLayout" name="horizontalLayout_3">
+     <item>
+      <widget class="QPushButton" name="openBtn">
+       <property name="minimumSize">
+        <size>
+         <width>40</width>
+         <height>0</height>
+        </size>
+       </property>
+       <property name="maximumSize">
+        <size>
+         <width>40</width>
+         <height>16777215</height>
+        </size>
+       </property>
+       <property name="text">
+        <string/>
+       </property>
+       <property name="icon">
+        <iconset resource="res/preset_editor_rsc.qrc">
+         <normaloff>:/main/folder.png</normaloff>:/main/folder.png</iconset>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="saveBtn">
+       <property name="minimumSize">
+        <size>
+         <width>40</width>
+         <height>0</height>
+        </size>
+       </property>
+       <property name="maximumSize">
+        <size>
+         <width>40</width>
+         <height>16777215</height>
+        </size>
+       </property>
+       <property name="text">
+        <string/>
+       </property>
+       <property name="icon">
+        <iconset resource="res/preset_editor_rsc.qrc">
+         <normaloff>:/main/disk.png</normaloff>:/main/disk.png</iconset>
+       </property>
+      </widget>
+     </item>
+     <item alignment="Qt::AlignLeft">
+      <widget class="QPushButton" name="reloadBtn">
+       <property name="text">
+        <string>Letzte Sitzung wiederherstellen</string>
+       </property>
+       <property name="icon">
+        <iconset resource="res/preset_editor_rsc.qrc">
+         <normaloff>:/main/update.png</normaloff>:/main/update.png</iconset>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </item>
+  </layout>
+ </widget>
+ <customwidgets>
+  <customwidget>
+   <class>TreeInternalDrop</class>
+   <extends>QTreeWidget</extends>
+   <header>modules/tree_drag_drop</header>
+  </customwidget>
+ </customwidgets>
+ <resources>
+  <include location="res/preset_editor_rsc.qrc"/>
+ </resources>
+ <connections>
+  <connection>
+   <sender>pushButtonShowFilter</sender>
+   <signal>clicked(bool)</signal>
+   <receiver>plainTextEditFilter</receiver>
+   <slot>setVisible(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>404</x>
+     <y>457</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>406</x>
+     <y>511</y>
+    </hint>
+   </hints>
+  </connection>
+ </connections>
+</ui>

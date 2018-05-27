@@ -1,0 +1,51 @@
+For a more convenient license overview:
+start the application and from the main window menu choose ? > Info
+for a well formatted list with interactive links to the authors and their license terms.
+
+The following is a list of image resources, their authors and the links to their licenses.
+See the license terms below the list.
+
+    (":/type/pkg.png", "Box", "by Gregor Cresnar", "http://www.flaticon.com/", "Flaticon Basic License"),
+    (":/type/checkmark.png", "Checkmark", "by Freepik", "http://www.flaticon.com/", "Flaticon Basic License"),
+    (":/type/fakom.png", "Leather", "by Smashicons", "http://www.flaticon.com/", "Flaticon Basic License"),
+    (":/type/car.png", "Car front", "by Google", "http://www.flaticon.com/", "CC 3.0 BY"),
+    (":/type/img.png", "Google Drive image", "by Google", "http://www.flaticon.com/", "CC 3.0 BY"),
+    (":/type/preset.png", "Gear black shape", "by SimpleIcon", "http://www.flaticon.com/", "CC 3.0 BY"),
+    (":/type/options.png", "Listing option", "by Dave Gandy", "http://www.flaticon.com/", "CC 3.0 BY"),
+    (":/type/viewset.png", "Photo camera", "by Dave Gandy", "http://www.flaticon.com/", "CC 3.0 BY"),
+    (":/type/reset.png", "Reload Arrow", "By Plainicon", "http://www.flaticon.com/", "CC 3.0 BY"),
+    (":/main/folder.png", "Folder", "by Ionicons", "https://ionicons.com/", "MIT License"),
+    (":/main/paint.png", "color-palette", "by Ionicons", "https://ionicons.com/", "MIT License"),
+    (":/main/link-broken.png", "link-broken", "by Iconic", "http://useiconic.com", "MIT License"),
+    (":/main/link-intact.png", "link-intact", "by Iconic", "http://useiconic.com", "MIT License"),
+    (":/main/trash-a.png", "trash-a", "by Iconic", "http://useiconic.com", "MIT License"),
+    (":/main/forward.png", "forward", "by Ionic", "http://ionicframework.com/", "MIT License"),
+    (":/main/ios7-plus.png", "ios7-plus", "by Ionic", "http://ionicframework.com/", "MIT License"),
+    (":/main/sad.png", "sad", "by Ionic", "http://ionicframework.com/", "MIT License"),
+    (":/main/refresh.png", "refresh", "by Ionic", "http://ionicframework.com/", "MIT License"),
+    (":/main/eye.png", "eye", "by Ionic", "http://ionicframework.com/", "MIT License"),
+    (":/main/eye-disabled.png", "eye-disabled", "by Ionic", "http://ionicframework.com/", "MIT License"),
+    (":/main/log-in.png", "log-in", "by Ionic", "http://ionicframework.com/", "MIT License"),
+    (":/main/navicon.png", "log-in", "by Ionic", "http://ionicframework.com/", "MIT License"),
+    (":/main/social-github.png", "social-github", "by Ionic", "http://ionicframework.com/", "MIT License")
+
+----------------------
+Flaticon Basic License
+----------------------
+Icons listed by "Flaticon Basic License" made by listed author from www.flaticon.com
+
+---------------------
+Creative Commons Attribution 3.0 Unported (CC BY 3.0)
+---------------------
+Icons listed by CC 3.0 BY:
+Copyright (c) the listed Author
+See the license terms: https://creativecommons.org/licenses/by/3.0/
+
+---------------------
+MIT License:
+---------------------
+Icons listed by MIT License:
+Copyright <YEAR OF CREATION> <THE LISTED AUTHOR>
+Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
+The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.

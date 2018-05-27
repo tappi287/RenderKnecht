@@ -1,0 +1,702 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>WizardPage</class>
+ <widget class="QWizardPage" name="WizardPage">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>1311</width>
+    <height>913</height>
+   </rect>
+  </property>
+  <property name="sizePolicy">
+   <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+    <horstretch>0</horstretch>
+    <verstretch>0</verstretch>
+   </sizepolicy>
+  </property>
+  <property name="windowTitle">
+   <string>Preset Kreation</string>
+  </property>
+  <layout class="QVBoxLayout" name="verticalLayout_5">
+   <property name="spacing">
+    <number>0</number>
+   </property>
+   <property name="leftMargin">
+    <number>0</number>
+   </property>
+   <property name="topMargin">
+    <number>0</number>
+   </property>
+   <property name="rightMargin">
+    <number>0</number>
+   </property>
+   <property name="bottomMargin">
+    <number>0</number>
+   </property>
+   <item>
+    <widget class="QSplitter" name="splitter">
+     <property name="orientation">
+      <enum>Qt::Horizontal</enum>
+     </property>
+     <property name="handleWidth">
+      <number>13</number>
+     </property>
+     <property name="childrenCollapsible">
+      <bool>false</bool>
+     </property>
+     <widget class="QWidget" name="widgetPreset" native="true">
+      <property name="sizePolicy">
+       <sizepolicy hsizetype="MinimumExpanding" vsizetype="MinimumExpanding">
+        <horstretch>0</horstretch>
+        <verstretch>0</verstretch>
+       </sizepolicy>
+      </property>
+      <property name="minimumSize">
+       <size>
+        <width>350</width>
+        <height>0</height>
+       </size>
+      </property>
+      <layout class="QVBoxLayout" name="verticalLayout">
+       <property name="spacing">
+        <number>0</number>
+       </property>
+       <property name="leftMargin">
+        <number>0</number>
+       </property>
+       <property name="topMargin">
+        <number>0</number>
+       </property>
+       <property name="rightMargin">
+        <number>0</number>
+       </property>
+       <property name="bottomMargin">
+        <number>0</number>
+       </property>
+       <item>
+        <layout class="QHBoxLayout" name="horizontalLayout_Titel">
+         <property name="spacing">
+          <number>0</number>
+         </property>
+         <property name="topMargin">
+          <number>3</number>
+         </property>
+         <property name="bottomMargin">
+          <number>6</number>
+         </property>
+         <item alignment="Qt::AlignVCenter">
+          <widget class="QLabel" name="label_LogoPreset">
+           <property name="minimumSize">
+            <size>
+             <width>35</width>
+             <height>35</height>
+            </size>
+           </property>
+           <property name="maximumSize">
+            <size>
+             <width>35</width>
+             <height>35</height>
+            </size>
+           </property>
+           <property name="text">
+            <string/>
+           </property>
+           <property name="pixmap">
+            <pixmap resource="res/preset_editor_rsc.qrc">:/type/preset_ref.png</pixmap>
+           </property>
+           <property name="scaledContents">
+            <bool>true</bool>
+           </property>
+          </widget>
+         </item>
+         <item alignment="Qt::AlignVCenter">
+          <widget class="QLabel" name="labelPresetTree">
+           <property name="minimumSize">
+            <size>
+             <width>0</width>
+             <height>40</height>
+            </size>
+           </property>
+           <property name="maximumSize">
+            <size>
+             <width>16777215</width>
+             <height>40</height>
+            </size>
+           </property>
+           <property name="text">
+            <string>Preset Titel</string>
+           </property>
+           <property name="wordWrap">
+            <bool>true</bool>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </item>
+       <item>
+        <layout class="QHBoxLayout" name="horizontalLayout">
+         <property name="spacing">
+          <number>9</number>
+         </property>
+         <property name="leftMargin">
+          <number>0</number>
+         </property>
+         <property name="topMargin">
+          <number>4</number>
+         </property>
+         <property name="rightMargin">
+          <number>0</number>
+         </property>
+         <property name="bottomMargin">
+          <number>4</number>
+         </property>
+         <item alignment="Qt::AlignVCenter">
+          <widget class="QLineEdit" name="lineEditPresetTitle">
+           <property name="minimumSize">
+            <size>
+             <width>35</width>
+             <height>30</height>
+            </size>
+           </property>
+           <property name="maximumSize">
+            <size>
+             <width>16777215</width>
+             <height>30</height>
+            </size>
+           </property>
+           <property name="whatsThis">
+            <string>Erweitert den Preset Namen um benutzerdefinierten Text.</string>
+           </property>
+           <property name="placeholderText">
+            <string>Benutzerdefinierter Text im Preset Namen</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QPushButton" name="hideColBtn">
+           <property name="maximumSize">
+            <size>
+             <width>35</width>
+             <height>32</height>
+            </size>
+           </property>
+           <property name="whatsThis">
+            <string>Erweiterte Informationsspalten ein- oder ausblenden.</string>
+           </property>
+           <property name="text">
+            <string/>
+           </property>
+           <property name="icon">
+            <iconset resource="res/preset_editor_rsc.qrc">
+             <normaloff>:/type/options.png</normaloff>
+             <normalon>:/main/options-neg.png</normalon>:/type/options.png</iconset>
+           </property>
+           <property name="iconSize">
+            <size>
+             <width>28</width>
+             <height>28</height>
+            </size>
+           </property>
+           <property name="checkable">
+            <bool>true</bool>
+           </property>
+           <property name="checked">
+            <bool>true</bool>
+           </property>
+           <property name="flat">
+            <bool>true</bool>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </item>
+       <item>
+        <widget class="TreePresetDrop" name="treeWidget_Preset">
+         <property name="whatsThis">
+          <string>Dieser Baum zeigt die gewählten Optionen für das aktuelle Preset.</string>
+         </property>
+         <property name="dragEnabled">
+          <bool>true</bool>
+         </property>
+         <property name="dragDropMode">
+          <enum>QAbstractItemView::InternalMove</enum>
+         </property>
+         <property name="defaultDropAction">
+          <enum>Qt::MoveAction</enum>
+         </property>
+         <property name="selectionMode">
+          <enum>QAbstractItemView::ExtendedSelection</enum>
+         </property>
+         <property name="columnCount">
+          <number>4</number>
+         </property>
+         <column>
+          <property name="text">
+           <string>Name</string>
+          </property>
+         </column>
+         <column>
+          <property name="text">
+           <string>Wert</string>
+          </property>
+         </column>
+         <column>
+          <property name="text">
+           <string>PR Familie</string>
+          </property>
+         </column>
+         <column>
+          <property name="text">
+           <string notr="true">4</string>
+          </property>
+         </column>
+         <item>
+          <property name="text">
+           <string>New Item</string>
+          </property>
+          <property name="text">
+           <string>ABC</string>
+          </property>
+          <property name="flags">
+           <set>ItemIsSelectable|ItemIsDragEnabled|ItemIsUserCheckable</set>
+          </property>
+         </item>
+         <item>
+          <property name="text">
+           <string>New Item</string>
+          </property>
+         </item>
+         <item>
+          <property name="text">
+           <string>New Item</string>
+          </property>
+         </item>
+         <item>
+          <property name="text">
+           <string>New Item</string>
+          </property>
+         </item>
+        </widget>
+       </item>
+      </layout>
+     </widget>
+     <widget class="QWidget" name="widgetOptions" native="true">
+      <property name="sizePolicy">
+       <sizepolicy hsizetype="MinimumExpanding" vsizetype="MinimumExpanding">
+        <horstretch>0</horstretch>
+        <verstretch>0</verstretch>
+       </sizepolicy>
+      </property>
+      <property name="minimumSize">
+       <size>
+        <width>350</width>
+        <height>0</height>
+       </size>
+      </property>
+      <layout class="QVBoxLayout" name="verticalLayout_2">
+       <property name="spacing">
+        <number>0</number>
+       </property>
+       <property name="leftMargin">
+        <number>0</number>
+       </property>
+       <property name="topMargin">
+        <number>0</number>
+       </property>
+       <property name="rightMargin">
+        <number>0</number>
+       </property>
+       <property name="bottomMargin">
+        <number>0</number>
+       </property>
+       <item>
+        <layout class="QHBoxLayout" name="horizontalLayout_OptionTitel">
+         <property name="spacing">
+          <number>0</number>
+         </property>
+         <property name="topMargin">
+          <number>3</number>
+         </property>
+         <property name="rightMargin">
+          <number>6</number>
+         </property>
+         <property name="bottomMargin">
+          <number>6</number>
+         </property>
+         <item alignment="Qt::AlignVCenter">
+          <widget class="QLabel" name="label_LogoOptions">
+           <property name="minimumSize">
+            <size>
+             <width>35</width>
+             <height>35</height>
+            </size>
+           </property>
+           <property name="maximumSize">
+            <size>
+             <width>35</width>
+             <height>35</height>
+            </size>
+           </property>
+           <property name="text">
+            <string/>
+           </property>
+           <property name="pixmap">
+            <pixmap resource="res/preset_editor_rsc.qrc">:/type/render.png</pixmap>
+           </property>
+           <property name="scaledContents">
+            <bool>true</bool>
+           </property>
+          </widget>
+         </item>
+         <item alignment="Qt::AlignVCenter">
+          <widget class="QLabel" name="labelOptions">
+           <property name="minimumSize">
+            <size>
+             <width>0</width>
+             <height>40</height>
+            </size>
+           </property>
+           <property name="maximumSize">
+            <size>
+             <width>16777215</width>
+             <height>40</height>
+            </size>
+           </property>
+           <property name="text">
+            <string>Verfügbare Optionenfdfsfsfsdfsdfd dfsdfs fsdfsdf dsfsdfsdf sdfsdfsdf fdsfsdfs__ sdfs fsd fs</string>
+           </property>
+           <property name="wordWrap">
+            <bool>true</bool>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </item>
+       <item>
+        <layout class="QHBoxLayout" name="horizontalLayout_5">
+         <property name="spacing">
+          <number>9</number>
+         </property>
+         <property name="leftMargin">
+          <number>34</number>
+         </property>
+         <property name="topMargin">
+          <number>4</number>
+         </property>
+         <property name="rightMargin">
+          <number>6</number>
+         </property>
+         <property name="bottomMargin">
+          <number>4</number>
+         </property>
+         <item alignment="Qt::AlignVCenter">
+          <widget class="QLineEdit" name="lineEditPreset">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+           <property name="minimumSize">
+            <size>
+             <width>35</width>
+             <height>30</height>
+            </size>
+           </property>
+           <property name="maximumSize">
+            <size>
+             <width>16777215</width>
+             <height>30</height>
+            </size>
+           </property>
+           <property name="whatsThis">
+            <string>Baum Inhalte filtern.</string>
+           </property>
+           <property name="placeholderText">
+            <string>Baum Inhalte filtern...</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QPushButton" name="fillPresetBtn">
+           <property name="maximumSize">
+            <size>
+             <width>16777215</width>
+             <height>32</height>
+            </size>
+           </property>
+           <property name="whatsThis">
+            <string>Aktuelles Preset automagisch mit nicht verwendeten Optionen befüllen. Bezugs-, Sitz-, Leder oder Fahrwerksoptionen werden ignoriert.</string>
+           </property>
+           <property name="text">
+            <string>Preset auto&amp;magisch befüllen</string>
+           </property>
+           <property name="icon">
+            <iconset resource="res/preset_editor_rsc.qrc">
+             <normaloff>:/main/qub_button.png</normaloff>:/main/qub_button.png</iconset>
+           </property>
+           <property name="iconSize">
+            <size>
+             <width>28</width>
+             <height>28</height>
+            </size>
+           </property>
+          </widget>
+         </item>
+         <item alignment="Qt::AlignVCenter">
+          <widget class="QPushButton" name="hideBtn">
+           <property name="maximumSize">
+            <size>
+             <width>35</width>
+             <height>32</height>
+            </size>
+           </property>
+           <property name="whatsThis">
+            <string>Bereits verwendete Optionen ein- oder ausblenden.</string>
+           </property>
+           <property name="text">
+            <string/>
+           </property>
+           <property name="icon">
+            <iconset resource="res/preset_editor_rsc.qrc">
+             <normaloff>:/main/eye.png</normaloff>
+             <normalon>:/main/eye-disabled.png</normalon>:/main/eye.png</iconset>
+           </property>
+           <property name="iconSize">
+            <size>
+             <width>28</width>
+             <height>28</height>
+            </size>
+           </property>
+           <property name="checkable">
+            <bool>true</bool>
+           </property>
+           <property name="flat">
+            <bool>true</bool>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QPushButton" name="lockBtn">
+           <property name="maximumSize">
+            <size>
+             <width>35</width>
+             <height>32</height>
+            </size>
+           </property>
+           <property name="whatsThis">
+            <string>Bereits verwendete Optionen für die Bearbeitung sperren.</string>
+           </property>
+           <property name="text">
+            <string/>
+           </property>
+           <property name="icon">
+            <iconset resource="res/preset_editor_rsc.qrc">
+             <normaloff>:/main/lock_open.png</normaloff>
+             <normalon>:/main/lock.png</normalon>:/main/lock_open.png</iconset>
+           </property>
+           <property name="iconSize">
+            <size>
+             <width>28</width>
+             <height>28</height>
+            </size>
+           </property>
+           <property name="checkable">
+            <bool>true</bool>
+           </property>
+           <property name="checked">
+            <bool>true</bool>
+           </property>
+           <property name="flat">
+            <bool>true</bool>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </item>
+       <item>
+        <widget class="QTabWidget" name="tabWidget">
+         <property name="whatsThis">
+          <string/>
+         </property>
+         <property name="tabPosition">
+          <enum>QTabWidget::West</enum>
+         </property>
+         <property name="tabShape">
+          <enum>QTabWidget::Rounded</enum>
+         </property>
+         <property name="currentIndex">
+          <number>0</number>
+         </property>
+         <widget class="QWidget" name="packageTab">
+          <attribute name="icon">
+           <iconset resource="res/preset_editor_rsc.qrc">
+            <normaloff>:/type/pkg.png</normaloff>:/type/pkg.png</iconset>
+          </attribute>
+          <attribute name="title">
+           <string>Pakete</string>
+          </attribute>
+          <layout class="QVBoxLayout" name="verticalLayout_3">
+           <property name="spacing">
+            <number>0</number>
+           </property>
+           <property name="leftMargin">
+            <number>0</number>
+           </property>
+           <property name="topMargin">
+            <number>0</number>
+           </property>
+           <property name="rightMargin">
+            <number>0</number>
+           </property>
+           <property name="bottomMargin">
+            <number>0</number>
+           </property>
+           <item>
+            <widget class="QTreeWidget" name="treeWidget_Pkg">
+             <property name="whatsThis">
+              <string>Dieser Baum zeigt verfügbare Paketoptionen für das aktuelle Modell.</string>
+             </property>
+             <property name="dragDropMode">
+              <enum>QAbstractItemView::DragOnly</enum>
+             </property>
+             <property name="selectionMode">
+              <enum>QAbstractItemView::ExtendedSelection</enum>
+             </property>
+             <property name="columnCount">
+              <number>2</number>
+             </property>
+             <column>
+              <property name="text">
+               <string>Name</string>
+              </property>
+             </column>
+             <column>
+              <property name="text">
+               <string notr="true">2</string>
+              </property>
+             </column>
+             <item>
+              <property name="text">
+               <string>New Item</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string>New Item</string>
+              </property>
+             </item>
+            </widget>
+           </item>
+          </layout>
+         </widget>
+         <widget class="QWidget" name="optionTab">
+          <attribute name="icon">
+           <iconset resource="res/preset_editor_rsc.qrc">
+            <normaloff>:/type/options.png</normaloff>:/type/options.png</iconset>
+          </attribute>
+          <attribute name="title">
+           <string>PR Optionen</string>
+          </attribute>
+          <layout class="QVBoxLayout" name="verticalLayout_4">
+           <property name="spacing">
+            <number>0</number>
+           </property>
+           <property name="leftMargin">
+            <number>0</number>
+           </property>
+           <property name="topMargin">
+            <number>0</number>
+           </property>
+           <property name="rightMargin">
+            <number>0</number>
+           </property>
+           <property name="bottomMargin">
+            <number>0</number>
+           </property>
+           <item>
+            <widget class="QTreeWidget" name="treeWidget_Opt">
+             <property name="whatsThis">
+              <string>Dieser Baum zeigt PR Optionen für das aktuelle Modell.</string>
+             </property>
+             <property name="dragDropMode">
+              <enum>QAbstractItemView::DragOnly</enum>
+             </property>
+             <property name="selectionMode">
+              <enum>QAbstractItemView::ExtendedSelection</enum>
+             </property>
+             <property name="indentation">
+              <number>5</number>
+             </property>
+             <property name="sortingEnabled">
+              <bool>true</bool>
+             </property>
+             <attribute name="headerShowSortIndicator" stdset="0">
+              <bool>true</bool>
+             </attribute>
+             <column>
+              <property name="text">
+               <string>Name</string>
+              </property>
+             </column>
+             <column>
+              <property name="text">
+               <string>Beschreibung</string>
+              </property>
+             </column>
+             <column>
+              <property name="text">
+               <string>PR Familie</string>
+              </property>
+             </column>
+             <item>
+              <property name="text">
+               <string>New Item</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string>New Item</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string>New Item</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string>New Item</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string>New Item</string>
+              </property>
+             </item>
+            </widget>
+           </item>
+          </layout>
+         </widget>
+        </widget>
+       </item>
+      </layout>
+     </widget>
+    </widget>
+   </item>
+  </layout>
+ </widget>
+ <customwidgets>
+  <customwidget>
+   <class>TreePresetDrop</class>
+   <extends>QTreeWidget</extends>
+   <header>modules/gui_preset_wizard_page_presets</header>
+  </customwidget>
+ </customwidgets>
+ <resources>
+  <include location="res/preset_editor_rsc.qrc"/>
+ </resources>
+ <connections/>
+</ui>

@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>Dialog</class>
+ <widget class="QDialog" name="Dialog">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>742</width>
+    <height>808</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>About</string>
+  </property>
+  <layout class="QVBoxLayout" name="verticalLayout">
+   <item>
+    <widget class="QLabel" name="titleLabel">
+     <property name="text">
+      <string>&lt;b&gt;RenderKnecht String Kerker&lt;/b&gt; v{version} licensed under {license}</string>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="QScrollArea" name="scrollArea">
+     <property name="horizontalScrollBarPolicy">
+      <enum>Qt::ScrollBarAlwaysOff</enum>
+     </property>
+     <property name="widgetResizable">
+      <bool>true</bool>
+     </property>
+     <property name="alignment">
+      <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
+     </property>
+     <widget class="QWidget" name="scrollAreaWidgetContents">
+      <property name="geometry">
+       <rect>
+        <x>0</x>
+        <y>0</y>
+        <width>714</width>
+        <height>752</height>
+       </rect>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">background: rgb(255, 255, 255); color: rgb(61, 61, 61)</string>
+      </property>
+      <layout class="QVBoxLayout" name="verticalLayout_2">
+       <property name="spacing">
+        <number>0</number>
+       </property>
+       <property name="leftMargin">
+        <number>9</number>
+       </property>
+       <property name="topMargin">
+        <number>9</number>
+       </property>
+       <property name="rightMargin">
+        <number>9</number>
+       </property>
+       <property name="bottomMargin">
+        <number>0</number>
+       </property>
+       <item>
+        <widget class="QLabel" name="descLabel">
+         <property name="text">
+          <string>&lt;b&gt;RenderKnecht String Kerker&lt;/b&gt; v{version}&lt;br&gt;licensed under {license}
+Autor: (c) Copyright 2017-2018 {author}&lt;br&gt;&lt;a href=&quot;mailto:{mail}&quot;&gt;{mail}&lt;/a&gt;&lt;br&gt;&lt;br&gt;
+Credits: &lt;b&gt;&lt;br&gt;{credits}&lt;/b&gt;&lt;br&gt;&lt;br&gt;
+&lt;br&gt;&lt;br&gt;--REPLACE-WITH-RESOURCE-CREDITS--&lt;br&gt;
+--REPLACE-WITH-RESOURCE-CREDITS--&lt;br&gt;
+--REPLACE-WITH-RESOURCE-CREDITS--&lt;br&gt;
+--REPLACE-WITH-RESOURCE-CREDITS--&lt;br&gt;
+--REPLACE-WITH-RESOURCE-CREDITS--&lt;br&gt;
+--REPLACE-WITH-RESOURCE-CREDITS--&lt;br&gt;
+--REPLACE-WITH-RESOURCE-CREDITS--&lt;br&gt;
+--REPLACE-WITH-RESOURCE-CREDITS--&lt;br&gt;
+--REPLACE-WITH-RESOURCE-CREDITS--&lt;br&gt;
+--REPLACE-WITH-RESOURCE-CREDITS--&lt;br&gt;
+--REPLACE-WITH-RESOURCE-CREDITS--&lt;br&gt;
+--REPLACE-WITH-RESOURCE-CREDITS--&lt;br&gt;
+--REPLACE-WITH-RESOURCE-CREDITS--&lt;br&gt;
+--REPLACE-WITH-RESOURCE-CREDITS--&lt;br&gt;
+--REPLACE-WITH-RESOURCE-CREDITS--&lt;br&gt;
+--REPLACE-WITH-RESOURCE-CREDITS--&lt;br&gt;
+--REPLACE-WITH-RESOURCE-CREDITS--&lt;br&gt;
+--REPLACE-WITH-RESOURCE-CREDITS--&lt;br&gt;
+--REPLACE-WITH-RESOURCE-CREDITS--&lt;br&gt;
+--REPLACE-WITH-RESOURCE-CREDITS--&lt;br&gt;
+&lt;br&gt;
+Status: {status}&lt;br&gt;{start_info}{env} 
+&lt;p style=&quot;font-size: 8pt;&quot;&gt;&lt;i&gt;{gnu}&lt;/i&gt;&lt;/p&gt;</string>
+         </property>
+         <property name="alignment">
+          <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
+         </property>
+         <property name="wordWrap">
+          <bool>true</bool>
+         </property>
+         <property name="openExternalLinks">
+          <bool>true</bool>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </widget>
+    </widget>
+   </item>
+  </layout>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>

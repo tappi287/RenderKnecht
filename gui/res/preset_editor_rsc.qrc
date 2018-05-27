@@ -1,0 +1,81 @@
+<RCC>
+  <qresource prefix="main">
+    <file>social-github-b.png</file>
+    <file>social-github.png</file>
+    <file>switch.png</file>
+    <file>pfad_aeffchen.png</file>
+    <file>help.png</file>
+    <file>disk.png</file>
+    <file>lock.png</file>
+    <file>lock_open.png</file>
+    <file>options-neg.png</file>
+    <file>qub_button.png</file>
+    <file>qob_menu.png</file>
+    <file>paint-color.png</file>
+    <file>hal-icon.png</file>
+    <file>paint.png</file>
+    <file>clip_cut.png</file>
+    <file>clip_copy.png</file>
+    <file>clip_paste.png</file>
+    <file>update-ready.png</file>
+    <file>update.png</file>
+    <file>reset_state.png</file>
+    <file>link-broken.png</file>
+    <file>link-intact.png</file>
+    <file>link-contained.png</file>
+    <file>refresh.png</file>
+    <file>close.png</file>
+    <file>expand.png</file>
+    <file>ios7-plus.png</file>
+    <file>folder.png</file>
+    <file>navicon.png</file>
+    <file>trash-a.png</file>
+    <file>coffee.png</file>
+    <file>eye.png</file>
+    <file>eye-disabled.png</file>
+    <file>folder.png</file>
+    <file>forward.png</file>
+    <file>log-in.png</file>
+    <file>RK_Icon.png</file>
+    <file>sad.png</file>
+  </qresource>
+  <qresource prefix="font">
+    <file>Inconsolata-Regular.ttf</file>
+  </qresource>
+  <qresource prefix="ovr">
+    <file>banner.png</file>
+    <file>c_cyan.png</file>
+    <file>c_darkgrey.png</file>
+    <file>c_grey.png</file>
+    <file>c_purple.png</file>
+    <file>c_yellow.png</file>
+    <file>welcome.png</file>
+    <file>warn.png</file>
+  </qresource>
+  <qresource prefix="type">
+    <file>img_path.png</file>
+    <file>img_free.png</file>
+    <file>checkmark.png</file>
+    <file>fakom_trim.png</file>
+    <file>preset_ref.png</file>
+    <file>fakom.png</file>
+    <file>copy.png</file>
+    <file>render.png</file>
+    <file>viewset.png</file>
+    <file>reset.png</file>
+    <file>car.png</file>
+    <file>img.png</file>
+    <file>options.png</file>
+    <file>pkg.png</file>
+    <file>preset.png</file>
+  </qresource>
+  <qresource prefix="anim">
+    <file>Splash_Screen.gif</file>
+    <file>Splash_Screen.gif</file>
+    <file>Splash_Screen.gif</file>
+    <file>save_animation.gif</file>
+    <file>copy_animation.gif</file>
+    <file>coffee_animation.gif</file>
+    <file>link_animation.gif</file>
+  </qresource>
+</RCC>

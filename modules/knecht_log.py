@@ -1,0 +1,113 @@
+"""
+
+Logging module for py_knecht. Initializes logger objects from a log configuration ini file.
+
+Copyright (C) 2017 Stefan Tapper, All rights reserved.
+
+    This file is part of RenderKnecht Strink Kerker.
+
+    RenderKnecht Strink Kerker is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    RenderKnecht Strink Kerker is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with RenderKnecht Strink Kerker.  If not, see <http://www.gnu.org/licenses/>.
+
+Target is to have a logger for every module involved. Logger needs to be in ini file:
+
+[logger_logger_name]
+qualname=logger_name
+
+DEBUG 		Detailed information, typically of interest only when diagnosing problems.
+INFO 		Confirmation that things are working as expected.
+WARNING 	An indication that something unexpected happened, or indicative of some problem in the near future (e.g. ‘disk space low’). The software is still working as expected.
+ERROR		Due to a more serious problem, the software has not been able to perform some function.
+CRITICAL 	A serious error, indicating that the program itself may be unable to continue running.
+
+"""
+import logging
+import logging.config
+import sys
+from PyQt5.QtCore import pyqtSignal, QObject
+from modules.app_globals import LOG_CONF_FILE, LOG_FILE
+
+
+def init_root_file_handler():
+    """
+        File handler is added
+    """
+    fh = logging.FileHandler(LOG_FILE, 'w')
+
+    # Try to read format from configured root log handler
+    try:
+        formatter = logging.Formatter(logging.root.handlers[0].formatter._fmt)
+    except Exception as e:
+        logging.root.debug(
+            'No handler found to read format from for File Handler. %s', e)
+        formatter = logging.Formatter(
+            "%(asctime)s - %(name)s - %(levelname)s - %(message)s")
+
+    # Set log file format
+    fh.setFormatter(formatter)
+
+    # Add Handler to Logger
+    logging.root.addHandler(fh)
+
+
+def init_logging(logger_name):
+    try:
+        logging.config.fileConfig(LOG_CONF_FILE, disable_existing_loggers=False)
+
+        #create logger
+        logger = logging.getLogger(logger_name)
+        log_conf = True
+    except AttributeError as e:
+        logging.root.setLevel(logging.DEBUG)
+
+        #create logger
+        logger = logging.getLogger(logger_name)
+        formatter = logging.Formatter(
+            "%(asctime)s - %(name)s - %(levelname)s - %(message)s")
+
+        ch = logging.StreamHandler(sys.stderr, )
+        ch.setFormatter(formatter)
+
+        logger.addHandler(ch)
+        logger.error('%s', e)
+
+        log_conf = False
+
+    if log_conf:
+        logger.debug('Log configuration loaded from %s and set to log file %s',
+                     LOG_CONF_FILE, LOG_FILE)
+    else:
+        logger.warning(
+            "No log file configuration found or configuration contains errors: %s. Setting log level to debug.",
+            LOG_CONF_FILE)
+
+    return logger
+
+
+class QPlainTextEditLogger(logging.Handler, QObject):
+    """ Log handler that appends text to QPlainTextEdit """
+    log_message = pyqtSignal(str)
+
+    def __init__(self):
+        super(QPlainTextEditLogger, self).__init__()
+        QObject.__init__(self)
+
+    def emit(self, record):
+        msg = None
+
+        try:
+            msg = self.format(record)
+            self.log_message.emit(msg)
+        except:
+            # MS Visual Studio 15.4.x BUG ?, channel is not defined
+            pass

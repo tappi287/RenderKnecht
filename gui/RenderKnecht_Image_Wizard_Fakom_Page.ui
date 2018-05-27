@@ -1,0 +1,441 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>WizardPage</class>
+ <widget class="QWizardPage" name="WizardPage">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>1024</width>
+    <height>806</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Farbkombinationen</string>
+  </property>
+  <property name="title">
+   <string>Farbkombinationen</string>
+  </property>
+  <property name="subTitle">
+   <string>Bitte die benötigten Farbkombinationen auswählen. Aus jeder gewählten Farbkombination wird genau ein Referenzbildpreset erstellt.</string>
+  </property>
+  <layout class="QVBoxLayout" name="verticalLayout_3">
+   <property name="leftMargin">
+    <number>0</number>
+   </property>
+   <property name="topMargin">
+    <number>0</number>
+   </property>
+   <property name="rightMargin">
+    <number>0</number>
+   </property>
+   <property name="bottomMargin">
+    <number>0</number>
+   </property>
+   <item>
+    <widget class="QSplitter" name="treeSplitter">
+     <property name="orientation">
+      <enum>Qt::Vertical</enum>
+     </property>
+     <property name="handleWidth">
+      <number>12</number>
+     </property>
+     <widget class="QWidget" name="widgetPresetSelection" native="true">
+      <property name="sizePolicy">
+       <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+        <horstretch>0</horstretch>
+        <verstretch>10</verstretch>
+       </sizepolicy>
+      </property>
+      <layout class="QVBoxLayout" name="verticalLayout">
+       <property name="spacing">
+        <number>0</number>
+       </property>
+       <property name="leftMargin">
+        <number>0</number>
+       </property>
+       <property name="topMargin">
+        <number>0</number>
+       </property>
+       <property name="rightMargin">
+        <number>0</number>
+       </property>
+       <property name="bottomMargin">
+        <number>0</number>
+       </property>
+       <item>
+        <layout class="QHBoxLayout" name="horizontalLayout">
+         <property name="spacing">
+          <number>9</number>
+         </property>
+         <property name="leftMargin">
+          <number>9</number>
+         </property>
+         <property name="topMargin">
+          <number>4</number>
+         </property>
+         <property name="rightMargin">
+          <number>9</number>
+         </property>
+         <property name="bottomMargin">
+          <number>9</number>
+         </property>
+         <item alignment="Qt::AlignVCenter">
+          <widget class="QLabel" name="label">
+           <property name="minimumSize">
+            <size>
+             <width>0</width>
+             <height>30</height>
+            </size>
+           </property>
+           <property name="text">
+            <string>Filter:</string>
+           </property>
+          </widget>
+         </item>
+         <item alignment="Qt::AlignVCenter">
+          <widget class="QLineEdit" name="lineEditFilter">
+           <property name="minimumSize">
+            <size>
+             <width>35</width>
+             <height>30</height>
+            </size>
+           </property>
+          </widget>
+         </item>
+         <item alignment="Qt::AlignVCenter">
+          <widget class="QCheckBox" name="checkBox_models">
+           <property name="minimumSize">
+            <size>
+             <width>0</width>
+             <height>30</height>
+            </size>
+           </property>
+           <property name="whatsThis">
+            <string>Gruppiert die ausgelesenen Farbkombination nach den zugehörigen Modellen.</string>
+           </property>
+           <property name="text">
+            <string>Nach Modell gruppieren</string>
+           </property>
+           <property name="checked">
+            <bool>true</bool>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </item>
+       <item>
+        <widget class="QTreeWidget" name="fakomTree">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+           <horstretch>0</horstretch>
+           <verstretch>10</verstretch>
+          </sizepolicy>
+         </property>
+         <property name="tabKeyNavigation">
+          <bool>true</bool>
+         </property>
+         <property name="alternatingRowColors">
+          <bool>true</bool>
+         </property>
+         <property name="selectionMode">
+          <enum>QAbstractItemView::MultiSelection</enum>
+         </property>
+         <property name="animated">
+          <bool>true</bool>
+         </property>
+         <property name="wordWrap">
+          <bool>true</bool>
+         </property>
+         <property name="headerHidden">
+          <bool>true</bool>
+         </property>
+         <property name="columnCount">
+          <number>4</number>
+         </property>
+         <column>
+          <property name="text">
+           <string>Name</string>
+          </property>
+         </column>
+         <column>
+          <property name="text">
+           <string>Grp</string>
+          </property>
+         </column>
+         <column>
+          <property name="text">
+           <string>Sib</string>
+          </property>
+         </column>
+         <column>
+          <property name="text">
+           <string notr="true">4</string>
+          </property>
+         </column>
+         <item>
+          <property name="text">
+           <string>FZ</string>
+          </property>
+          <item>
+           <property name="text">
+            <string>A6 FZ-N2M-7HA</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>A6 FZ-N5W-7HA</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>A6 FZ-N5W-7HB</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>A6 FZ-N5W-7HC</string>
+           </property>
+          </item>
+         </item>
+         <item>
+          <property name="text">
+           <string>AY</string>
+          </property>
+          <item>
+           <property name="text">
+            <string>A6 AY-N5W-7HB</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>A6 AY-N5W-7HC</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>A6 AY-N5W-7HE</string>
+           </property>
+          </item>
+         </item>
+         <item>
+          <property name="text">
+           <string>MJ</string>
+          </property>
+          <item>
+           <property name="text">
+            <string>A6 MJ-N2M-7HA</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>A6 MJ-N5W-7HA</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>A6 MJ-N5W-7HB</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>A6 MJ-N5W-7HC</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>A6 MJ-N1F-7HA</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>A6 MJ-N1F-7HB</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>A6 MJ-N1F-7HC</string>
+           </property>
+          </item>
+         </item>
+        </widget>
+       </item>
+      </layout>
+     </widget>
+     <widget class="QWidget" name="widgetPresetDisplay" native="true">
+      <property name="sizePolicy">
+       <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+        <horstretch>0</horstretch>
+        <verstretch>3</verstretch>
+       </sizepolicy>
+      </property>
+      <layout class="QVBoxLayout" name="verticalLayout_2">
+       <property name="spacing">
+        <number>0</number>
+       </property>
+       <property name="leftMargin">
+        <number>0</number>
+       </property>
+       <property name="topMargin">
+        <number>0</number>
+       </property>
+       <property name="rightMargin">
+        <number>0</number>
+       </property>
+       <property name="bottomMargin">
+        <number>0</number>
+       </property>
+       <item>
+        <layout class="QHBoxLayout" name="horizontalLayout_2">
+         <property name="spacing">
+          <number>2</number>
+         </property>
+         <property name="bottomMargin">
+          <number>3</number>
+         </property>
+         <item>
+          <widget class="QLabel" name="label_2">
+           <property name="maximumSize">
+            <size>
+             <width>30</width>
+             <height>30</height>
+            </size>
+           </property>
+           <property name="text">
+            <string/>
+           </property>
+           <property name="pixmap">
+            <pixmap resource="res/preset_editor_rsc.qrc">:/type/preset_ref.png</pixmap>
+           </property>
+           <property name="scaledContents">
+            <bool>true</bool>
+           </property>
+          </widget>
+         </item>
+         <item alignment="Qt::AlignVCenter">
+          <widget class="QLabel" name="label_Selected">
+           <property name="whatsThis">
+            <string>Zeigt eine Übersicht der ausgewählten Presets.</string>
+           </property>
+           <property name="text">
+            <string>Presets</string>
+           </property>
+          </widget>
+         </item>
+         <item alignment="Qt::AlignRight">
+          <widget class="QCheckBox" name="checkBoxSort">
+           <property name="whatsThis">
+            <string>Erstellt die Presets unabhängig von der Auswahlreihenfolge in alphabetischer Reihenfolge.</string>
+           </property>
+           <property name="text">
+            <string>Presets alphabetisch sortiert anlegen</string>
+           </property>
+           <property name="checked">
+            <bool>true</bool>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </item>
+       <item>
+        <widget class="QTreeWidget" name="treeWidget_Selected">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+           <horstretch>0</horstretch>
+           <verstretch>3</verstretch>
+          </sizepolicy>
+         </property>
+         <property name="palette">
+          <palette>
+           <active>
+            <colorrole role="Light">
+             <brush brushstyle="SolidPattern">
+              <color alpha="255">
+               <red>227</red>
+               <green>227</green>
+               <blue>227</blue>
+              </color>
+             </brush>
+            </colorrole>
+            <colorrole role="Base">
+             <brush brushstyle="SolidPattern">
+              <color alpha="255">
+               <red>227</red>
+               <green>227</green>
+               <blue>227</blue>
+              </color>
+             </brush>
+            </colorrole>
+           </active>
+           <inactive>
+            <colorrole role="Light">
+             <brush brushstyle="SolidPattern">
+              <color alpha="255">
+               <red>227</red>
+               <green>227</green>
+               <blue>227</blue>
+              </color>
+             </brush>
+            </colorrole>
+            <colorrole role="Base">
+             <brush brushstyle="SolidPattern">
+              <color alpha="255">
+               <red>227</red>
+               <green>227</green>
+               <blue>227</blue>
+              </color>
+             </brush>
+            </colorrole>
+           </inactive>
+           <disabled>
+            <colorrole role="Light">
+             <brush brushstyle="SolidPattern">
+              <color alpha="255">
+               <red>227</red>
+               <green>227</green>
+               <blue>227</blue>
+              </color>
+             </brush>
+            </colorrole>
+            <colorrole role="Base">
+             <brush brushstyle="SolidPattern">
+              <color alpha="255">
+               <red>240</red>
+               <green>240</green>
+               <blue>240</blue>
+              </color>
+             </brush>
+            </colorrole>
+           </disabled>
+          </palette>
+         </property>
+         <property name="whatsThis">
+          <string>Zeigt eine Übersicht der ausgewählten Presets.</string>
+         </property>
+         <property name="editTriggers">
+          <set>QAbstractItemView::NoEditTriggers</set>
+         </property>
+         <property name="selectionMode">
+          <enum>QAbstractItemView::MultiSelection</enum>
+         </property>
+         <property name="headerHidden">
+          <bool>true</bool>
+         </property>
+         <column>
+          <property name="text">
+           <string>1</string>
+          </property>
+         </column>
+        </widget>
+       </item>
+      </layout>
+     </widget>
+    </widget>
+   </item>
+  </layout>
+ </widget>
+ <resources>
+  <include location="res/preset_editor_rsc.qrc"/>
+ </resources>
+ <connections/>
+</ui>

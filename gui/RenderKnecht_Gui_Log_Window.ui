@@ -1,0 +1,154 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>Form_log</class>
+ <widget class="QWidget" name="Form_log">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>1047</width>
+    <height>766</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Log Window</string>
+  </property>
+  <property name="windowIcon">
+   <iconset resource="res/preset_editor_rsc.qrc">
+    <normaloff>:/main/RK_Icon.png</normaloff>:/main/RK_Icon.png</iconset>
+  </property>
+  <layout class="QHBoxLayout" name="horizontalLayout_2">
+   <property name="spacing">
+    <number>0</number>
+   </property>
+   <property name="leftMargin">
+    <number>0</number>
+   </property>
+   <property name="topMargin">
+    <number>0</number>
+   </property>
+   <property name="rightMargin">
+    <number>0</number>
+   </property>
+   <property name="bottomMargin">
+    <number>0</number>
+   </property>
+   <item>
+    <layout class="QHBoxLayout" name="horizontalLayout_log">
+     <property name="spacing">
+      <number>0</number>
+     </property>
+     <item>
+      <layout class="QVBoxLayout" name="verticalLayout">
+       <property name="spacing">
+        <number>0</number>
+       </property>
+       <item>
+        <widget class="QPlainTextEdit" name="plainTextEdit_log">
+         <property name="font">
+          <font>
+           <family>Consolas</family>
+           <pointsize>9</pointsize>
+          </font>
+         </property>
+         <property name="autoFillBackground">
+          <bool>false</bool>
+         </property>
+         <property name="styleSheet">
+          <string notr="true">background:rgb(94, 94, 94); color:rgb(249, 249, 249)</string>
+         </property>
+         <property name="readOnly">
+          <bool>true</bool>
+         </property>
+         <property name="plainText">
+          <string/>
+         </property>
+         <property name="backgroundVisible">
+          <bool>false</bool>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <layout class="QHBoxLayout" name="horizontalLayout_logLevel">
+         <property name="spacing">
+          <number>0</number>
+         </property>
+         <property name="leftMargin">
+          <number>0</number>
+         </property>
+         <property name="topMargin">
+          <number>0</number>
+         </property>
+         <property name="rightMargin">
+          <number>0</number>
+         </property>
+         <property name="bottomMargin">
+          <number>0</number>
+         </property>
+         <item>
+          <widget class="QLabel" name="label_logLevel">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+           <property name="styleSheet">
+            <string notr="true">background:rgb(94, 94, 94); color:rgb(249, 249, 249)</string>
+           </property>
+           <property name="text">
+            <string>Log Level</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QComboBox" name="comboBox_logLevel">
+           <property name="styleSheet">
+            <string notr="true">background:rgb(94, 94, 94); color:rgb(249, 249, 249)</string>
+           </property>
+           <property name="editable">
+            <bool>false</bool>
+           </property>
+           <property name="currentIndex">
+            <number>0</number>
+           </property>
+           <item>
+            <property name="text">
+             <string>Debug</string>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string>Info</string>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string>Warning</string>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string>Error</string>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string>Critical</string>
+            </property>
+           </item>
+          </widget>
+         </item>
+        </layout>
+       </item>
+      </layout>
+     </item>
+    </layout>
+   </item>
+  </layout>
+ </widget>
+ <resources>
+  <include location="res/preset_editor_rsc.qrc"/>
+ </resources>
+ <connections/>
+</ui>
