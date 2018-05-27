@@ -1,7 +1,7 @@
 # RenderKnecht
 Windows GUI erstellt schalt- und renderbare Presets aus OEM Informationen für 3DExcite DeltaGen und stellt Batch Rendering und Remote Pfad Rendering zur Verfügung.
 
-![GitHub license](https://img.shields.io/badge/license-GPL--3.0-blue.svg) [![Download latest](https://img.shields.io/badge/download-latest-green.svg)](https://github.com/tappi287/RenderKnecht/blob/master/dist/RenderKnecht_String-Kerker.exe)
+[![GitHub license](https://img.shields.io/badge/license-GPL--3.0-blue.svg)](http://www.gnu.org/licenses/gpl) [![Download latest](https://img.shields.io/badge/download-latest-green.svg)](https://github.com/tappi287/RenderKnecht/blob/master/dist/RenderKnecht_String-Kerker.exe)
 
 ### Bekomme gestartet
  1. Downloade die [späteste Veröffentlichung](https://github.com/tappi287/RenderKnecht/blob/master/dist/RenderKnecht_String-Kerker.exe)
