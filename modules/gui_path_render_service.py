@@ -21,6 +21,7 @@ Copyright (C) 2017 Stefan Tapper, All rights reserved.
 """
 import pickle
 import json
+import re
 from pathlib import Path
 from PyQt5 import QtCore, QtWidgets
 from PyQt5.QtGui import QDesktopServices
@@ -28,7 +29,6 @@ from queue import Queue
 from datetime import datetime, timedelta
 from functools import partial
 
-from modules.tree_methods import tree_setup_header_format
 from modules.gui_set_path import SetDirectoryPath
 from modules.tree_overlay import InfoOverlay, Overlay
 from modules.tree_context_menus import JobManagerContextMenu
@@ -80,6 +80,13 @@ class PathRenderService(QtCore.QObject):
         self.ui.pathConnectBtn.pressed.connect(self.search_service)
         self.ui.pathConnectBtn.setText(self.btn_disconnected)
 
+        # --------- Validate Job Name ---------
+        self.ui.pathJobNameLineEdit.editingFinished.connect(self.validate_job_name)
+
+        # --------- CSB Import hidden objects ---------
+        self.ui.checkBoxCsbIgnoreHidden.toggled.connect(self.update_csb_import_option)
+        self.csb_ignore_hidden = '1'
+
         # --------- Set scene file ---------
         self.scene_file = Path('.')
         args = ('Szenendatei *.csb oder *.mb auswählen',  # title
@@ -88,9 +95,10 @@ class PathRenderService(QtCore.QObject):
         self.file_dialog = SetDirectoryPath(
             app, ui, mode='file',
             line_edit=self.ui.pathSceneLineEdit, tool_button=self.ui.pathSceneBtn,
-            dialog_args=args
-        )
+            dialog_args=args, reject_invalid_path_edits=True
+            )
         self.file_dialog.path_changed.connect(self.update_scene_file)
+        self.file_dialog.invalid_path_entered.connect(self.invalid_scene_path_entered)
 
         # --------- Set output dir ---------
         self.output_dir = Path('.')
@@ -98,8 +106,8 @@ class PathRenderService(QtCore.QObject):
         self.dir_dialog = SetDirectoryPath(
             app, ui,
             line_edit=self.ui.pathOutputLineEdit, tool_button=self.ui.pathOutputBtn,
-            dialog_args=args
-        )
+            dialog_args=args,
+            )
         self.dir_dialog.path_changed.connect(self.update_output_dir)
 
         # --------- Add job button ---------
@@ -227,15 +235,40 @@ class PathRenderService(QtCore.QObject):
         self.send_message('GREETINGS_1')
         self.send_message('GET_RENDERER')
 
-    def update_scene_file(self, scene_path):
+    def update_scene_file(self, scene_path: Path):
         self.scene_file = scene_path
         self.update_status(f'Szenen Datei gesetzt:<br><i>{scene_path.as_posix()}</i>', 2)
         LOGGER.debug('Path service scene: %s', self.scene_file)
+
+    def invalid_scene_path_entered(self):
+        """ User entered non-existent path into line widget """
+        msg = 'Ungültiger / Nicht existenter Szenen-Pfad angegeben.'
+        scene_file_error = self.validate_scene_file_type(self.scene_file.as_posix())
+
+        if not scene_file_error:
+            # Restore last valid scene file
+            self.ui.pathSceneLineEdit.setText(self.scene_file.as_posix())
+            msg += ' Setze vorherigen Szenenpfad.'
+            self.update_status(f'Vorherigen Szenenpfad gesetzt:<br><i>{self.scene_file.as_posix()}</i>', 2)
+        else:
+            # No path to restore
+            self.update_status('Ungültigen Szenenpfad verworfen. Kein Szenen-Pfad gesetzt.', 2)
+
+        self.ovr.display(msg, 5000)
 
     def update_output_dir(self, output_path):
         self.output_dir = output_path
         self.update_status(f'Ausgabeverzeichnis gesetzt:<br><i>{output_path.as_posix()}</i>', 2)
         LOGGER.debug('Path service output dir: %s', self.output_dir)
+
+    def update_csb_import_option(self, ignore_hidden):
+        """ Set CSB Import ignoreHiddenOption=1 or 0 """
+        if ignore_hidden:
+            self.csb_ignore_hidden = '1'
+        else:
+            self.csb_ignore_hidden = '0'
+        self.update_status(f'CSB Import Option gesetzt: <i>ignoreHiddenObject={self.csb_ignore_hidden}</i>', 2)
+        LOGGER.debug('Toggled CSB import option: %s, set value to %s', ignore_hidden, self.csb_ignore_hidden)
 
     def create_job(self):
         self.ui.pathJobSendBtn.setEnabled(False)
@@ -261,7 +294,7 @@ class PathRenderService(QtCore.QObject):
 
         msg = 'ADD_JOB '
 
-        for __s in [job_title, scene_file, render_dir, renderer]:
+        for __s in [job_title, scene_file, render_dir, renderer, self.csb_ignore_hidden]:
             msg += __s + ';'
 
         # Remove trailing semicolon
@@ -514,12 +547,27 @@ class PathRenderService(QtCore.QObject):
 
         self.text_browser.append(current_time + is_response + status_msg)
 
+    def validate_job_name(self):
+        job_name_text = self.ui.pathJobNameLineEdit.text()[:64]
+
+        if not bool(re.compile(r'^[A-Za-z0-9-_]+\Z').match(job_name_text)):
+            self.ui.pathJobNameLineEdit.clear()
+            self.ui.pathJobNameLineEdit.setPlaceholderText(
+                'Job Titel darf nur Buchstaben, Zahlen, Binde- oder _strich enthalten.'
+                )
+
     @staticmethod
-    def validate_settings(scene_file, render_dir, renderer):
-        if scene_file.endswith('.mb') or scene_file.endswith('.csb'):
-            pass
+    def validate_scene_file_type(scene_file):
+        if scene_file.casefold().endswith('.mb') or scene_file.casefold().endswith('.csb'):
+            return False
         else:
             return 'No valid scene file *.mb or *.csb'
+
+    @classmethod
+    def validate_settings(cls, scene_file, render_dir, renderer):
+        scene_file_error = cls.validate_scene_file_type(scene_file)
+        if scene_file_error:
+            return scene_file_error
 
         if not render_dir or render_dir == '.':
             return 'Rendering directory does not exist.'

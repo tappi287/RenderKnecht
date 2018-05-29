@@ -28,11 +28,13 @@ from modules.app_strings import Msg
 
 class SetDirectoryPath(QtCore.QObject):
     path_changed = QtCore.pyqtSignal(Path)
+    invalid_path_entered = QtCore.pyqtSignal()
 
     def __init__(self, app, ui, mode='dir',
                  line_edit=None,
                  tool_button=None,
-                 dialog_args=()):
+                 dialog_args=(),
+                 reject_invalid_path_edits=False):
         super(SetDirectoryPath, self).__init__()
         self.app, self.ui, self.line_edit, self.tool_button = app, ui, line_edit, tool_button
         self.mode = mode
@@ -44,6 +46,7 @@ class SetDirectoryPath(QtCore.QObject):
             self.tool_button.pressed.connect(self.btn_open_dialog)
 
         if self.line_edit:
+            self.reject_invalid_path_edits = reject_invalid_path_edits
             self.line_edit.editingFinished.connect(self.path_text_changed)
 
     def btn_open_dialog(self):
@@ -116,3 +119,10 @@ class SetDirectoryPath(QtCore.QObject):
                     self.set_path(text_path)
             else:
                 self.set_path(text_path)
+        else:
+            # Pasted or typed Path does not exist
+            if self.reject_invalid_path_edits:
+                self.line_edit.clear()
+                self.line_edit.setPlaceholderText(Msg.SET_PATH_REJECTED_TXT)
+
+            self.invalid_path_entered.emit()

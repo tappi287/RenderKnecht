@@ -243,6 +243,8 @@ class Msg:
     RENDER_TOGGLE_TIMEOUT_OFF = 'Feedbackloop deaktiviert. Für korrekte Schaltungen, stelle sicher das '
     RENDER_TOGGLE_TIMEOUT_OFF += 'DeltaGen>Varianten State Check aktiviert ist.'
 
+    SET_PATH_REJECTED_TXT = '< Gültigen Pfad eingeben >'
+
     VERSION_MSG = 'Die Anwendung lädt Aktualisierungen automatisch herunter und informiert mit einem Symbol in ' \
                   'der Menüleiste über bereitstehende Versionen.'
 

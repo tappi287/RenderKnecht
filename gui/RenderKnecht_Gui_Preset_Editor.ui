@@ -2102,6 +2102,22 @@ p, li { white-space: pre-wrap; }
              </layout>
             </item>
             <item>
+             <widget class="QCheckBox" name="checkBoxCsbIgnoreHidden">
+              <property name="font">
+               <font>
+                <weight>50</weight>
+                <bold>false</bold>
+               </font>
+              </property>
+              <property name="text">
+               <string>CSB Ignore Hidden Objects</string>
+              </property>
+              <property name="checked">
+               <bool>true</bool>
+              </property>
+             </widget>
+            </item>
+            <item>
              <layout class="QHBoxLayout" name="horizontalLayout_3">
               <property name="spacing">
                <number>9</number>
