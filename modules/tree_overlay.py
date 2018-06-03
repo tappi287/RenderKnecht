@@ -171,6 +171,9 @@ class Overlay(_OverlayWidget):
 
 
 class IntroOverlay(_OverlayWidget):
+    opaque_timer = QtCore.QTimer()
+    opaque_timer.setSingleShot(True)
+
     finished_signal = QtCore.pyqtSignal()
 
     def __init__(self, parent):
@@ -180,6 +183,23 @@ class IntroOverlay(_OverlayWidget):
         self.intro_mov = QMovie(':/anim/Introduction.gif')
         self.intro_mov.setCacheMode(QMovie.CacheAll)
         self.intro_mov.finished.connect(self.finished)
+        self.opaque_timer.timeout.connect(self.set_opaque_for_mouse_events)
+
+        self.installEventFilter(self)
+
+    def eventFilter(self, obj, event):
+        if obj is None or event is None:
+            return False
+
+        if obj is self:
+            if event.type() == QtCore.QEvent.MouseButtonPress:
+                self.mouse_click()
+                return True
+
+        return False
+
+    def set_opaque_for_mouse_events(self):
+        self.setAttribute(QtCore.Qt.WA_TransparentForMouseEvents, False)
 
     def intro(self):
         LOGGER.info('Playing introduction in %sx %sy %spx %spx',
@@ -189,11 +209,16 @@ class IntroOverlay(_OverlayWidget):
         self.movie_screen.setMovie(self.intro_mov)
         self.movie_screen.setGeometry(self.parent.rect())
         self._updateParent()
+        self.opaque_timer.start(1000)
         self.movie_screen.show()
         self.show()
 
         self.intro_mov.jumpToFrame(0)
         self.intro_mov.start()
+
+    def mouse_click(self):
+        self.intro_mov.stop()
+        self.finished()
 
     def finished(self):
         self.movie_screen.hide()

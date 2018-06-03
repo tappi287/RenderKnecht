@@ -338,7 +338,9 @@ class RenderKnechtGui(QtWidgets.QApplication):
 
     def show_intro(self):
         # Reset GUI Size to default to play introduction
-        self.ui.setGeometry(*UI_SIZE)
+        x = self.ui.geometry().x()
+        y = self.ui.geometry().y()
+        self.ui.setGeometry(x, y, UI_SIZE[2], UI_SIZE[3])
 
         # Intro overlay
         self.intro_widget = IntroOverlay(self.ui.centralWidget())
