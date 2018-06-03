@@ -25,19 +25,22 @@ from functools import partial
 from PyQt5 import QtWidgets
 from PyQt5.uic import loadUi
 from modules.knecht_log import init_logging
-from modules.knecht_log import QPlainTextEditLogger
+from modules.knecht_log import QPlainTextEditLogger, add_queue_handler
 from modules.app_globals import UI_FILE_LOG_WINDOW
 from modules.knecht_settings import knechtSettings
 
 # Initialize logging for this module
-LOGGER = init_logging(__name__)
+LOGGER = init_logging('gui_logger')
 
 
 class LogWindow(QtWidgets.QWidget):
     """ Log Window that displays log entries """
+    gui_logger = None
 
-    def __init__(self, widget=None):
+    def __init__(self, logging_queue, action_widget=None):
         super(LogWindow, self).__init__()
+        global LOGGER
+        add_queue_handler(LOGGER, logging_queue)
 
         # Avoid UIC Debug messages
         log_level = LOGGER.getEffectiveLevel()
@@ -48,9 +51,9 @@ class LogWindow(QtWidgets.QWidget):
         logging.root.setLevel(log_level)
 
         # Get menu item that toggles window visibility and check it
-        if widget:
-            self.widget = widget
-            self.widget.setChecked(True)
+        if action_widget:
+            self.action_widget = action_widget
+            self.action_widget.setChecked(True)
 
         # Text window
         self.plainTextEdit_log.setCenterOnScroll(True)
@@ -78,11 +81,12 @@ class LogWindow(QtWidgets.QWidget):
 
         try:
             # Format from already loaded logConfig if available
-            format_str = logging.root.handlers[1].formatter._fmt
-            formatter = logging.Formatter(format_str)
-            level = logging.root.handlers[1].level
+            formatter = LOGGER.handlers[0].formatter
+            level = LOGGER.handlers[0].level
             fallback_log = False
-        except:
+        except Exception as e:
+            print(e)
+
             # No config available
             format_str = '%(asctime)s - %(name)s - %(levelname)s - %(message)s'
             formatter = logging.Formatter(format_str)
@@ -122,11 +126,11 @@ class LogWindow(QtWidgets.QWidget):
         LOGGER.debug('Toggle log window.')
         if self.isHidden():
             self.show()
-            if self.widget: self.widget.setChecked(True)
+            if self.action_widget: self.action_widget.setChecked(True)
             LOGGER.debug('Displaying log window.')
         else:
             self.hide()
-            if self.widget: self.widget.setChecked(False)
+            if self.action_widget: self.action_widget.setChecked(False)
             LOGGER.debug('Hiding log window.')
 
     def closeEvent(self, QCloseEvent):
@@ -134,7 +138,7 @@ class LogWindow(QtWidgets.QWidget):
             'Log Window close event triggerd. Ignoring close event and hiding window instead.'
         )
         QCloseEvent.ignore()
-        if self.widget: self.widget.setChecked(False)
+        if self.action_widget: self.action_widget.setChecked(False)
         knechtSettings.app['log_window'] = False
         self.hide()
 

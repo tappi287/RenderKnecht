@@ -38,7 +38,7 @@ from modules.knecht_deltagen import SendToDeltaGen
 from modules.knecht_threads import PngConvertThread
 from modules.tree_context_menus import TreeContextMenu
 from modules.tree_load_save import OpenPresetFile, SavePreset
-from modules.knecht_log import init_logging
+from modules.knecht_log import init_logging, add_queue_handler
 
 LOGGER = init_logging(__name__)
 
@@ -50,9 +50,14 @@ class MenuBar(QtCore.QObject):
 
     def __init__(self, app, ui, log, tree_widget_source, tree_widget_dest, ui_action_open):
         super(MenuBar, self).__init__()
-
         # App class instance
         self.app = app
+
+        # Init queued logging
+        global LOGGER
+        add_queue_handler(LOGGER, self.app.logging_queue)
+
+        LOGGER.critical('Starting logging to queue in main menu.')
 
         # MainWindow class instance
         self.ui = ui

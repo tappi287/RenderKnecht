@@ -34,8 +34,100 @@ CRITICAL 	A serious error, indicating that the program itself may be unable to c
 import logging
 import logging.config
 import sys
+from logging.handlers import QueueHandler, QueueListener
 from PyQt5.QtCore import pyqtSignal, QObject
 from modules.app_globals import LOG_CONF_FILE, LOG_FILE
+
+
+def setup_log_file():
+    log_conf = {
+        'version': 1, 'disable_existing_loggers': True,
+        'formatters': {
+            'verbose': {
+                'format': '%(levelname)s %(asctime)s %(module)s %(process)d %(thread)d %(message)s'
+                },
+            'simple': {
+                'format': '%(asctime)s %(name)s %(levelname)s: %(message)s',
+                'datefmt': '%d.%m.%Y %H:%M'
+                },
+            'guiFormatter': {
+                'format': '%(name)s %(levelname)s: %(message)s',
+                'datefmt': '%d.%m.%Y %H:%M',
+                },
+            'file_formatter': {
+                'format': '%(asctime)s %(name)s %(levelname)s: %(message)s',
+                'datefmt': '%d.%m.%Y %H:%M'
+                },
+            },
+        'handlers': {
+            'console': {
+                'level': 'DEBUG', 'class': 'logging.StreamHandler',
+                'stream': 'ext://sys.stdout', 'formatter': 'simple'
+                },
+            'guiHandler': {
+                'level': 'INFO', 'class': 'logging.NullHandler',
+                'formatter': 'simple',
+                },
+            'file': {
+                'level': 'DEBUG', 'class': 'logging.handlers.RotatingFileHandler',
+                'filename': LOG_FILE.as_posix(), 'maxBytes': 5000000, 'backupCount': 4,
+                'formatter': 'file_formatter',
+                },
+            },
+        'loggers': {
+            'knechtLog': {
+                'handlers': ['file', 'guiHandler', 'console'], 'propagate': False, 'level': 'DEBUG',
+                },
+            'gui_logger': {
+                'handlers': ['guiHandler'], 'propagate': False, 'level': 'INFO'
+                },
+            }
+        }
+
+    logging.config.dictConfig(log_conf)
+
+
+def setup_log_queue_listener(logger, queue):
+    """
+        Moves handlers from logger to QueueListener and returns the listener
+        The listener needs to be started afterwwards with it's start method.
+    """
+    handler_ls = list()
+    for handler in logger.handlers:
+        print('Removing handler that will be added to queue listener: ', str(handler))
+        handler_ls.append(handler)
+
+    for handler in handler_ls:
+        logger.removeHandler(handler)
+
+    handler_ls = tuple(handler_ls)
+    queue_handler = QueueHandler(queue)
+    logger.addHandler(queue_handler)
+
+    listener = QueueListener(queue, *handler_ls)
+    return listener
+
+
+def setup_queued_logger(name, queue):
+    queue_handler = QueueHandler(queue)
+    logger = logging.getLogger(name)
+    logger.addHandler(queue_handler)
+    logger.debug('Added log queue handler.')
+    return logger
+
+
+def add_queue_handler(logger, queue):
+    for handler in logger.handlers:
+        # Handler already preset
+        logger.debug('Not adding logging queue handler. Handler present: %s', handler)
+        print(logger.name, 'Not adding logging queue handler. Handler present: ', handler)
+        break
+    else:
+        queue_handler = QueueHandler(queue)
+        queue_handler.setLevel(logging.DEBUG)
+        logger.addHandler(queue_handler)
+        logger.debug('Added log queue handler: %s', queue_handler)
+        print(logger.name, 'Added log queue handler:', queue_handler)
 
 
 def init_root_file_handler():
@@ -61,6 +153,12 @@ def init_root_file_handler():
 
 
 def init_logging(logger_name):
+    logger = logging.getLogger(logger_name)
+    logger.setLevel(logging.DEBUG)
+    return logger
+
+
+def legacy_init_logging(logger_name):
     try:
         logging.config.fileConfig(LOG_CONF_FILE, disable_existing_loggers=False)
 

@@ -34,7 +34,7 @@ from modules.gui_path_render_service import PathRenderService
 from modules.gui_main_menu import MenuBar
 from modules.gui_main_window import MainWindow
 from modules.gui_splash_screen_movie import show_splash_screen_movie
-from modules.knecht_log import init_logging
+from modules.knecht_log import setup_queued_logger
 from modules.knecht_settings import knechtSettings
 from modules.knecht_updater import VersionCheck, run_exe_updater
 from modules.knecht_xml import XML
@@ -42,9 +42,6 @@ from modules.knecht_deltagen import SendToDeltaGen
 from modules.tree_drag_drop import render_tree_drop, WidgetToWidgetDrop
 from modules.tree_methods import AddRemoveItemsCommand, add_variant, toggle_ref_visibility, tree_setup_header_format
 from modules.tree_overlay import IntroOverlay
-
-# Initialize logging for this module
-LOGGER = init_logging(__name__)
 
 
 def load_style(ui):
@@ -74,8 +71,13 @@ class RenderKnechtGui(QtWidgets.QApplication):
     intro_timer.setInterval(500)
     intro_widget = None
 
-    def __init__(self, version, knecht_except_hook):
+    def __init__(self, version, knecht_except_hook, logging_queue):
         super(RenderKnechtGui, self).__init__(sys.argv)
+
+        # Setup logging to queue
+        self.logging_queue = logging_queue
+        global LOGGER
+        LOGGER = setup_queued_logger(__name__, self.logging_queue)
 
         load_style(self)
 
@@ -127,7 +129,7 @@ class RenderKnechtGui(QtWidgets.QApplication):
         self.ui.actionUndo.triggered.connect(self.undo_grp.undo)
         self.ui.actionRedo.triggered.connect(self.undo_grp.redo)
 
-        self.Log_Window = LogWindow(self.ui.actionLog_Window)
+        self.Log_Window = LogWindow(logging_queue, self.ui.actionLog_Window)
         self.Log_Window.setGeometry(1800, 150, 900, 1024)
 
         # Setup XML Files
