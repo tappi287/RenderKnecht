@@ -27,7 +27,7 @@ import os
 from PyQt5 import QtWidgets, QtCore
 from PyQt5.uic import loadUi
 
-from modules.knecht_log import init_logging, add_queue_handler
+from modules.knecht_log import init_logging
 from modules.app_strings import Msg
 from modules.app_globals import UI_FILE_EXCEL_WINDOW, PR_FAM_INT, PR_FAM_EXT, Itemstyle, FAKOM_READER_PR_FAM
 from modules.knecht_parse_excel import LoadVplus
@@ -48,10 +48,6 @@ class VplusWindow(QtWidgets.QDialog):
         super(VplusWindow, self).__init__()
 
         self.ui = parent.open_dialog.ui
-
-        # Setup logging to queue
-        global LOGGER
-        add_queue_handler(LOGGER, self.ui.logging_queue)
 
         self.parent = parent
         self.fakom_reader, self.wizard = fakom_reader, wizard

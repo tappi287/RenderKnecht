@@ -38,7 +38,7 @@ from modules.tree_methods import SortTree, create_unique_item_name
 from modules.tree_overlay import InfoOverlay, Overlay
 from modules.tree_references import FindReferenceItems
 from modules.tree_search_replace import SearchReplace
-from modules.knecht_log import init_logging, add_queue_handler
+from modules.knecht_log import init_logging
 
 LOGGER = init_logging(__name__)
 
@@ -49,13 +49,9 @@ class MainWindow(QtWidgets.QMainWindow):
     def __init__(self, app_class):
         super(MainWindow, self).__init__()
 
-        # Move logger to queued logging
-        self.logging_queue = app_class.logging_queue
-        add_queue_handler(LOGGER, self.logging_queue)
-
         # Avoid UIC Debug messages
         log_level = LOGGER.getEffectiveLevel()
-        logging.root.setLevel(20)
+        logging.root.setLevel(40)
 
         # Load Ui file
         loadUi(UI_FILE_PRESET_EDITOR, self)

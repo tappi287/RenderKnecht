@@ -39,9 +39,10 @@ from PyQt5.QtCore import pyqtSignal, QObject
 from modules.app_globals import LOG_CONF_FILE, LOG_FILE
 
 
-def setup_log_file():
+def setup_logging(logging_queue):
     log_conf = {
-        'version': 1, 'disable_existing_loggers': True,
+        'version': 1,
+        'disable_existing_loggers': False,
         'formatters': {
             'verbose': {
                 'format': '%(levelname)s %(asctime)s %(module)s %(process)d %(thread)d %(message)s'
@@ -73,14 +74,24 @@ def setup_log_file():
                 'filename': LOG_FILE.as_posix(), 'maxBytes': 5000000, 'backupCount': 4,
                 'formatter': 'file_formatter',
                 },
+            'queueHandler': {
+                'level': 'DEBUG', 'class': 'logging.handlers.QueueHandler',
+                'queue': logging_queue, 'formatter': 'file_formatter',
+                },
             },
         'loggers': {
+            # Main logger, handler will be moved to QueueListener
             'knechtLog': {
                 'handlers': ['file', 'guiHandler', 'console'], 'propagate': False, 'level': 'DEBUG',
                 },
+            # Log Window Logger
             'gui_logger': {
-                'handlers': ['guiHandler'], 'propagate': False, 'level': 'INFO'
+                'handlers': ['guiHandler', 'queueHandler'], 'propagate': False, 'level': 'INFO'
                 },
+            # Default loggers
+            '': {
+                'handlers': ['queueHandler'], 'propagate': False, 'level': 'DEBUG',
+                }
             }
         }
 
@@ -108,96 +119,17 @@ def setup_log_queue_listener(logger, queue):
     return listener
 
 
-def setup_queued_logger(name, queue):
-    queue_handler = QueueHandler(queue)
-    logger = logging.getLogger(name)
-    logger.addHandler(queue_handler)
-    logger.debug('Added log queue handler.')
-    return logger
-
-
-def add_queue_handler(logger, queue):
-    for handler in logger.handlers:
-        # Handler already preset
-        logger.debug('Not adding logging queue handler. Handler present: %s', handler)
-        print(logger.name, 'Not adding logging queue handler. Handler present: ', handler)
-        break
-    else:
-        queue_handler = QueueHandler(queue)
-        queue_handler.setLevel(logging.DEBUG)
-        logger.addHandler(queue_handler)
-        logger.debug('Added log queue handler: %s', queue_handler)
-        print(logger.name, 'Added log queue handler:', queue_handler)
-
-
-def init_root_file_handler():
-    """
-        File handler is added
-    """
-    fh = logging.FileHandler(LOG_FILE, 'w')
-
-    # Try to read format from configured root log handler
-    try:
-        formatter = logging.Formatter(logging.root.handlers[0].formatter._fmt)
-    except Exception as e:
-        logging.root.debug(
-            'No handler found to read format from for File Handler. %s', e)
-        formatter = logging.Formatter(
-            "%(asctime)s - %(name)s - %(levelname)s - %(message)s")
-
-    # Set log file format
-    fh.setFormatter(formatter)
-
-    # Add Handler to Logger
-    logging.root.addHandler(fh)
-
-
 def init_logging(logger_name):
     logger = logging.getLogger(logger_name)
-    logger.setLevel(logging.DEBUG)
     return logger
 
 
-def legacy_init_logging(logger_name):
-    try:
-        logging.config.fileConfig(LOG_CONF_FILE, disable_existing_loggers=False)
-
-        #create logger
-        logger = logging.getLogger(logger_name)
-        log_conf = True
-    except AttributeError as e:
-        logging.root.setLevel(logging.DEBUG)
-
-        #create logger
-        logger = logging.getLogger(logger_name)
-        formatter = logging.Formatter(
-            "%(asctime)s - %(name)s - %(levelname)s - %(message)s")
-
-        ch = logging.StreamHandler(sys.stderr, )
-        ch.setFormatter(formatter)
-
-        logger.addHandler(ch)
-        logger.error('%s', e)
-
-        log_conf = False
-
-    if log_conf:
-        logger.debug('Log configuration loaded from %s and set to log file %s',
-                     LOG_CONF_FILE, LOG_FILE)
-    else:
-        logger.warning(
-            "No log file configuration found or configuration contains errors: %s. Setting log level to debug.",
-            LOG_CONF_FILE)
-
-    return logger
-
-
-class QPlainTextEditLogger(logging.Handler, QObject):
+class QPlainTextEditHandler(logging.Handler, QObject):
     """ Log handler that appends text to QPlainTextEdit """
     log_message = pyqtSignal(str)
 
     def __init__(self):
-        super(QPlainTextEditLogger, self).__init__()
+        super(QPlainTextEditHandler, self).__init__()
         QObject.__init__(self)
 
     def emit(self, record):

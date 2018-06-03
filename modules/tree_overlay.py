@@ -25,7 +25,7 @@ import queue
 from PyQt5 import QtWidgets, QtCore
 from PyQt5.QtGui import QMovie, QPainter, QPalette, QBrush, QColor, QFont, QEnterEvent, QRegion
 
-from modules.knecht_log import init_logging, add_queue_handler
+from modules.knecht_log import init_logging
 from modules.app_globals import Itemstyle
 
 # Initialize logging for this module

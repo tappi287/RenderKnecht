@@ -25,7 +25,7 @@ from functools import partial
 from PyQt5 import QtWidgets
 from PyQt5.uic import loadUi
 from modules.knecht_log import init_logging
-from modules.knecht_log import QPlainTextEditLogger, add_queue_handler
+from modules.knecht_log import QPlainTextEditHandler
 from modules.app_globals import UI_FILE_LOG_WINDOW
 from modules.knecht_settings import knechtSettings
 
@@ -35,12 +35,10 @@ LOGGER = init_logging('gui_logger')
 
 class LogWindow(QtWidgets.QWidget):
     """ Log Window that displays log entries """
-    gui_logger = None
+    gui_handler = None
 
-    def __init__(self, logging_queue, action_widget=None):
+    def __init__(self, action_widget=None):
         super(LogWindow, self).__init__()
-        global LOGGER
-        add_queue_handler(LOGGER, logging_queue)
 
         # Avoid UIC Debug messages
         log_level = LOGGER.getEffectiveLevel()
@@ -67,17 +65,19 @@ class LogWindow(QtWidgets.QWidget):
         # Index + 1 * 10
         log_level = (self.comboBox_logLevel.currentIndex() + 1) * 10
 
-        self.gui_logger.setLevel(log_level)
+        # TODO Log Window level change not working with queue listener yet
+        logging.root.handlers[1].setLevel(log_level)
         try:
             LOGGER.warning('Changed Log Window log level to: %s',
-                           logging.getLevelName(logging.root.handlers[3].level))
+                           logging.getLevelName(logging.root.handlers[1].level)
+                           )
         except IndexError:
             LOGGER.error(
                 'Log handler not found. Log Configuration is probably missing!')
 
     def init_functions(self):
         # Create log handler that writes to this window QPlainTextEdit
-        self.gui_logger = QPlainTextEditLogger()
+        self.gui_handler = QPlainTextEditHandler()
 
         try:
             # Format from already loaded logConfig if available
@@ -93,19 +93,22 @@ class LogWindow(QtWidgets.QWidget):
             level = 10
             fallback_log = True
 
-        self.gui_logger.setFormatter(formatter)
-        self.gui_logger.setLevel(level)
-        logging.root.addHandler(self.gui_logger)
+        self.gui_handler.setFormatter(formatter)
+        self.gui_handler.setLevel(level)
+        logging.root.addHandler(self.gui_handler)
+
+        for handler in logging.root.handlers:
+            print('Global logging handlers:', handler)
 
         # ComboBox index to current Log Level
-        comboBox_level = (self.gui_logger.level - 1) / 10
+        comboBox_level = (self.gui_handler.level - 1) / 10
         try:
             self.comboBox_logLevel.setCurrentIndex(comboBox_level)
         except:
             pass
 
         # Bind logger signal to textBox update
-        self.gui_logger.log_message.connect(self.update_log)
+        self.gui_handler.log_message.connect(self.update_log)
 
         # Bind ComboBox to log level
         self.comboBox_logLevel.currentIndexChanged.connect(
