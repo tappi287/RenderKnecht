@@ -55,6 +55,11 @@ class MainWindow(QtWidgets.QMainWindow):
 
         # Load Ui file
         loadUi(UI_FILE_PRESET_EDITOR, self)
+
+        # Add LED Overlay to tabWidget
+        # Spams the log with Debug messages, so initialize in this block
+        self.led_ovr = LedCornerWidget(parent=self.tabWidget)
+
         logging.root.setLevel(log_level)
 
         # Clipboard
@@ -170,9 +175,6 @@ class MainWindow(QtWidgets.QMainWindow):
         self.treeWidget_DestPreset.internal_drag_drop.setup_ui(self)
         self.treeWidget_Variants.internal_drag_drop.setup_ui(self)
         self.treeWidget_render.internal_drag_drop.setup_ui(self, True)
-
-        # Add LED Overlay to tabWidget
-        self.led_ovr = LedCornerWidget(parent=self.tabWidget)
 
         # hide variants type column
         self.treeWidget_Variants.header().hideSection(ItemColumn.TYPE)
