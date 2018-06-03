@@ -15,8 +15,12 @@ __pycache__/
 
 # RenderKnecht
 _TestDocuments/
+gui/src/anim_render/
 updater_modules/sftp.py
 sftp.py
+*.blend1
+*.blend2
+*.blend3
 
 # Distribution / packaging
 .Python

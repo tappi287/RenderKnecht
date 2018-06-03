@@ -2267,6 +2267,7 @@ p, li { white-space: pre-wrap; }
     </property>
     <addaction name="actionLog_Window"/>
     <addaction name="actionSplash_Screen"/>
+    <addaction name="actionIntro"/>
     <addaction name="actionStyle"/>
    </widget>
    <widget class="QMenu" name="menu">
@@ -2605,6 +2606,11 @@ p, li { white-space: pre-wrap; }
    </property>
    <property name="text">
     <string>Dokumentation</string>
+   </property>
+  </action>
+  <action name="actionIntro">
+   <property name="text">
+    <string>Einführung</string>
    </property>
   </action>
  </widget>

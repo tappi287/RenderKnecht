@@ -40,7 +40,8 @@ class knechtSettings:
         render_path='',
         log_window=True,
         version='0.0.0',
-        app_style='windowsvista')
+        app_style='windowsvista',
+        introduction_shown=False)
 
     dg = dict(
         viewer_size='1280 720',

@@ -32,11 +32,9 @@ from modules.app_globals import Itemstyle
 LOGGER = init_logging(__name__)
 
 
-class Overlay(QtWidgets.QWidget):
-    """ Draw animated icons at cursor position to indicate user actions like copy etc. """
-
+class _OverlayWidget(QtWidgets.QWidget):
     def __init__(self, parent):
-        super(Overlay, self).__init__(parent)
+        super(_OverlayWidget, self).__init__(parent)
         palette = QPalette(self.palette())
         palette.setColor(palette.Background, QtCore.Qt.transparent)
 
@@ -52,50 +50,10 @@ class Overlay(QtWidgets.QWidget):
 
         self.setGeometry(0, 0, parent.frameGeometry().width(), height)
 
-        self.parent = parent
-
-        # Setup overlay movies
-        # ref_created, copy_created
-        movies = [  # 0
-            ':/anim/link_animation.gif',
-            # 1
-            ':/anim/copy_animation.gif',
-            # 2
-            ':/anim/coffee_animation.gif',
-            # 3
-            ':/anim/save_animation.gif'
-        ]
-        self.mov = []
-
-        for i, m in enumerate(movies):
-            self.mov.append(QMovie(m))
-            self.mov[i].setCacheMode(QMovie.CacheAll)
-            self.mov[i].setSpeed(100)
-            self.mov[i].finished.connect(self.movie_finished)
-
         # Add the QMovie object to the label
         self.movie_screen = QtWidgets.QLabel(self)
         self.movie_screen.setSizePolicy(QtWidgets.QSizePolicy.Expanding,
                                         QtWidgets.QSizePolicy.Expanding)
-        self.movie_screen.setMovie(self.mov[0])
-        self.movie_screen.setGeometry(5, 20, 64, 64)
-
-        self.show()
-
-    def update_position(self, pos):
-        """ Receives position of drop events """
-        self.movie_screen.setGeometry(pos.x() - 32, pos.y(), 64, 64)
-        self._updateParent()
-
-    def generic_center(self):
-        """ Moves Movie to Center of parent """
-        w, h = 64, 64
-        r = self.parent.rect()
-        x, y = r.width() / 2, r.height() / 2
-
-        x, y = x - (w / 2), y - (h / 2)
-        self.movie_screen.setGeometry(x, y, w, h)
-        self._updateParent()
 
     def move_to_center(self, current_mov):
         """ Move Screen to center """
@@ -109,6 +67,67 @@ class Overlay(QtWidgets.QWidget):
 
         self.movie_screen.setGeometry(x, y, w, h)
         self._updateParent()
+
+    def generic_center(self):
+        """ Moves Movie to Center of parent """
+        w, h = 64, 64
+        r = self.parent.rect()
+        x, y = r.width() / 2, r.height() / 2
+
+        x, y = x - (w / 2), y - (h / 2)
+        self.movie_screen.setGeometry(x, y, w, h)
+        self._updateParent()
+
+    def update_position(self, pos):
+        """ Receives position of drop events """
+        self.movie_screen.setGeometry(pos.x() - 32, pos.y(), 64, 64)
+        self._updateParent()
+
+    def _updateParent(self):
+        """ Resize self and update parent widget """
+        original = self.parent.resizeEvent
+
+        def resizeEventWrapper(event):
+            original(event)
+            self.resize(event.size())
+
+        resizeEventWrapper._original = original
+        self.parent.resizeEvent = resizeEventWrapper
+        self.resize(self.parent.size())
+
+
+class Overlay(_OverlayWidget):
+    """ Draw animated icons at cursor position to indicate user actions like copy etc. """
+
+    def __init__(self, parent):
+        super(Overlay, self).__init__(parent)
+
+        self.parent = parent
+
+        # Setup overlay movies
+        # ref_created, copy_created
+        movies = [
+            # 0
+            ':/anim/link_animation.gif',
+            # 1
+            ':/anim/copy_animation.gif',
+            # 2
+            ':/anim/coffee_animation.gif',
+            # 3
+            ':/anim/save_animation.gif',
+        ]
+        self.mov = []
+
+        for i, m in enumerate(movies):
+            self.mov.append(QMovie(m))
+            self.mov[i].setCacheMode(QMovie.CacheAll)
+            self.mov[i].setSpeed(100)
+            self.mov[i].finished.connect(self.movie_finished)
+
+        self.movie_screen.setMovie(self.mov[0])
+        self.movie_screen.setGeometry(5, 20, 64, 64)
+
+        self.show()
 
     def ref_created(self):
         """ Visual indicator for reference created """
@@ -150,17 +169,36 @@ class Overlay(QtWidgets.QWidget):
     def movie_finished(self):
         self.movie_screen.hide()
 
-    def _updateParent(self):
-        """ Resize self and update parent widget """
-        original = self.parent.resizeEvent
 
-        def resizeEventWrapper(event):
-            original(event)
-            self.resize(event.size())
+class IntroOverlay(_OverlayWidget):
+    finished_signal = QtCore.pyqtSignal()
 
-        resizeEventWrapper._original = original
-        self.parent.resizeEvent = resizeEventWrapper
-        self.resize(self.parent.size())
+    def __init__(self, parent):
+        super(IntroOverlay, self).__init__(parent)
+        self.parent = parent
+
+        self.intro_mov = QMovie(':/anim/Introduction.gif')
+        self.intro_mov.setCacheMode(QMovie.CacheAll)
+        self.intro_mov.finished.connect(self.finished)
+
+    def intro(self):
+        LOGGER.info('Playing introduction in %sx %sy %spx %spx',
+                    self.parent.rect().x(), self.parent.rect().y(),
+                    self.parent.rect().width(), self.parent.rect().height())
+
+        self.movie_screen.setMovie(self.intro_mov)
+        self.movie_screen.setGeometry(self.parent.rect())
+        self._updateParent()
+        self.movie_screen.show()
+        self.show()
+
+        self.intro_mov.jumpToFrame(0)
+        self.intro_mov.start()
+
+    def finished(self):
+        self.movie_screen.hide()
+        self.hide()
+        self.finished_signal.emit()
 
 
 class InfoOverlay(QtWidgets.QWidget):

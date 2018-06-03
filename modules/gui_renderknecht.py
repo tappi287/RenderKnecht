@@ -28,7 +28,7 @@ from pathlib import Path
 from PyQt5 import QtCore, QtWidgets
 from PyQt5.QtGui import QFontDatabase
 
-from modules.app_globals import DEST_XML, ItemColumn, Itemstyle, Msg, SHOW_SPLASH, SRC_XML, UI_DARK_STYLE_SHEET
+from modules.app_globals import DEST_XML, ItemColumn, Itemstyle, Msg, SHOW_SPLASH, SRC_XML, UI_DARK_STYLE_SHEET, UI_SIZE
 from modules.gui_log_window import LogWindow
 from modules.gui_path_render_service import PathRenderService
 from modules.gui_main_menu import MenuBar
@@ -41,6 +41,7 @@ from modules.knecht_xml import XML
 from modules.knecht_deltagen import SendToDeltaGen
 from modules.tree_drag_drop import render_tree_drop, WidgetToWidgetDrop
 from modules.tree_methods import AddRemoveItemsCommand, add_variant, toggle_ref_visibility, tree_setup_header_format
+from modules.tree_overlay import IntroOverlay
 
 # Initialize logging for this module
 LOGGER = init_logging(__name__)
@@ -68,6 +69,11 @@ class RenderKnechtGui(QtWidgets.QApplication):
     quit_timer.setSingleShot(True)
     quit_timer.setInterval(1000)
 
+    intro_timer = QtCore.QTimer()
+    intro_timer.setSingleShot(True)
+    intro_timer.setInterval(500)
+    intro_widget = None
+
     def __init__(self, version, knecht_except_hook):
         super(RenderKnechtGui, self).__init__(sys.argv)
 
@@ -87,7 +93,7 @@ class RenderKnechtGui(QtWidgets.QApplication):
         font_id = QFontDatabase.addApplicationFont(Itemstyle.FONT['Inconsolata'])
         LOGGER.debug('Font loaded: %s', QFontDatabase.applicationFontFamilies(font_id))
 
-        self.ui.setGeometry(150, 150, 1600, 1024)
+        self.ui.setGeometry(*UI_SIZE)
 
         # Prepare exception handling
         knecht_except_hook.app = self
@@ -194,6 +200,7 @@ class RenderKnechtGui(QtWidgets.QApplication):
         # View > Log Window | Splash Screen
         self.ui.actionLog_Window.triggered.connect(self.menu.ViewLogWindow)
         self.ui.actionSplash_Screen.triggered.connect(self.menu.ViewSplashScreen)
+        self.ui.actionIntro.triggered.connect(self.show_intro)
         self.ui.actionStyle.triggered.connect(self.menu.ViewStyleSetting)
 
         # Source Tree Widget can drag and drop to Destination Tree Widget
@@ -309,6 +316,13 @@ class RenderKnechtGui(QtWidgets.QApplication):
         # init path render service
         self.path_render_service = PathRenderService(self, self.ui)
 
+        # Introduction movie
+        intro_shown = knechtSettings.app.get('introduction_shown')
+
+        if not intro_shown:
+            self.intro_timer.timeout.connect(self.show_intro)
+            self.intro_timer.start()
+
         # Show window and finish splash screen
         self.ui.show()
         splash.finish(self.ui)
@@ -321,6 +335,22 @@ class RenderKnechtGui(QtWidgets.QApplication):
         # Report ImageIO Libary Path
         img_io = os.getenv('IMAGEIO_FREEIMAGE_LIB')
         LOGGER.info('ImageIO Freelib path: %s', img_io)
+
+    def show_intro(self):
+        # Reset GUI Size to default to play introduction
+        self.ui.setGeometry(*UI_SIZE)
+
+        # Intro overlay
+        self.intro_widget = IntroOverlay(self.ui.centralWidget())
+        self.intro_widget.generic_center()
+        self.intro_widget.intro()
+        self.intro_widget.finished_signal.connect(self.del_intro)
+
+    def del_intro(self):
+        LOGGER.debug('Deleting intro widget.')
+        self.intro_widget.deleteLater()
+        self.intro_widget = None
+        knechtSettings.app['introduction_shown'] = True
 
     def set_undo_stack_active(self, clean_state):
         """ Receives cleanChanged from Undo Grp to set last stack active if current stack is changed """
@@ -711,12 +741,10 @@ class RenderKnechtGui(QtWidgets.QApplication):
             self.app = app
 
         def dbl_click(self, event):
-            if self.widget.topLevelItemCount() == 0:
-                return False
+            if not self.clear():
+                event.ignore()
+                return
 
-            clr_command = self.ClearCommand(self.widget, self.app)
-            self.widget.undo_stack.push(clr_command)
-            self.widget.undo_stack.setActive(True)
             event.accept()
 
         def clear(self):

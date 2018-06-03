@@ -19,7 +19,7 @@ Copyright (C) 2017 Stefan Tapper, All rights reserved.
     along with RenderKnecht Strink Kerker.  If not, see <http://www.gnu.org/licenses/>.
 
 """
-import os.path
+import os
 from functools import partial
 from pathlib import Path
 
