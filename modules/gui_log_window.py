@@ -25,18 +25,19 @@ from functools import partial
 from PyQt5 import QtWidgets
 from PyQt5.uic import loadUi
 from modules.knecht_log import init_logging
-from modules.knecht_log import QPlainTextEditLogger
+from modules.knecht_log import QPlainTextEditHandler
 from modules.app_globals import UI_FILE_LOG_WINDOW
 from modules.knecht_settings import knechtSettings
 
 # Initialize logging for this module
-LOGGER = init_logging(__name__)
+LOGGER = init_logging('gui_logger')
 
 
 class LogWindow(QtWidgets.QWidget):
     """ Log Window that displays log entries """
+    gui_handler = None
 
-    def __init__(self, widget=None):
+    def __init__(self, action_widget=None):
         super(LogWindow, self).__init__()
 
         # Avoid UIC Debug messages
@@ -48,9 +49,9 @@ class LogWindow(QtWidgets.QWidget):
         logging.root.setLevel(log_level)
 
         # Get menu item that toggles window visibility and check it
-        if widget:
-            self.widget = widget
-            self.widget.setChecked(True)
+        if action_widget:
+            self.action_widget = action_widget
+            self.action_widget.setChecked(True)
 
         # Text window
         self.plainTextEdit_log.setCenterOnScroll(True)
@@ -64,44 +65,45 @@ class LogWindow(QtWidgets.QWidget):
         # Index + 1 * 10
         log_level = (self.comboBox_logLevel.currentIndex() + 1) * 10
 
-        self.gui_logger.setLevel(log_level)
-        try:
-            LOGGER.warning('Changed Log Window log level to: %s',
-                           logging.getLevelName(logging.root.handlers[3].level))
-        except IndexError:
-            LOGGER.error(
-                'Log handler not found. Log Configuration is probably missing!')
+        self.gui_handler.setLevel(log_level)
+        LOGGER.critical('Changed Log Window log level to: %s',
+                        logging.getLevelName(self.gui_handler.level)
+                       )
 
     def init_functions(self):
         # Create log handler that writes to this window QPlainTextEdit
-        self.gui_logger = QPlainTextEditLogger()
+        self.gui_handler = QPlainTextEditHandler()
 
         try:
             # Format from already loaded logConfig if available
-            format_str = logging.root.handlers[1].formatter._fmt
-            formatter = logging.Formatter(format_str)
-            level = logging.root.handlers[1].level
+            formatter = LOGGER.handlers[0].formatter
+            level = LOGGER.handlers[0].level
             fallback_log = False
-        except:
+        except Exception as e:
+            print(e)
+
             # No config available
             format_str = '%(asctime)s - %(name)s - %(levelname)s - %(message)s'
             formatter = logging.Formatter(format_str)
             level = 10
             fallback_log = True
 
-        self.gui_logger.setFormatter(formatter)
-        self.gui_logger.setLevel(level)
-        logging.root.addHandler(self.gui_logger)
+        self.gui_handler.setFormatter(formatter)
+        self.gui_handler.setLevel(level)
+        logging.root.addHandler(self.gui_handler)
+
+        for handler in logging.root.handlers:
+            print('Global logging handlers:', handler)
 
         # ComboBox index to current Log Level
-        comboBox_level = (self.gui_logger.level - 1) / 10
+        combo_box_level = (self.gui_handler.level - 1) / 10
         try:
-            self.comboBox_logLevel.setCurrentIndex(comboBox_level)
-        except:
-            pass
+            self.comboBox_logLevel.setCurrentIndex(combo_box_level)
+        except Exception as e:
+            print(e)
 
         # Bind logger signal to textBox update
-        self.gui_logger.log_message.connect(self.update_log)
+        self.gui_handler.log_message.connect(self.update_log)
 
         # Bind ComboBox to log level
         self.comboBox_logLevel.currentIndexChanged.connect(
@@ -115,18 +117,19 @@ class LogWindow(QtWidgets.QWidget):
 
     def update_log(self, msg):
         """ Receives Signal from Logger """
-        msg = msg.replace('modules.', '')
         self.plainTextEdit_log.appendPlainText(msg)
 
     def toggle_window(self):
         LOGGER.debug('Toggle log window.')
         if self.isHidden():
             self.show()
-            if self.widget: self.widget.setChecked(True)
+            if self.action_widget:
+                self.action_widget.setChecked(True)
             LOGGER.debug('Displaying log window.')
         else:
             self.hide()
-            if self.widget: self.widget.setChecked(False)
+            if self.action_widget:
+                self.action_widget.setChecked(False)
             LOGGER.debug('Hiding log window.')
 
     def closeEvent(self, QCloseEvent):
@@ -134,7 +137,7 @@ class LogWindow(QtWidgets.QWidget):
             'Log Window close event triggerd. Ignoring close event and hiding window instead.'
         )
         QCloseEvent.ignore()
-        if self.widget: self.widget.setChecked(False)
+        if self.action_widget: self.action_widget.setChecked(False)
         knechtSettings.app['log_window'] = False
         self.hide()
 

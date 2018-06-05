@@ -1,6 +1,6 @@
 """
 
-Logging module for py_knecht. Initializes logger objects from a log configuration ini file.
+Logging module for py_knecht. Now logs to a queue listener and all modules to a queueHandler
 
 Copyright (C) 2017 Stefan Tapper, All rights reserved.
 
@@ -19,88 +19,113 @@ Copyright (C) 2017 Stefan Tapper, All rights reserved.
     You should have received a copy of the GNU General Public License
     along with RenderKnecht Strink Kerker.  If not, see <http://www.gnu.org/licenses/>.
 
-Target is to have a logger for every module involved. Logger needs to be in ini file:
-
-[logger_logger_name]
-qualname=logger_name
-
-DEBUG 		Detailed information, typically of interest only when diagnosing problems.
-INFO 		Confirmation that things are working as expected.
-WARNING 	An indication that something unexpected happened, or indicative of some problem in the near future (e.g. ‘disk space low’). The software is still working as expected.
-ERROR		Due to a more serious problem, the software has not been able to perform some function.
-CRITICAL 	A serious error, indicating that the program itself may be unable to continue running.
-
 """
 import logging
 import logging.config
 import sys
+from logging.handlers import QueueHandler, QueueListener
 from PyQt5.QtCore import pyqtSignal, QObject
 from modules.app_globals import LOG_CONF_FILE, LOG_FILE
 
 
-def init_root_file_handler():
+def setup_logging(logging_queue):
+    log_conf = {
+        'version': 1,
+        'disable_existing_loggers': False,
+        'formatters': {
+            'verbose': {
+                'format': '%(levelname)s %(asctime)s %(module)s %(process)d %(thread)d %(message)s'
+                },
+            'simple': {
+                'format': '%(asctime)s %(name)s %(levelname)s: %(message)s',
+                'datefmt': '%d.%m.%Y %H:%M'
+                },
+            'guiFormatter': {
+                'format': '%(name)s %(levelname)s: %(message)s',
+                'datefmt': '%d.%m.%Y %H:%M',
+                },
+            'file_formatter': {
+                'format': '%(asctime)s %(name)s %(levelname)s: %(message)s',
+                'datefmt': '%d.%m.%Y %H:%M'
+                },
+            },
+        'handlers': {
+            'console': {
+                'level': 'DEBUG', 'class': 'logging.StreamHandler',
+                'stream': 'ext://sys.stdout', 'formatter': 'simple'
+                },
+            'guiHandler': {
+                'level': 'INFO', 'class': 'logging.NullHandler',
+                'formatter': 'simple',
+                },
+            'file': {
+                'level': 'DEBUG', 'class': 'logging.handlers.RotatingFileHandler',
+                'filename': LOG_FILE.as_posix(), 'maxBytes': 5000000, 'backupCount': 4,
+                'formatter': 'file_formatter',
+                },
+            'queueHandler': {
+                'level': 'DEBUG', 'class': 'logging.handlers.QueueHandler',
+                'queue': logging_queue, 'formatter': 'file_formatter',
+                },
+            },
+        'loggers': {
+            # Main logger, these handlers will be moved to the QueueListener
+            'knechtLog': {
+                'handlers': ['file', 'guiHandler', 'console'], 'propagate': False, 'level': 'DEBUG',
+                },
+            # Log Window Logger
+            'gui_logger': {
+                'handlers': ['guiHandler', 'queueHandler'], 'propagate': False, 'level': 'INFO'
+                },
+            # Module loggers
+            '': {
+                'handlers': ['queueHandler'], 'propagate': False, 'level': 'DEBUG',
+                }
+            }
+        }
+
+    logging.config.dictConfig(log_conf)
+
+
+def setup_log_queue_listener(logger, queue):
     """
-        File handler is added
+        Moves handlers from logger to QueueListener and returns the listener
+        The listener needs to be started afterwwards with it's start method.
     """
-    fh = logging.FileHandler(LOG_FILE, 'w')
+    handler_ls = list()
+    for handler in logger.handlers:
+        print('Removing handler that will be added to queue listener: ', str(handler))
+        handler_ls.append(handler)
 
-    # Try to read format from configured root log handler
-    try:
-        formatter = logging.Formatter(logging.root.handlers[0].formatter._fmt)
-    except Exception as e:
-        logging.root.debug(
-            'No handler found to read format from for File Handler. %s', e)
-        formatter = logging.Formatter(
-            "%(asctime)s - %(name)s - %(levelname)s - %(message)s")
+    for handler in handler_ls:
+        logger.removeHandler(handler)
 
-    # Set log file format
-    fh.setFormatter(formatter)
+    handler_ls = tuple(handler_ls)
+    queue_handler = QueueHandler(queue)
+    logger.addHandler(queue_handler)
 
-    # Add Handler to Logger
-    logging.root.addHandler(fh)
+    listener = QueueListener(queue, *handler_ls)
+    return listener
 
 
 def init_logging(logger_name):
-    try:
-        logging.config.fileConfig(LOG_CONF_FILE, disable_existing_loggers=False)
-
-        #create logger
-        logger = logging.getLogger(logger_name)
-        log_conf = True
-    except AttributeError as e:
-        logging.root.setLevel(logging.DEBUG)
-
-        #create logger
-        logger = logging.getLogger(logger_name)
-        formatter = logging.Formatter(
-            "%(asctime)s - %(name)s - %(levelname)s - %(message)s")
-
-        ch = logging.StreamHandler(sys.stderr, )
-        ch.setFormatter(formatter)
-
-        logger.addHandler(ch)
-        logger.error('%s', e)
-
-        log_conf = False
-
-    if log_conf:
-        logger.debug('Log configuration loaded from %s and set to log file %s',
-                     LOG_CONF_FILE, LOG_FILE)
-    else:
-        logger.warning(
-            "No log file configuration found or configuration contains errors: %s. Setting log level to debug.",
-            LOG_CONF_FILE)
-
+    logger_name = logger_name.replace('modules.', '')
+    logger = logging.getLogger(logger_name)
+    logger.setLevel(logging.DEBUG)
     return logger
 
 
-class QPlainTextEditLogger(logging.Handler, QObject):
-    """ Log handler that appends text to QPlainTextEdit """
+class _HandlerSignal(QObject):
     log_message = pyqtSignal(str)
 
+
+class QPlainTextEditHandler(logging.Handler):
+    """ Log handler that appends text to QPlainTextEdit """
+
     def __init__(self):
-        super(QPlainTextEditLogger, self).__init__()
-        QObject.__init__(self)
+        super(QPlainTextEditHandler, self).__init__()
+        self.signal_cls = _HandlerSignal()
+        self.log_message = self.signal_cls.log_message
 
     def emit(self, record):
         msg = None

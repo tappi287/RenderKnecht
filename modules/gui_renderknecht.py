@@ -43,7 +43,6 @@ from modules.tree_drag_drop import render_tree_drop, WidgetToWidgetDrop
 from modules.tree_methods import AddRemoveItemsCommand, add_variant, toggle_ref_visibility, tree_setup_header_format
 from modules.tree_overlay import IntroOverlay
 
-# Initialize logging for this module
 LOGGER = init_logging(__name__)
 
 

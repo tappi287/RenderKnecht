@@ -46,7 +46,9 @@ class VplusWindow(QtWidgets.QDialog):
     def __init__(self, parent, pr_fam_set, model_list, file,
                  fakom_reader: bool=False, wizard: bool=False):
         super(VplusWindow, self).__init__()
+
         self.ui = parent.open_dialog.ui
+
         self.parent = parent
         self.fakom_reader, self.wizard = fakom_reader, wizard
 
