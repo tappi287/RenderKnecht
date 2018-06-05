@@ -1,6 +1,6 @@
 """
 
-Logging module for py_knecht. Initializes logger objects from a log configuration ini file.
+Logging module for py_knecht. Now logs to a queue listener and all modules to a queueHandler
 
 Copyright (C) 2017 Stefan Tapper, All rights reserved.
 
@@ -18,17 +18,6 @@ Copyright (C) 2017 Stefan Tapper, All rights reserved.
 
     You should have received a copy of the GNU General Public License
     along with RenderKnecht Strink Kerker.  If not, see <http://www.gnu.org/licenses/>.
-
-Target is to have a logger for every module involved. Logger needs to be in ini file:
-
-[logger_logger_name]
-qualname=logger_name
-
-DEBUG 		Detailed information, typically of interest only when diagnosing problems.
-INFO 		Confirmation that things are working as expected.
-WARNING 	An indication that something unexpected happened, or indicative of some problem in the near future (e.g. ‘disk space low’). The software is still working as expected.
-ERROR		Due to a more serious problem, the software has not been able to perform some function.
-CRITICAL 	A serious error, indicating that the program itself may be unable to continue running.
 
 """
 import logging
@@ -80,7 +69,7 @@ def setup_logging(logging_queue):
                 },
             },
         'loggers': {
-            # Main logger, handler will be moved to QueueListener
+            # Main logger, these handlers will be moved to the QueueListener
             'knechtLog': {
                 'handlers': ['file', 'guiHandler', 'console'], 'propagate': False, 'level': 'DEBUG',
                 },
@@ -88,7 +77,7 @@ def setup_logging(logging_queue):
             'gui_logger': {
                 'handlers': ['guiHandler', 'queueHandler'], 'propagate': False, 'level': 'INFO'
                 },
-            # Default loggers
+            # Module loggers
             '': {
                 'handlers': ['queueHandler'], 'propagate': False, 'level': 'DEBUG',
                 }
@@ -120,17 +109,23 @@ def setup_log_queue_listener(logger, queue):
 
 
 def init_logging(logger_name):
+    logger_name = logger_name.replace('modules.', '')
     logger = logging.getLogger(logger_name)
+    logger.setLevel(logging.DEBUG)
     return logger
 
 
-class QPlainTextEditHandler(logging.Handler, QObject):
-    """ Log handler that appends text to QPlainTextEdit """
+class _HandlerSignal(QObject):
     log_message = pyqtSignal(str)
+
+
+class QPlainTextEditHandler(logging.Handler):
+    """ Log handler that appends text to QPlainTextEdit """
 
     def __init__(self):
         super(QPlainTextEditHandler, self).__init__()
-        QObject.__init__(self)
+        self.signal_cls = _HandlerSignal()
+        self.log_message = self.signal_cls.log_message
 
     def emit(self, record):
         msg = None

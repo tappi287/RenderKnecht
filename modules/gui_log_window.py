@@ -65,15 +65,10 @@ class LogWindow(QtWidgets.QWidget):
         # Index + 1 * 10
         log_level = (self.comboBox_logLevel.currentIndex() + 1) * 10
 
-        # TODO Log Window level change not working with queue listener yet
-        logging.root.handlers[1].setLevel(log_level)
-        try:
-            LOGGER.warning('Changed Log Window log level to: %s',
-                           logging.getLevelName(logging.root.handlers[1].level)
-                           )
-        except IndexError:
-            LOGGER.error(
-                'Log handler not found. Log Configuration is probably missing!')
+        self.gui_handler.setLevel(log_level)
+        LOGGER.critical('Changed Log Window log level to: %s',
+                        logging.getLevelName(self.gui_handler.level)
+                       )
 
     def init_functions(self):
         # Create log handler that writes to this window QPlainTextEdit
@@ -101,11 +96,11 @@ class LogWindow(QtWidgets.QWidget):
             print('Global logging handlers:', handler)
 
         # ComboBox index to current Log Level
-        comboBox_level = (self.gui_handler.level - 1) / 10
+        combo_box_level = (self.gui_handler.level - 1) / 10
         try:
-            self.comboBox_logLevel.setCurrentIndex(comboBox_level)
-        except:
-            pass
+            self.comboBox_logLevel.setCurrentIndex(combo_box_level)
+        except Exception as e:
+            print(e)
 
         # Bind logger signal to textBox update
         self.gui_handler.log_message.connect(self.update_log)
@@ -122,18 +117,19 @@ class LogWindow(QtWidgets.QWidget):
 
     def update_log(self, msg):
         """ Receives Signal from Logger """
-        msg = msg.replace('modules.', '')
         self.plainTextEdit_log.appendPlainText(msg)
 
     def toggle_window(self):
         LOGGER.debug('Toggle log window.')
         if self.isHidden():
             self.show()
-            if self.action_widget: self.action_widget.setChecked(True)
+            if self.action_widget:
+                self.action_widget.setChecked(True)
             LOGGER.debug('Displaying log window.')
         else:
             self.hide()
-            if self.action_widget: self.action_widget.setChecked(False)
+            if self.action_widget:
+                self.action_widget.setChecked(False)
             LOGGER.debug('Hiding log window.')
 
     def closeEvent(self, QCloseEvent):
