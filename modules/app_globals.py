@@ -291,8 +291,6 @@ _UI_DARK_STYLE_SHEET = 'rk_fusion_dark.qss'
 _DOC_FILE = 'RenderKnecht Dokumentation.chm'
 
 # Log file names
-_LOG_CONF = 'logging_conf.ini'
-_LOG_CONF_DEV = 'logging_conf_dev.ini'
 _LOG_FILE = 'RenderKnecht_log_file'
 
 
@@ -330,12 +328,6 @@ def create_work_files(src, dest):
         os.mkdir(dest)
 
     # Copy files
-    if not os.path.exists(dest / _LOG_CONF):
-        try:
-            shutil.copy(src / _LOG_CONF, dest / _LOG_CONF)
-        except Exception as e:
-            print(e)
-
     if not os.path.exists(dest / _CONVERSION_FILE):
         try:
             shutil.copy(src / _CONVERSION_FILE, dest / _CONVERSION_FILE)
@@ -389,9 +381,6 @@ else:
     rel_lib = Path('modules/' + lib_name)
     os.environ['IMAGEIO_FREEIMAGE_LIB'] = str(script_dir / rel_lib)
 
-    # Use Dev log configuration
-    _LOG_CONF = _LOG_CONF_DEV
-
     # Info msg
     InfoMessage.ENV = '<br>Anwendung läuft in Dev. Benutze _LOG_CONF_DEV<br>'
 
@@ -436,7 +425,6 @@ except Exception as e:
     print(e)
 
 # Log files
-LOG_CONF_FILE = HELPER_DIR / _LOG_CONF
 log_file_name = _LOG_FILE + '_' + str(time.time()) + '.log'
 LOG_FILE = HELPER_DIR / log_file_name
 

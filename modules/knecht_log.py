@@ -25,7 +25,7 @@ import logging.config
 import sys
 from logging.handlers import QueueHandler, QueueListener
 from PyQt5.QtCore import pyqtSignal, QObject
-from modules.app_globals import LOG_CONF_FILE, LOG_FILE
+from modules.app_globals import LOG_FILE
 
 
 def setup_logging(logging_queue):
@@ -133,6 +133,7 @@ class QPlainTextEditHandler(logging.Handler):
         try:
             msg = self.format(record)
             self.log_message.emit(msg)
-        except:
+        except Exception as e:
             # MS Visual Studio 15.4.x BUG ?, channel is not defined
+            print(e)
             pass
