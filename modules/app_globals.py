@@ -497,15 +497,15 @@ PR_FAM_INT = [
     'MAS', 'MDS', 'MFA', 'MIK', 'NAC', 'NAV', 'PAM', 'QGM', 'RAO', 'RDK', 'RSV',
     'SAB', 'SAG', 'SDH', 'SHM', 'SIB', 'SIE', 'SIH', 'SLM', 'SNA', 'SON', 'SPR',
     'SPU', 'SRH', 'SSH', 'SSR', 'SWS', 'THE', 'TKV', 'TUE', 'TVE', 'VBK', 'VHS',
-    'VOS', 'VRH', 'VTV', 'WIN', 'WSS', 'ZAB', 'ZFM', 'ZKV'
-]
+    'VOS', 'VRH', 'VTV', 'WIN', 'WSS', 'ZAB', 'ZFM', 'ZKV', 'HBV'
+    ]
 
 PR_FAM_EXT = [
     'AAU', 'ABO', 'AER', 'AGS', 'AHV', 'ASL', 'ASR', 'ATA', 'AWV', 'BAH', 'BAV',
     'BBO', 'DAR', 'DEI', 'DFO', 'EPH', 'FSP', 'GRA', 'GWA', 'HEB', 'HES', 'HEW',
     'HSW', 'KAR', 'KSU', 'KZV', 'LIA', 'NEL', 'NES', 'RAD', 'SBR', 'SFS', 'SPU',
     'SSH', 'STF', 'SWR', 'SZU', 'TKV', 'TYZ', 'VTV', 'WAL', 'ZIE', 'ZKS'
-]
+    ]
 
 PACKAGE_FILTER = ['Argentinien', 'Australien', 'Balkan', 'Baltikum', 'Belgien', 'China', 'Dänemark', 'Export',
                   'Finnland', 'Frankreich', 'GB', 'GUS', 'Great Britain', 'Griechenland', 'Großbritannien',
