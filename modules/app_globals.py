@@ -497,7 +497,7 @@ PR_FAM_INT = [
     'MAS', 'MDS', 'MFA', 'MIK', 'NAC', 'NAV', 'PAM', 'QGM', 'RAO', 'RDK', 'RSV',
     'SAB', 'SAG', 'SDH', 'SHM', 'SIB', 'SIE', 'SIH', 'SLM', 'SNA', 'SON', 'SPR',
     'SPU', 'SRH', 'SSH', 'SSR', 'SWS', 'THE', 'TKV', 'TUE', 'TVE', 'VBK', 'VHS',
-    'VOS', 'VRH', 'VTV', 'WIN', 'WSS', 'ZAB', 'ZFM', 'ZKV', 'HBV'
+    'VOS', 'VRH', 'VTV', 'WIN', 'WSS', 'ZAB', 'ZFM', 'ZKV', 'HBV', 'RAU'
     ]
 
 PR_FAM_EXT = [
