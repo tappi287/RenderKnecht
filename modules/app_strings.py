@@ -41,14 +41,11 @@ class Msg:
            '<li>Ausnahmen werden als Fehlermeldungen gezeigt und lassen den Interpreter nicht abstürzen</li>' \
            '<li>Pfad Render Service Client GUI hinzugefügt</li>' \
            '<li>Preset Wizard Kontext Menü für PR und Paket Optionen + Filter verbessert</li>' \
-           '<li>V Plus Browser Serienumfäng markiert mit I werden als Landessetzung L gelesen</li>' \
-           '<li>Neues Edag FaKom Muster hinzugefügt</li>' \
            '<li>Nicht-interagierbare Separatoren über das Menü erstellbar</li>' \
            '<li>Neue Kontextaktionen Variantenbaum und Textfeld, siehe Kontextmenü</li>' \
            '<li>Referenzbild-Preset-Assistent - QOB 9000 - in Betrieb genommen, Dave</li>' \
            '<li>temporäres Zeilenfärben zur besseren Übersicht möglich</li>' \
            '<li>FaKom Lutscher kann Paketumfänge optional als Referenz zum Paket einfügen</li>' \
-           '<li>Vollständiger Import von gefilterten V Plus Browser Auszügen</li>' \
            '<li>Referenzen mit identischer ID aber unterschiedlichem Namen werden ' \
            'automatsich korrigiert</li>' \
            '<li>Auto Save alle 5min bei ungespeicherten Änderungen</li>' \

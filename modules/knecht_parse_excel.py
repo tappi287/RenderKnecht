@@ -495,7 +495,7 @@ class LoadVplus(QtCore.QObject):
                     trim_attr['name'] = shorten_model_name(model_name, 8,
                         self.shorten_names) + current_market + ' ' + model_year
 
-                    # Extract first n string elements eg. Audi A3 Sedan for options preset name
+                    # Extract first n string elements eg. Brand Model for options preset name
                     opti_attr['name'] = shorten_model_name(model_name, 3,
                         True) + model_code + ' Options ' + current_market
                 except Exception as e:
