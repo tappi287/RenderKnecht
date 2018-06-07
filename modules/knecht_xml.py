@@ -164,7 +164,7 @@ class XML:
                 :return: True on successful transfer to treeWidget
         """
         self.xml_tree = et_element
-        LOGGER.debug('Parsing element to tree: ')
+        LOGGER.debug('Parsing element to tree: %s', et_element.tag)
         return self.parse_xml_to_treewidget(xml_tree_exists=True)
 
     def parse_file(self, file):
@@ -252,8 +252,12 @@ class XML:
         elif node.tag == 'render_setting':
             self.create_tree_widget_item(node, self.__preset_item)
         elif node.tag in ['variant', 'reference']:
-            # Create variant / reference with parent: last preset_item
-            self.create_tree_widget_item(node, self.__preset_item)
+            if self.__preset_item:
+                # Create variant / reference with parent: last preset_item
+                self.create_tree_widget_item(node, self.__preset_item)
+            else:
+                # Parse orphans aswell for session load / variants widget
+                self.create_tree_widget_item(node, self.widget)
 
     @staticmethod
     def create_tree_widget_item(node, parent=None):

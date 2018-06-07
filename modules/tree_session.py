@@ -20,12 +20,15 @@ Copyright (C) 2017 Stefan Tapper, All rights reserved.
 
 """
 import os
+import time
 from pathlib import Path
 
 from PyQt5 import QtCore
 
+from modules.tree_methods import tree_setup_header_format
 from modules.knecht_log import init_logging
 from modules.knecht_xml import XML
+from modules.app_strings import Msg
 
 LOGGER = init_logging(__name__)
 
@@ -42,7 +45,7 @@ class _TreeSession(object):
 class TreeSessionManager(QtCore.QObject):
     # XML DOM / hierarchy tags
     session_xml_dom = {
-        'root': 'knecht_session',
+        'root': 'knecht_session', 'origin': 'origin',
         }
 
     def __init__(self, app, ui):
@@ -54,7 +57,7 @@ class TreeSessionManager(QtCore.QObject):
             tree_session = _TreeSession(tree)
             self.trees.append(tree_session)
 
-    def save_session_xml(self):
+    def save_session(self):
         session_xml = XML(_SESSION_PATH, None)
         session_xml.root = self.session_xml_dom['root']
 
@@ -73,4 +76,71 @@ class TreeSessionManager(QtCore.QObject):
             current_tree_element = session_xml.xml_sub_element
             current_tree_element.append(tree_session.xml.root)
 
+        self.describe_origin(session_xml)
         session_xml.save_tree()
+        LOGGER.debug('Saved tree contents to session file:\n%s', _SESSION_PATH.as_posix())
+
+    def load_session(self):
+        __xml = XML('', None)
+        xml_file = Path(_SESSION_PATH)
+
+        if not xml_file.exists():
+            return
+
+        try:
+            xml_tree = __xml.parse_xml_file(xml_file)
+        except Exception as e:
+            LOGGER.error('Error loading session data: %s', e)
+            return
+
+        # Move Variant Tree items out of orphan preset
+        self.prepare_variants(xml_tree)
+
+        for tree_session in self.trees:
+            name = tree_session.name
+
+            tree_xml = xml_tree.find(f'./{name}/')
+            if tree_xml:
+                tree_session.xml.parse_element_to_tree_widget(tree_xml)
+                LOGGER.debug('Loading session elements for %s.', tree_session.name)
+
+            # Sort the tree widgets
+            self.ui.sort_tree_widget.sort_all(tree_session.widget)
+
+        # Sort treeWidget headers according to content
+        tree_setup_header_format(self.ui.tree_widget_list)
+
+    @staticmethod
+    def prepare_variants(xml_tree):
+        variants = list()
+        variants_xml = xml_tree.find('./treeWidget_Variants/')
+
+        if not variants_xml:
+            return
+
+        # Get all variants from orphan preset
+        var_lvl = XML.dom_tags.get('sub_lvl_1')
+        variant_presets = variants_xml.find(f'./{var_lvl}')
+        orphan_preset = variant_presets.find('./')
+
+        if not orphan_preset.attrib.get('name') == Msg.ORPHAN_PRESET_NAME:
+            return
+
+        for variant in orphan_preset.iterfind('./'):
+            variants.append(variant)
+
+        # Insert Variants one level above
+        for v in variants:
+            variant_presets.append(v)
+
+        # Delete orphan preset
+        variant_presets.remove(orphan_preset)
+
+    @classmethod
+    def describe_origin(cls, session_xml_cls):
+        __origin = session_xml_cls.root.find(f'./{cls.session_xml_dom.get("origin")}')
+
+        __o_txt = 'RenderKnecht Session on '+\
+                  os.getenv('COMPUTERNAME', 'Unknown_System') + ' @ ' +\
+                  time.strftime('%Y-%m-%d_%H:%M:%S')
+        __origin.text = __o_txt

@@ -28,7 +28,7 @@ from PyQt5.QtCore import QUrl
 from PyQt5.QtGui import QColor, QDesktopServices
 
 from modules.app_strings import Msg, InfoMessage
-from modules.app_globals import RENDER_BASE_PATH, HELPER_DIR, START_UP_FILE, Itemstyle, DOC_FILE
+from modules.app_globals import RENDER_BASE_PATH, HELPER_DIR, Itemstyle, DOC_FILE
 from modules.gui_splash_screen_movie import show_splash_screen_movie
 from modules.gui_widgets import FakomWindow, styleChooser, AboutBox
 from modules.gui_set_path import SetDirectoryPath
@@ -396,6 +396,7 @@ class MenuBar(QtCore.QObject):
             log_msg += '\nSaved Current Path:\n{}'.format(self.ui.current_path)
 
         # Load StartUp file
+        """
         if START_UP_FILE:
             self.file_mgr.parse_xml(START_UP_FILE)
             load_msg = Msg.LOAD_MSG + str(START_UP_FILE)
@@ -403,6 +404,7 @@ class MenuBar(QtCore.QObject):
 
             self.ui.current_path = str(Path(START_UP_FILE))
             log_msg += '\nStart up file found and parsed:\n{}'.format(START_UP_FILE)
+        """
 
         # Load last render path
         if not knechtSettings.app['render_path'] == '':

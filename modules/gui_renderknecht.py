@@ -326,6 +326,9 @@ class RenderKnechtGui(QtWidgets.QApplication):
             self.intro_timer.timeout.connect(self.show_intro)
             self.intro_timer.start()
 
+        # Load session
+        self.session.load_session()
+
         # Show window and finish splash screen
         self.ui.show()
         splash.finish(self.ui)
@@ -730,7 +733,7 @@ class RenderKnechtGui(QtWidgets.QApplication):
                 return
 
         # Save current session
-        self.session.save_session_xml()
+        self.session.save_session()
 
         self.ui.end_threads()
         self.ui.close()

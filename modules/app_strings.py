@@ -356,14 +356,12 @@ class InfoMessage:
                     '<h4>Credits:</h4><b>{credits}</b>'
                     '<h4>Resource Credits:</h4>{icon_credits}'
                     '<h4>Anwendungsinfo:</h4>'
-                    'Status: {status}<br>{start_info}{env} '
                     '<p style="font-size: 8pt;"><i>{gnu}</i></p><br>'
                     .format(author=InfoMessage.auth,
                             mail=InfoMessage.mail,
                             credits=cls.credit_list(),
                             icon_credits=cls.resource_credits(),
                             status=InfoMessage.stat,
-                            start_info=InfoMessage.START_INFO,
                             env=InfoMessage.ENV,
                             gnu=GNU_MESSAGE)]
 
