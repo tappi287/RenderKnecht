@@ -330,13 +330,13 @@ class XML:
     def read_all_from_widget(self):
         """ Read all widget items and store in ET.SubElement """
         self.__p_count = 0
-        self.__orphan_preset = False
+        self.__orphan_preset = None
 
         # Iterate all QTreeWidgetItem's
         list(map(self.read_item, iterate_tree_widget_items_flat(self.widget)))
 
         # Nothing to save, return False
-        if self.__p_count == 0:
+        if self.__p_count == 0 and not self.__orphan_preset:
             return False
         return True
 
@@ -357,9 +357,10 @@ class XML:
         if item.UserType in [1000, 1003, 1005]:
             # Create Preset Element: parent, tag, attributes
             self.__current_preset = Et.SubElement(
-                self.__variant_presets,  # Parent Element
-                self.xmlTypeDict[item.UserType],  # Tag from UserType
-                read_item_attributes())  # Attributes to store
+                self.__variant_presets,             # Parent Element
+                self.xmlTypeDict[item.UserType],    # Tag from UserType
+                read_item_attributes(),             # Attributes to store
+                )
             self.__p_count += 1
         else:
             # Make sure variant | reference item has a preset parent

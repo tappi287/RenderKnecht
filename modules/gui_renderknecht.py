@@ -42,6 +42,7 @@ from modules.knecht_deltagen import SendToDeltaGen
 from modules.tree_drag_drop import render_tree_drop, WidgetToWidgetDrop
 from modules.tree_methods import AddRemoveItemsCommand, add_variant, toggle_ref_visibility, tree_setup_header_format
 from modules.tree_overlay import IntroOverlay
+from modules.tree_session import TreeSessionManager
 
 LOGGER = init_logging(__name__)
 
@@ -107,6 +108,9 @@ class RenderKnechtGui(QtWidgets.QApplication):
         for tree_widget in self.ui.tree_widget_list:
             tree_widget.undo_stack = QtWidgets.QUndoStack(self.undo_grp)
             tree_widget.undo_stack.setUndoLimit(25)
+
+        # Session mgr
+        self.session = TreeSessionManager(self, self.ui)
 
         # Set app class for delete class
         AddRemoveItemsCommand.app = self
@@ -724,6 +728,9 @@ class RenderKnechtGui(QtWidgets.QApplication):
 
             if not save:
                 return
+
+        # Save current session
+        self.session.save_session_xml()
 
         self.ui.end_threads()
         self.ui.close()
