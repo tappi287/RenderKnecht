@@ -264,12 +264,15 @@ class MainWindow(QtWidgets.QMainWindow):
         return answer
 
     def set_window_title(self, file_info: str = ''):
-        if file_info:
+        self.setWindowTitle(self.title + ' - ' + self.ver)
+
+        if file_info != '':
             if self.unsaved_changes_present:
                 file_info = '*' + file_info + '*'
-            self.setWindowTitle(file_info + ' - ' + self.title + ' - ' + self.ver)
+                self.setWindowTitle('*' + self.title + ' ' + self.ver + '*')
+            self.label_Dest_File.setText(file_info)
         else:
-            self.setWindowTitle(self.title + ' - ' + self.ver)
+            self.label_Dest_File.setText(Msg.NO_FILE_INFO)
 
     def report_conflict(self, item=False, new_id=False):
         """ Report ID Conflict """

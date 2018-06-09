@@ -149,6 +149,7 @@ class Msg:
     STYLE_CHANGED = 'Anwendungsstil wird nach einem Neustart der Anwendung übernommen. Einstellung: '
 
     NO_FILE_MSG = 'Keine Datei, oder Datei vom falschen Typ ausgewählt.'
+    NO_FILE_INFO = '<i>Nicht als Datei gespeichert</i>'
     NOTHING_TO_DELETE = 'Nichts zum Entfernen ausgewählt.'
     NOTHING_TO_COPY = 'Nichts zum Kopieren ausgewählt.'
     NOTHING_TO_PASTE = 'Nichts in der Zwischenablage zum Einfügen gefunden.'
@@ -241,6 +242,8 @@ class Msg:
     RENDER_TOGGLE_TIMEOUT_OFF += 'DeltaGen>Varianten State Check aktiviert ist.'
 
     SET_PATH_REJECTED_TXT = '< Gültigen Pfad eingeben >'
+    SESSION_LOADED = 'Vorherige Sitzung wiederhergestellt.'
+    SESSION_SAVING = 'Sitzung wird gespeichert...'
 
     VERSION_MSG = 'Die Anwendung lädt Aktualisierungen automatisch herunter und informiert mit einem Symbol in ' \
                   'der Menüleiste über bereitstehende Versionen.'

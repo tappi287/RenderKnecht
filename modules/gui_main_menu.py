@@ -148,7 +148,9 @@ class MenuBar(QtCore.QObject):
         # Save successful
         self.ui.unsaved_changes_present = False
         self.ui.current_path = str(Path(self.save_mgr.save_file))
+        LOGGER.info('UI Current Path: %s', self.ui.current_path)
         knechtSettings.app['current_path'] = Path(self.save_mgr.save_file).parent
+        knechtSettings.add_recent_file('variants_xml', Path(self.save_mgr.save_file).as_posix())
         self.ui.set_window_title(Path(self.save_mgr.save_file).name)
 
         # Update recent files menu

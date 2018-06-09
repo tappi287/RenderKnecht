@@ -379,6 +379,9 @@ class OpenPresetFile:
             xml_message = Msg.XML_FILE_LOADED + Path(xmlFile).name
             self.tree_widget_source.info_overlay.display(xml_message, 4000)
 
+            # Add to recent files
+            knechtSettings.add_recent_file('variants_xml', Path(xmlFile).as_posix())
+
             # Sort tree widget
             self.ui.sort_tree_widget.sort_all(self.tree_widget_source)
 
