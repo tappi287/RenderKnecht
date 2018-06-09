@@ -31,8 +31,23 @@
   </property>
   <widget class="QWidget" name="centralwidget">
    <layout class="QVBoxLayout" name="verticalLayout_2">
+    <property name="spacing">
+     <number>0</number>
+    </property>
+    <property name="leftMargin">
+     <number>6</number>
+    </property>
+    <property name="topMargin">
+     <number>6</number>
+    </property>
+    <property name="rightMargin">
+     <number>6</number>
+    </property>
+    <property name="bottomMargin">
+     <number>0</number>
+    </property>
     <item>
-     <widget class="QSplitter" name="splitter_2">
+     <widget class="QSplitter" name="horizontalSplitter">
       <property name="orientation">
        <enum>Qt::Horizontal</enum>
       </property>
@@ -49,12 +64,12 @@
          <height>800</height>
         </size>
        </property>
-       <layout class="QHBoxLayout" name="horizontalLayout">
+       <layout class="QVBoxLayout" name="verticalLayout_9">
         <property name="spacing">
          <number>0</number>
         </property>
         <property name="leftMargin">
-         <number>9</number>
+         <number>0</number>
         </property>
         <property name="topMargin">
          <number>0</number>
@@ -66,16 +81,25 @@
          <number>0</number>
         </property>
         <item>
-         <widget class="QSplitter" name="splitter">
+         <widget class="QSplitter" name="presetTreeSplitter">
           <property name="orientation">
            <enum>Qt::Vertical</enum>
           </property>
+          <property name="handleWidth">
+           <number>6</number>
+          </property>
           <widget class="QWidget" name="verticalLayoutWidget_2">
            <layout class="QVBoxLayout" name="verticalLayout_Src">
+            <property name="spacing">
+             <number>0</number>
+            </property>
             <item>
              <layout class="QHBoxLayout" name="horizontalLayout_Src">
               <property name="spacing">
                <number>9</number>
+              </property>
+              <property name="bottomMargin">
+               <number>6</number>
               </property>
               <item>
                <widget class="QPushButton" name="pushButton_Src_sort">
@@ -355,41 +379,50 @@
             </item>
            </layout>
           </widget>
-          <widget class="QWidget" name="layoutWidget">
-           <layout class="QVBoxLayout" name="verticalLayout_Presets">
+          <widget class="QWidget" name="">
+           <layout class="QVBoxLayout" name="verticalLayout_Dest">
+            <property name="spacing">
+             <number>0</number>
+            </property>
             <item>
-             <layout class="QVBoxLayout" name="verticalLayout_Dest">
+             <layout class="QHBoxLayout" name="horizontalLayout_Dest">
+              <property name="spacing">
+               <number>9</number>
+              </property>
+              <property name="bottomMargin">
+               <number>6</number>
+              </property>
               <item>
-               <layout class="QHBoxLayout" name="horizontalLayout_Dest">
-                <property name="spacing">
-                 <number>9</number>
+               <widget class="QPushButton" name="pushButton_Dest_sort">
+                <property name="maximumSize">
+                 <size>
+                  <width>30</width>
+                  <height>40</height>
+                 </size>
                 </property>
-                <item>
-                 <widget class="QPushButton" name="pushButton_Dest_sort">
-                  <property name="maximumSize">
-                   <size>
-                    <width>30</width>
-                    <height>40</height>
-                   </size>
-                  </property>
-                  <property name="statusTip">
-                   <string>Sortiert gesamte Tabelle von zum Beispiel 1, 3, 8 zu 1,2,3</string>
-                  </property>
-                  <property name="icon">
-                   <iconset resource="res/preset_editor_rsc.qrc">
-                    <normaloff>:/main/refresh.png</normaloff>:/main/refresh.png</iconset>
-                  </property>
-                  <property name="iconSize">
-                   <size>
-                    <width>30</width>
-                    <height>30</height>
-                   </size>
-                  </property>
-                  <property name="flat">
-                   <bool>true</bool>
-                  </property>
-                 </widget>
-                </item>
+                <property name="statusTip">
+                 <string>Sortiert gesamte Tabelle von zum Beispiel 1, 3, 8 zu 1,2,3</string>
+                </property>
+                <property name="icon">
+                 <iconset resource="res/preset_editor_rsc.qrc">
+                  <normaloff>:/main/refresh.png</normaloff>:/main/refresh.png</iconset>
+                </property>
+                <property name="iconSize">
+                 <size>
+                  <width>30</width>
+                  <height>30</height>
+                 </size>
+                </property>
+                <property name="flat">
+                 <bool>true</bool>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <layout class="QVBoxLayout" name="verticalLayout_Labels">
+                <property name="spacing">
+                 <number>0</number>
+                </property>
                 <item>
                  <widget class="QLabel" name="label_Dest">
                   <property name="sizePolicy">
@@ -398,14 +431,29 @@
                     <verstretch>0</verstretch>
                    </sizepolicy>
                   </property>
+                  <property name="minimumSize">
+                   <size>
+                    <width>450</width>
+                    <height>0</height>
+                   </size>
+                  </property>
+                  <property name="maximumSize">
+                   <size>
+                    <width>450</width>
+                    <height>16777215</height>
+                   </size>
+                  </property>
                   <property name="toolTip">
                    <string>Doppelklick mich für hübsche Listen!</string>
                   </property>
                   <property name="statusTip">
                    <string>Doppelklick passt Spaltenbreite an Inhalte an.</string>
                   </property>
+                  <property name="styleSheet">
+                   <string notr="true">font-size: 7pt;</string>
+                  </property>
                   <property name="text">
-                   <string>Benutzer Presets</string>
+                   <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Benutzer Presets&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
                   </property>
                   <property name="textFormat">
                    <enum>Qt::RichText</enum>
@@ -416,184 +464,239 @@
                   <property name="alignment">
                    <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
                   </property>
+                  <property name="wordWrap">
+                   <bool>true</bool>
+                  </property>
                   <property name="margin">
                    <number>0</number>
                   </property>
                  </widget>
                 </item>
                 <item>
-                 <widget class="QLineEdit" name="lineEdit_Dest_filter">
+                 <widget class="QLabel" name="label_Dest_File">
+                  <property name="sizePolicy">
+                   <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+                    <horstretch>0</horstretch>
+                    <verstretch>0</verstretch>
+                   </sizepolicy>
+                  </property>
+                  <property name="minimumSize">
+                   <size>
+                    <width>450</width>
+                    <height>0</height>
+                   </size>
+                  </property>
                   <property name="maximumSize">
                    <size>
-                    <width>16777215</width>
-                    <height>24</height>
+                    <width>450</width>
+                    <height>16777215</height>
                    </size>
+                  </property>
+                  <property name="toolTip">
+                   <string>Doppelklick mich für hübsche Listen!</string>
                   </property>
                   <property name="statusTip">
-                   <string>Filter Benutzer Presets nach Namen.</string>
+                   <string>Doppelklick passt Spaltenbreite an Inhalte an.</string>
                   </property>
-                  <property name="layoutDirection">
-                   <enum>Qt::LeftToRight</enum>
+                  <property name="styleSheet">
+                   <string notr="true">font-size: 7pt;</string>
                   </property>
-                  <property name="placeholderText">
-                   <string>Nach mehreren Namen mit Leerzeichen filtern und, oder nach ID mit &quot;id Zahl&quot;</string>
+                  <property name="text">
+                   <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;20180806_Toledo_NeMo_Shot_05-06-10_PR-String_KnechtFile.xml&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
                   </property>
-                  <property name="cursorMoveStyle">
-                   <enum>Qt::VisualMoveStyle</enum>
+                  <property name="textFormat">
+                   <enum>Qt::RichText</enum>
                   </property>
-                 </widget>
-                </item>
-                <item>
-                 <widget class="QPushButton" name="pushButton_Dest_show">
-                  <property name="maximumSize">
-                   <size>
-                    <width>40</width>
-                    <height>40</height>
-                   </size>
+                  <property name="scaledContents">
+                   <bool>false</bool>
                   </property>
-                  <property name="font">
-                   <font>
-                    <pointsize>6</pointsize>
-                   </font>
+                  <property name="alignment">
+                   <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
                   </property>
-                  <property name="statusTip">
-                   <string>Schaltet Sichtbarkeit der Preset Vorgaben an/aus. Ctrl+H</string>
-                  </property>
-                  <property name="icon">
-                   <iconset resource="res/preset_editor_rsc.qrc">
-                    <normaloff>:/main/eye.png</normaloff>
-                    <normalon>:/main/eye-disabled.png</normalon>:/main/eye.png</iconset>
-                  </property>
-                  <property name="iconSize">
-                   <size>
-                    <width>30</width>
-                    <height>30</height>
-                   </size>
-                  </property>
-                  <property name="shortcut">
-                   <string>Ctrl+H</string>
-                  </property>
-                  <property name="checkable">
+                  <property name="wordWrap">
                    <bool>true</bool>
                   </property>
-                  <property name="flat">
-                   <bool>true</bool>
-                  </property>
-                 </widget>
-                </item>
-                <item>
-                 <widget class="QPushButton" name="pushButton_Dest_clear">
-                  <property name="maximumSize">
-                   <size>
-                    <width>40</width>
-                    <height>40</height>
-                   </size>
-                  </property>
-                  <property name="font">
-                   <font>
-                    <pointsize>6</pointsize>
-                   </font>
-                  </property>
-                  <property name="statusTip">
-                   <string>Doppeklick leert die Benutzer Presets.</string>
-                  </property>
-                  <property name="icon">
-                   <iconset resource="res/preset_editor_rsc.qrc">
-                    <normaloff>:/main/trash-a.png</normaloff>:/main/trash-a.png</iconset>
-                  </property>
-                  <property name="iconSize">
-                   <size>
-                    <width>30</width>
-                    <height>30</height>
-                   </size>
-                  </property>
-                  <property name="flat">
-                   <bool>true</bool>
+                  <property name="margin">
+                   <number>0</number>
                   </property>
                  </widget>
                 </item>
                </layout>
               </item>
               <item>
-               <widget class="TreeInternalDrop" name="treeWidget_DestPreset">
-                <property name="minimumSize">
+               <widget class="QLineEdit" name="lineEdit_Dest_filter">
+                <property name="maximumSize">
                  <size>
-                  <width>500</width>
-                  <height>0</height>
+                  <width>16777215</width>
+                  <height>24</height>
                  </size>
                 </property>
                 <property name="statusTip">
-                 <string>Sortierung mit Pfeiltasten, Bild Auf Ab Tasten. Bearbeitet und speichert die Benutzer Presets.</string>
+                 <string>Filter Benutzer Presets nach Namen.</string>
                 </property>
-                <property name="frameShadow">
-                 <enum>QFrame::Plain</enum>
+                <property name="layoutDirection">
+                 <enum>Qt::LeftToRight</enum>
                 </property>
-                <property name="tabKeyNavigation">
+                <property name="text">
+                 <string/>
+                </property>
+                <property name="placeholderText">
+                 <string>Baum filtern...</string>
+                </property>
+                <property name="cursorMoveStyle">
+                 <enum>Qt::VisualMoveStyle</enum>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QPushButton" name="pushButton_Dest_show">
+                <property name="maximumSize">
+                 <size>
+                  <width>40</width>
+                  <height>40</height>
+                 </size>
+                </property>
+                <property name="font">
+                 <font>
+                  <pointsize>6</pointsize>
+                 </font>
+                </property>
+                <property name="statusTip">
+                 <string>Schaltet Sichtbarkeit der Preset Vorgaben an/aus. Ctrl+H</string>
+                </property>
+                <property name="icon">
+                 <iconset resource="res/preset_editor_rsc.qrc">
+                  <normaloff>:/main/eye.png</normaloff>
+                  <normalon>:/main/eye-disabled.png</normalon>:/main/eye.png</iconset>
+                </property>
+                <property name="iconSize">
+                 <size>
+                  <width>30</width>
+                  <height>30</height>
+                 </size>
+                </property>
+                <property name="shortcut">
+                 <string>Ctrl+H</string>
+                </property>
+                <property name="checkable">
                  <bool>true</bool>
                 </property>
-                <property name="dragEnabled">
+                <property name="flat">
                  <bool>true</bool>
                 </property>
-                <property name="dragDropMode">
-                 <enum>QAbstractItemView::InternalMove</enum>
+               </widget>
+              </item>
+              <item>
+               <widget class="QPushButton" name="pushButton_Dest_clear">
+                <property name="maximumSize">
+                 <size>
+                  <width>40</width>
+                  <height>40</height>
+                 </size>
                 </property>
-                <property name="defaultDropAction">
-                 <enum>Qt::MoveAction</enum>
+                <property name="font">
+                 <font>
+                  <pointsize>6</pointsize>
+                 </font>
                 </property>
-                <property name="alternatingRowColors">
+                <property name="statusTip">
+                 <string>Doppeklick leert die Benutzer Presets.</string>
+                </property>
+                <property name="icon">
+                 <iconset resource="res/preset_editor_rsc.qrc">
+                  <normaloff>:/main/trash-a.png</normaloff>:/main/trash-a.png</iconset>
+                </property>
+                <property name="iconSize">
+                 <size>
+                  <width>30</width>
+                  <height>30</height>
+                 </size>
+                </property>
+                <property name="flat">
                  <bool>true</bool>
                 </property>
-                <property name="selectionMode">
-                 <enum>QAbstractItemView::ExtendedSelection</enum>
-                </property>
-                <property name="uniformRowHeights">
-                 <bool>true</bool>
-                </property>
-                <property name="sortingEnabled">
-                 <bool>true</bool>
-                </property>
-                <property name="animated">
-                 <bool>true</bool>
-                </property>
-                <property name="wordWrap">
-                 <bool>true</bool>
-                </property>
-                <attribute name="headerDefaultSectionSize">
-                 <number>100</number>
-                </attribute>
-                <column>
-                 <property name="text">
-                  <string>Order</string>
-                 </property>
-                </column>
-                <column>
-                 <property name="text">
-                  <string>Name</string>
-                 </property>
-                </column>
-                <column>
-                 <property name="text">
-                  <string>Wert</string>
-                 </property>
-                </column>
-                <column>
-                 <property name="text">
-                  <string>Typ</string>
-                 </property>
-                </column>
-                <column>
-                 <property name="text">
-                  <string>Referenz</string>
-                 </property>
-                </column>
-                <column>
-                 <property name="text">
-                  <string>Id</string>
-                 </property>
-                </column>
                </widget>
               </item>
              </layout>
+            </item>
+            <item>
+             <widget class="TreeInternalDrop" name="treeWidget_DestPreset">
+              <property name="minimumSize">
+               <size>
+                <width>500</width>
+                <height>0</height>
+               </size>
+              </property>
+              <property name="statusTip">
+               <string>Sortierung mit Pfeiltasten, Bild Auf Ab Tasten. Bearbeitet und speichert die Benutzer Presets.</string>
+              </property>
+              <property name="frameShadow">
+               <enum>QFrame::Plain</enum>
+              </property>
+              <property name="tabKeyNavigation">
+               <bool>true</bool>
+              </property>
+              <property name="dragEnabled">
+               <bool>true</bool>
+              </property>
+              <property name="dragDropMode">
+               <enum>QAbstractItemView::InternalMove</enum>
+              </property>
+              <property name="defaultDropAction">
+               <enum>Qt::MoveAction</enum>
+              </property>
+              <property name="alternatingRowColors">
+               <bool>true</bool>
+              </property>
+              <property name="selectionMode">
+               <enum>QAbstractItemView::ExtendedSelection</enum>
+              </property>
+              <property name="uniformRowHeights">
+               <bool>true</bool>
+              </property>
+              <property name="sortingEnabled">
+               <bool>true</bool>
+              </property>
+              <property name="animated">
+               <bool>true</bool>
+              </property>
+              <property name="wordWrap">
+               <bool>true</bool>
+              </property>
+              <attribute name="headerDefaultSectionSize">
+               <number>100</number>
+              </attribute>
+              <column>
+               <property name="text">
+                <string>Order</string>
+               </property>
+              </column>
+              <column>
+               <property name="text">
+                <string>Name</string>
+               </property>
+              </column>
+              <column>
+               <property name="text">
+                <string>Wert</string>
+               </property>
+              </column>
+              <column>
+               <property name="text">
+                <string>Typ</string>
+               </property>
+              </column>
+              <column>
+               <property name="text">
+                <string>Referenz</string>
+               </property>
+              </column>
+              <column>
+               <property name="text">
+                <string>Id</string>
+               </property>
+              </column>
+             </widget>
             </item>
            </layout>
           </widget>
