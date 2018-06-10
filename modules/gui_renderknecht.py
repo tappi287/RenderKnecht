@@ -42,6 +42,7 @@ from modules.knecht_deltagen import SendToDeltaGen
 from modules.tree_drag_drop import render_tree_drop, WidgetToWidgetDrop
 from modules.tree_methods import AddRemoveItemsCommand, add_variant, toggle_ref_visibility, tree_setup_header_format
 from modules.tree_overlay import IntroOverlay
+from modules.tree_session import TreeSessionManager
 
 LOGGER = init_logging(__name__)
 
@@ -107,6 +108,9 @@ class RenderKnechtGui(QtWidgets.QApplication):
         for tree_widget in self.ui.tree_widget_list:
             tree_widget.undo_stack = QtWidgets.QUndoStack(self.undo_grp)
             tree_widget.undo_stack.setUndoLimit(25)
+
+        # Session mgr
+        self.session = TreeSessionManager(self, self.ui)
 
         # Set app class for delete class
         AddRemoveItemsCommand.app = self
@@ -234,6 +238,7 @@ class RenderKnechtGui(QtWidgets.QApplication):
         # Double click on label sorts headers
         self.ui.label_Src.mouseDoubleClickEvent = self.sort_all_headers_event
         self.ui.label_Dest.mouseDoubleClickEvent = self.sort_all_headers_event
+        self.ui.label_Dest_File.mouseDoubleClickEvent = self.sort_all_headers_event
         self.ui.label_Renderlist.mouseDoubleClickEvent = self.sort_all_headers_event
 
         # Sort buttons
@@ -253,7 +258,7 @@ class RenderKnechtGui(QtWidgets.QApplication):
         self.ui.treeWidget_SrcPreset.clear_tree = src_clear.clear
         self.ui.pushButton_Src_clear.mouseDoubleClickEvent = src_clear.dbl_click
 
-        dst_clear = self.ClearTree(self.ui.treeWidget_DestPreset, self)
+        dst_clear = self.ClearTree(self.ui.treeWidget_DestPreset, self, unset_save_file=True)
         self.ui.treeWidget_DestPreset.clear_tree = dst_clear.clear
         self.ui.pushButton_Dest_clear.mouseDoubleClickEvent = dst_clear.dbl_click
 
@@ -321,6 +326,9 @@ class RenderKnechtGui(QtWidgets.QApplication):
         if not intro_shown:
             self.intro_timer.timeout.connect(self.show_intro)
             self.intro_timer.start()
+
+        # Load session
+        self.session.load_session()
 
         # Show window and finish splash screen
         self.ui.show()
@@ -725,6 +733,13 @@ class RenderKnechtGui(QtWidgets.QApplication):
             if not save:
                 return
 
+        # Disable tree widgets before session save
+        for widget in self.ui.tree_widget_list:
+            widget.setEnabled(False)
+
+        # Save current session
+        self.session.save_session()
+
         self.ui.end_threads()
         self.ui.close()
 
@@ -737,9 +752,10 @@ class RenderKnechtGui(QtWidgets.QApplication):
 
     class ClearTree:
 
-        def __init__(self, widget, app):
+        def __init__(self, widget, app, unset_save_file=False):
             self.widget = widget
             self.app = app
+            self.unset_save_file = unset_save_file
 
         def dbl_click(self, event):
             if not self.clear():
@@ -749,6 +765,12 @@ class RenderKnechtGui(QtWidgets.QApplication):
             event.accept()
 
         def clear(self):
+            if self.unset_save_file:
+                LOGGER.debug('Clear tree is unsetting save file.')
+                self.app.menu.save_mgr.save_file = ''
+                self.app.ui.unsaved_changes_present = False
+                self.app.ui.set_window_title('')
+
             if self.widget.topLevelItemCount() == 0:
                 return False
 

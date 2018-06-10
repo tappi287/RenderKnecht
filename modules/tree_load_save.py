@@ -65,7 +65,7 @@ from PyQt5.QtWidgets import QTreeWidget
 from PyQt5 import QtCore
 
 from modules.knecht_threads import ConvertLegacyVariants, ExcelConversionThread
-from modules.app_globals import SAVE_CUR, Msg, HELPER_DIR
+from modules.app_globals import Msg, HELPER_DIR
 from modules.knecht_log import init_logging
 from modules.tree_methods import SortTree
 from modules.knecht_settings import knechtSettings
@@ -74,19 +74,6 @@ LOGGER = init_logging(__name__)
 
 # Strings
 Msg()
-
-
-def save_current_filename(filename):
-    """ Save last opened file as StartUp file for next session """
-    filename = Path(filename)
-
-    if filename.exists():
-        # Save last active file
-        with open(SAVE_CUR, 'w') as f:
-            f.write(str(filename))
-
-        # Add to recent files
-        knechtSettings.add_recent_file('variants_xml', str(filename))
 
 
 class SavePreset:
@@ -109,17 +96,8 @@ class SavePreset:
         # Save to file
         save_successful, save_msg = self.save_items(self.save_file)
 
-        # Save current file name
-        if save_successful:
-            try:
-                # Save as StartUp file for next session
-                save_current_filename(self.save_file)
-            except Exception as e:
-                LOGGER.warning('Could not save current file name. %s\n%s',
-                               self.save_file, e)
-
-            self.widget.overlay.save_anim()
-            self.widget.info_overlay.display(save_msg, 8000)
+        self.widget.overlay.save_anim()
+        self.widget.info_overlay.display(save_msg, 8000)
 
         return save_successful, save_msg
 
@@ -396,12 +374,13 @@ class OpenPresetFile:
 
         # Xml had valid content
         if current_file:
-            # Save as StartUp file for next session
-            save_current_filename(xmlFile)
             self.ui.set_window_title(Path(xmlFile).name)
 
             xml_message = Msg.XML_FILE_LOADED + Path(xmlFile).name
             self.tree_widget_source.info_overlay.display(xml_message, 4000)
+
+            # Add to recent files
+            knechtSettings.add_recent_file('variants_xml', Path(xmlFile).as_posix())
 
             # Sort tree widget
             self.ui.sort_tree_widget.sort_all(self.tree_widget_source)

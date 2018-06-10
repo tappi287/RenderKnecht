@@ -225,8 +225,8 @@ class FindReferenceItems:
             only_report_exisiting: true
             report existing references within same tree for provided preset
         """
-        # Provided item is Preset or RenderPreset?
-        if src_preset.UserType not in [1000, 1003]:
+        # Provided item is Preset
+        if src_preset.UserType not in [1000]:
             return [], [], []
 
         # LOGGER.debug('Searching for references in: %s', src_preset.text(ItemColumn.NAME))

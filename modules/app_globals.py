@@ -448,24 +448,11 @@ UI_SIZE = (150, 150, 1600, 1024)
 # User Documentation
 DOC_FILE = _DOCS_DIR / _DOC_FILE
 
-# Start-Up file
-SAVE_CUR = HELPER_DIR / _SAVE_CUR
-
 # Xml Temp Files
 SRC_XML = HELPER_DIR / _SRC_TEMP_XML
 DEST_XML = HELPER_DIR / _DEST_TEMP_XML
 
-if os.path.exists(SAVE_CUR):
-    with open(SAVE_CUR, 'r') as f:
-        _START_UP_FILE_NAME = f.readline()
-
-START_UP_FILE = HELPER_DIR / _START_UP_FILE_NAME
-if not os.path.exists(START_UP_FILE):
-    START_UP_FILE = False
-    InfoMessage.START_INFO = '<br>Beim Start geladen:<br>' + 'Nüscht.' + '<br>'
-else:
-    InfoMessage.START_INFO = '<br>Beim Start geladen:<br>' + str(
-        START_UP_FILE) + '<br>'
+InfoMessage.START_INFO = '<br>Beim Start geladen:<br>' + 'Nüscht.' + '<br>'
 
 # System version info
 sys_version_info = '<br>Python %s<br>Platform %s<br>' % (sys.version,

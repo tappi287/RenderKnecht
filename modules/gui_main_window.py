@@ -74,7 +74,6 @@ class MainWindow(QtWidgets.QMainWindow):
 
         # Add version to Window title
         self.ver = InfoMessage.ver
-        self.stat = InfoMessage.stat
         self.title = self.windowTitle()
         self.set_window_title()
 
@@ -265,11 +264,15 @@ class MainWindow(QtWidgets.QMainWindow):
         return answer
 
     def set_window_title(self, file_info: str = ''):
-        if file_info:
-            if self.unsaved_changes_present: file_info = '*' + file_info + '*'
-            self.setWindowTitle(file_info + ' - ' + self.title + ' - ' + self.ver + ' - ' + self.stat)
+        self.setWindowTitle(self.title + ' - ' + self.ver)
+
+        if file_info != '':
+            if self.unsaved_changes_present:
+                file_info = '*' + file_info + '*'
+                self.setWindowTitle('*' + self.title + ' ' + self.ver + '*')
+            self.label_Dest_File.setText(file_info)
         else:
-            self.setWindowTitle(self.title + ' - ' + self.ver + ' - ' + self.stat)
+            self.label_Dest_File.setText(Msg.NO_FILE_INFO)
 
     def report_conflict(self, item=False, new_id=False):
         """ Report ID Conflict """
@@ -294,10 +297,14 @@ class MainWindow(QtWidgets.QMainWindow):
 
     def get_tree_name(self, widget):
         """ Return user readable tree names """
-        if widget is self.treeWidget_SrcPreset: return 'Preset Vorgaben'
-        if widget is self.treeWidget_DestPreset: return 'Benutzer Vorgaben'
-        if widget is self.treeWidget_Variants: return 'Varianten Liste'
-        if widget is self.treeWidget_render: return 'Render Liste'
+        if widget is self.treeWidget_SrcPreset:
+            return 'Preset Vorgaben'
+        if widget is self.treeWidget_DestPreset:
+            return 'Benutzer Vorgaben'
+        if widget is self.treeWidget_Variants:
+            return 'Varianten Liste'
+        if widget is self.treeWidget_render:
+            return 'Render Liste'
         return ''
 
     def tree_with_focus(self):
