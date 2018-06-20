@@ -151,7 +151,10 @@ class SendToDeltaGen(QObject):
         if self.thread:
             if self.thread_running():
                 LOGGER.info('Shutting down DeltaGen communication thread.')
-                self.thread.exit_thread()
+                try:
+                    self.thread.exit_thread()
+                except AttributeError:
+                    pass
 
             self.thread.exit()
             self.thread.wait(msecs=20000)
@@ -442,6 +445,11 @@ class SendToDeltaGen(QObject):
         return render_preset_dict
 
     def validate_render_settings(self, render_preset_dict):
+        # Check render path
+        if not self.render_user_path or self.render_user_path == Path('.'):
+            QtWidgets.QMessageBox.critical(self.widget, Msg.GENERIC_ERROR_TITLE, Msg.RENDER_INVALID_PATH)
+            return False
+
         # Check if all settings are available
         if render_preset_dict:
             for idx in range(0, len(render_preset_dict)):
@@ -1115,8 +1123,13 @@ class send_to_dg_worker(QObject):
                 self.render_log += '\nDatei konnte nicht als gültige Bilddatei verfiziert werden: ' + str(
                     img_path) + '\n'
 
-                if exception_message:
-                    self.render_log += exception_message + '\n'
+                try:
+                    if exception_message:
+                        self.render_log += exception_message + '\n'
+                except UnboundLocalError:
+                    # exception_message not defined
+                    pass
+
                 break
 
     def calculate_remaining(self, render_time, img_count, image_num):

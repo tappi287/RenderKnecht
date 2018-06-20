@@ -25,9 +25,8 @@ WELCOME_MSG = '\n\nWillkommen im RenderKnecht String Kerker!\n\n'
 class Msg:
     """ Set GUI strings as class attributes for easy import and access """
     APP_LINK_LINE = '<span style="font-size: 7pt;">' \
-                     '<a style="color: #ced0d1" href="https://docs.google.com/spreadsheets/d/' \
-                     '1gtp5drr-STY75i68vwMmm6FPDqAG-qrs9ZAw2-lJvuk/edi' \
-                     't?usp=sharing">Beschwerden an meinen Assistenten</a> ' \
+                     '<a style="color: #ced0d1" href="https://github.com/tappi287/RenderKnecht/issues"' \
+                     '>Beschwerden an meinen Assistenten</a> ' \
                      'damit er sie für mich verbrennt, denn:</span>'
 
     _APP = '<h4><img src=":/ovr/welcome.png" width="21" height="21" style="float: left;">' \
@@ -54,8 +53,8 @@ class Msg:
            'Öffnen des Ausgabeordners per Dialog möglich</li>'
 
     APP_VERSION_GREETING = _APP
-    APP_EXT_LINK_BTN = 'Docs'
-    APP_EXT_LINK = 'https://docs.google.com/spreadsheets/d/1gtp5drr-STY75i68vwMmm6FPDqAG-qrs9ZAw2-lJvuk/edit?usp=sharing'
+    APP_EXT_LINK_BTN = 'Report issues'
+    APP_EXT_LINK = 'https://github.com/tappi287/RenderKnecht/issues'
     APP_EXIT_WHILE_THREAD_TITLE = 'Beenden'
     APP_EXIT_WHILE_THREAD_RUNNING = 'Ein laufender Prozess rendert oder sendet Daten an DeltaGen.<br><br>'
     APP_EXIT_WHILE_THREAD_RUNNING += 'Die Anwendung wirklich schließen?'
@@ -235,6 +234,7 @@ class Msg:
     REFERENCE_NAME = 'Referenz'
     ORPHAN_PRESET_NAME = '#_Verwaiste_Elemente'
     RENDER_FILE_DIALOG = 'Pfad zum Render Ausgabeverzeichnis angeben...'
+    RENDER_INVALID_PATH = 'Ausgabe Pfad ungültig. Gültigen Pfad angeben.'
     RENDER_NO_PRESETS = 'Render Presets konnten nicht verifiziert werden. Vorgang abgebrochen.'
     RENDER_LOG = ['RenderKnecht Render Log erstellt am ', 'Erzeuge Bild mit Namen: ', 'Varianten: ']
     RENDER_TOGGLE_TIMEOUT_ON = 'Feedbackloop je gesendeter Variante und Varianten State Check aktiviert.'
