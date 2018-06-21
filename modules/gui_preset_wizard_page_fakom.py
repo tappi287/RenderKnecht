@@ -30,7 +30,7 @@ from modules.gui_widgets import load_ui_file
 from modules.tree_events import TreeKeyEvents
 from modules.tree_context_menus import SelectionContextMenu
 from modules.tree_methods import iterate_item_childs, deep_copy_items, style_database_preset
-from modules.tree_methods import delete_tree_item_without_undo, create_unique_item_name
+from modules.tree_methods import delete_tree_item_without_undo, create_unique_item_name, iterate_tree_widget_items_flat
 from modules.tree_overlay import InfoOverlay
 from modules.tree_filter_thread import filter_on_timer
 
@@ -140,7 +140,7 @@ class FakomWizardPage(QtWidgets.QWizardPage):
         self.load_preset_page_content = True
 
     def isComplete(self):
-        __items = self.fakomTree.selectedItems()
+        __items = self.get_selected_fakom_items()
 
         if __items:
             self.parent.fakom_presets = __items
@@ -372,8 +372,22 @@ class FakomWizardPage(QtWidgets.QWizardPage):
 
                 __g.setText(0, f'{__g.text(3)} - {__preset_num_per_model[__m]:02d}')
 
+    def get_selected_fakom_items(self):
+        """ Return selected QTreeWidget items *including hidden items* """
+        selected_items = list()
+
+        for __i in self.fakomTree.findItems('sib_item', QtCore.Qt.MatchRecursive, 2):
+            for __c in self.iter_childs.iterate_childs(__i):
+                if __c.isSelected():
+                    selected_items.append(__c)
+
+        return selected_items
+
     def selection_changed(self):
-        __items = self.fakomTree.selectedItems()
+        # buildin method does not return selected, hidden(filtered) items
+        # __items = self.fakomTree.selectedItems()
+
+        __items = self.get_selected_fakom_items()
 
         # Avoid selection signal for unselectable grouping items
         # who emit selectionChanged anyway
