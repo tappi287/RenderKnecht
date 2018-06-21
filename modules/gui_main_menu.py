@@ -186,6 +186,9 @@ class MenuBar(QtCore.QObject):
         if render_path == '':
             render_path = self.get_directory_file_dialog(self.ui.current_path, Msg.RENDER_FILE_DIALOG)
 
+        if render_path is None:
+            return
+
         # os.path is more robust in catching weird strings
         if os.path.exists(render_path):
             SendToDeltaGen.render_user_path = render_path

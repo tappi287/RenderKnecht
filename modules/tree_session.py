@@ -26,7 +26,7 @@ from functools import partial
 
 from PyQt5 import QtCore
 
-from modules.tree_methods import tree_setup_header_format
+from modules.tree_methods import tree_setup_header_format, iterate_tree_widget_items_flat, set_item_flags
 from modules.knecht_log import init_logging
 from modules.knecht_xml import XML
 from modules.app_strings import Msg
@@ -126,6 +126,11 @@ class TreeSessionManager(QtCore.QObject):
             if tree_xml:
                 tree_session.xml.parse_element_to_tree_widget(tree_xml)
                 LOGGER.debug('Loading session elements for %s.', tree_session.name)
+
+                # Set item flags for editable widgets
+                if tree_session.name != 'treeWidget_SrcPreset':
+                    for item in iterate_tree_widget_items_flat(tree_session.widget):
+                        set_item_flags(item)
 
             # Sort the tree widgets
             self.ui.sort_tree_widget.sort_all(tree_session.widget)

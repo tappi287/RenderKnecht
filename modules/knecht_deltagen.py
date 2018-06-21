@@ -54,7 +54,8 @@ def create_png_images(img_list, contains_render_preset_dir=False, converted_dir_
         except ValueError or OSError as exception_message:
             # Image may not be completly written yet
             LOGGER.error('Could not open image: %s, %s', img_file_path, exception_message)
-            return_msg += '\nBild konnte nicht gelesen werden: ' + img_file_path.name + '\n' + exception_message + '\n'
+            return_msg += '\nBild konnte nicht gelesen werden: '\
+                          + img_file_path.name + '\n' + str(exception_message) + '\n'
 
             skip_img = True
 
@@ -1068,8 +1069,8 @@ class send_to_dg_worker(QObject):
             self.status.emit('Erzeuge nächstes Bild in ' + str(count) + '...')
             time.sleep(1)
 
-    def verify_rendered_image(self, img_path, timeout=180):
-        """ Read rendered image with ImageIO to verify as valid image or break after 3mins/180secs """
+    def verify_rendered_image(self, img_path, timeout=3300):
+        """ Read rendered image with ImageIO to verify as valid image or break after 55mins/3300secs """
         begin = time.time()
         img = False
         exception_message = ''
