@@ -44,7 +44,7 @@ LOGGER = init_logging(__name__)
 
 
 class MainWindow(QtWidgets.QMainWindow):
-    """ MainWindow of the RenderKnecht Preset Editor """
+    """ SchnuffiWindow of the RenderKnecht Preset Editor """
 
     def __init__(self, app_class):
         super(MainWindow, self).__init__()
@@ -349,6 +349,6 @@ class MainWindow(QtWidgets.QMainWindow):
             tree_widget.filter.end_thread()
 
     def closeEvent(self, QCloseEvent):
-        LOGGER.debug('Preset Editor MainWindow close event triggered. Closing MainWindow.')
+        LOGGER.debug('Preset Editor SchnuffiWindow close event triggered. Closing SchnuffiWindow.')
         QCloseEvent.ignore()
         self.app_class.exit_preset_editor()

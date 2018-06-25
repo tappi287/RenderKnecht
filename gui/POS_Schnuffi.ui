@@ -1,0 +1,239 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>SchnuffiWindow</class>
+ <widget class="QMainWindow" name="SchnuffiWindow">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>1005</width>
+    <height>770</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>POS Schnuffi</string>
+  </property>
+  <property name="windowIcon">
+   <iconset resource="res/preset_editor_rsc.qrc">
+    <normaloff>:/main/dog.png</normaloff>:/main/dog.png</iconset>
+  </property>
+  <widget class="QWidget" name="centralwidget">
+   <layout class="QVBoxLayout" name="verticalLayout">
+    <property name="spacing">
+     <number>0</number>
+    </property>
+    <property name="leftMargin">
+     <number>0</number>
+    </property>
+    <property name="topMargin">
+     <number>0</number>
+    </property>
+    <property name="rightMargin">
+     <number>0</number>
+    </property>
+    <property name="bottomMargin">
+     <number>0</number>
+    </property>
+    <item>
+     <widget class="QTabWidget" name="tabWidget">
+      <property name="currentIndex">
+       <number>1</number>
+      </property>
+      <widget class="QWidget" name="tab">
+       <attribute name="title">
+        <string>Hinzugefügt</string>
+       </attribute>
+       <layout class="QVBoxLayout" name="verticalLayout_2">
+        <item>
+         <widget class="QTreeWidget" name="AddedWidget">
+          <property name="sortingEnabled">
+           <bool>true</bool>
+          </property>
+          <column>
+           <property name="text">
+            <string>Action List</string>
+           </property>
+          </column>
+          <column>
+           <property name="text">
+            <string>Wert</string>
+           </property>
+          </column>
+          <column>
+           <property name="text">
+            <string>Wert(alt)</string>
+           </property>
+          </column>
+          <column>
+           <property name="text">
+            <string>Typ</string>
+           </property>
+          </column>
+          <item>
+           <property name="text">
+            <string>List_1</string>
+           </property>
+           <item>
+            <property name="text">
+             <string>actor_name</string>
+            </property>
+            <property name="text">
+             <string>0</string>
+            </property>
+            <property name="text">
+             <string>1</string>
+            </property>
+            <property name="text">
+             <string>switch</string>
+            </property>
+           </item>
+          </item>
+         </widget>
+        </item>
+       </layout>
+      </widget>
+      <widget class="QWidget" name="tab_2">
+       <attribute name="title">
+        <string>Geändert</string>
+       </attribute>
+       <layout class="QVBoxLayout" name="verticalLayout_3">
+        <item>
+         <widget class="QTreeWidget" name="ModifiedWidget">
+          <property name="sortingEnabled">
+           <bool>true</bool>
+          </property>
+          <column>
+           <property name="text">
+            <string>Action List</string>
+           </property>
+          </column>
+          <column>
+           <property name="text">
+            <string>Wert</string>
+           </property>
+          </column>
+          <column>
+           <property name="text">
+            <string>Wert(alt)</string>
+           </property>
+          </column>
+          <column>
+           <property name="text">
+            <string>Typ</string>
+           </property>
+          </column>
+          <item>
+           <property name="text">
+            <string>List_1</string>
+           </property>
+           <item>
+            <property name="text">
+             <string>actor_name</string>
+            </property>
+            <property name="text">
+             <string>0</string>
+            </property>
+            <property name="text">
+             <string>1</string>
+            </property>
+            <property name="text">
+             <string>switch</string>
+            </property>
+           </item>
+          </item>
+         </widget>
+        </item>
+       </layout>
+      </widget>
+      <widget class="QWidget" name="tab_3">
+       <attribute name="title">
+        <string>Entfernt</string>
+       </attribute>
+       <layout class="QVBoxLayout" name="verticalLayout_4">
+        <item>
+         <widget class="QTreeWidget" name="RemovedWidget">
+          <property name="sortingEnabled">
+           <bool>true</bool>
+          </property>
+          <column>
+           <property name="text">
+            <string>Action List</string>
+           </property>
+          </column>
+          <column>
+           <property name="text">
+            <string>Wert</string>
+           </property>
+          </column>
+          <column>
+           <property name="text">
+            <string>Wert(alt)</string>
+           </property>
+          </column>
+          <column>
+           <property name="text">
+            <string>Typ</string>
+           </property>
+          </column>
+          <item>
+           <property name="text">
+            <string>List_1</string>
+           </property>
+           <item>
+            <property name="text">
+             <string>actor_name</string>
+            </property>
+            <property name="text">
+             <string>0</string>
+            </property>
+            <property name="text">
+             <string>1</string>
+            </property>
+            <property name="text">
+             <string>switch</string>
+            </property>
+           </item>
+          </item>
+         </widget>
+        </item>
+       </layout>
+      </widget>
+     </widget>
+    </item>
+   </layout>
+  </widget>
+  <widget class="QMenuBar" name="menubar">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>0</y>
+     <width>1005</width>
+     <height>31</height>
+    </rect>
+   </property>
+   <widget class="QMenu" name="menuDatei">
+    <property name="title">
+     <string>Datei</string>
+    </property>
+    <addaction name="actionOpen"/>
+    <addaction name="actionBeenden"/>
+   </widget>
+   <addaction name="menuDatei"/>
+  </widget>
+  <widget class="QStatusBar" name="statusbar"/>
+  <action name="actionBeenden">
+   <property name="text">
+    <string>Beenden</string>
+   </property>
+  </action>
+  <action name="actionOpen">
+   <property name="text">
+    <string>Vergleichen ...</string>
+   </property>
+  </action>
+ </widget>
+ <resources>
+  <include location="res/preset_editor_rsc.qrc"/>
+ </resources>
+ <connections/>
+</ui>

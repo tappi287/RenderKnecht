@@ -1,5 +1,6 @@
 <RCC>
   <qresource prefix="main">
+    <file>dog.png</file>
     <file>social-github-b.png</file>
     <file>social-github.png</file>
     <file>switch.png</file>

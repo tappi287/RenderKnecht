@@ -136,6 +136,9 @@ class Msg:
     REF_IMG_COLLECTED = 'Es wurden {trim:02d} Trim; {fakom:02d} FaKom; {pkg:03d} Pakete; ' \
                         '{pr:03d} PR-Optionen gesammelt.'
 
+    POS_RUNNING_TITLE = 'POS Schnuffi'
+    POS_RUNNING_MSG = 'POS Schnuffi Prozess läuft. Trotzdem beenden?'
+
     SAVE_FILTER = 'Variant Preset Dateien (*.xml)'
     SAVE_DIALOG_TITLE = 'Benutzer Presets als *.XML speichern...'
     SAVE_OVER = ['Datei: <i>', '</i><br>wirklich <b>überschreiben?</b>']
@@ -318,12 +321,13 @@ class InfoMessage:
         (":/type/pkg.png", "Box", "by Gregor Cresnar", "http://www.flaticon.com/", "Flaticon Basic License"),
         (":/type/checkmark.png", "Checkmark", "by Freepik", "http://www.flaticon.com/", "Flaticon Basic License"),
         (":/type/fakom.png", "Leather", "by Smashicons", "http://www.flaticon.com/", "Flaticon Basic License"),
+        (":/main/dog.png", "Dog", "by Twitter", "http://www.flaticon.com/", "CC 3.0 BY"),
         (":/type/car.png", "Car front", "by Google", "http://www.flaticon.com/", "CC 3.0 BY"),
         (":/type/img.png", "Google Drive image", "by Google", "http://www.flaticon.com/", "CC 3.0 BY"),
         (":/type/preset.png", "Gear black shape", "by SimpleIcon", "http://www.flaticon.com/", "CC 3.0 BY"),
         (":/type/options.png", "Listing option", "by Dave Gandy", "http://www.flaticon.com/", "CC 3.0 BY"),
         (":/type/viewset.png", "Photo camera", "by Dave Gandy", "http://www.flaticon.com/", "CC 3.0 BY"),
-        (":/type/reset.png", "Reload Arrow", "By Plainicon", "http://www.flaticon.com/", "CC 3.0 BY"),
+        (":/type/reset.png", "Reload Arrow", "by Plainicon", "http://www.flaticon.com/", "CC 3.0 BY"),
         (":/main/folder.png", "Folder", "by Ionicons", "https://ionicons.com/", "MIT License"),
         (":/main/paint.png", "color-palette", "by Ionicons", "https://ionicons.com/", "MIT License"),
         (":/main/link-broken.png", "link-broken", "by Iconic", "http://useiconic.com", "MIT License"),

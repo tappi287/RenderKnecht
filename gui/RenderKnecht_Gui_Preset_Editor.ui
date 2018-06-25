@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>MainWindow</class>
- <widget class="QMainWindow" name="MainWindow">
+ <class>SchnuffiWindow</class>
+ <widget class="QMainWindow" name="SchnuffiWindow">
   <property name="enabled">
    <bool>true</bool>
   </property>
@@ -2356,6 +2356,7 @@ p, li { white-space: pre-wrap; }
     <addaction name="menuImport"/>
     <addaction name="separator"/>
     <addaction name="actionPNG_Konverter"/>
+    <addaction name="actionSchnuffi"/>
     <addaction name="separator"/>
     <addaction name="actionSave"/>
     <addaction name="actionSave_as"/>
@@ -2714,6 +2715,15 @@ p, li { white-space: pre-wrap; }
   <action name="actionIntro">
    <property name="text">
     <string>Einführung</string>
+   </property>
+  </action>
+  <action name="actionSchnuffi">
+   <property name="icon">
+    <iconset resource="res/preset_editor_rsc.qrc">
+     <normaloff>:/main/dog.png</normaloff>:/main/dog.png</iconset>
+   </property>
+   <property name="text">
+    <string>POS Schnuffi</string>
    </property>
   </action>
  </widget>

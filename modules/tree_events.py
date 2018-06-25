@@ -148,7 +148,7 @@ class TreeKeyEvents(QtCore.QObject):
                         self.ui.actionSelectRef.trigger()
                         return True
 
-                    # Copy, Cut, Paste - redundant but doesn't work flawlessly with only shortcuts in MainWindow
+                    # Copy, Cut, Paste - redundant but doesn't work flawlessly with only shortcuts in SchnuffiWindow
                     if event.key() == QtCore.Qt.Key_C and event.modifiers() == QtCore.Qt.ControlModifier:
                         # Select Ref
                         if self.wizard:

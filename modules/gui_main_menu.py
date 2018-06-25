@@ -54,7 +54,7 @@ class MenuBar(QtCore.QObject):
         # App class instance
         self.app = app
 
-        # MainWindow class instance
+        # SchnuffiWindow class instance
         self.ui = ui
 
         # LogWindow class instance

@@ -43,6 +43,7 @@ from modules.tree_drag_drop import render_tree_drop, WidgetToWidgetDrop
 from modules.tree_methods import AddRemoveItemsCommand, add_variant, toggle_ref_visibility, tree_setup_header_format
 from modules.tree_overlay import IntroOverlay
 from modules.tree_session import TreeSessionManager
+from modules.pos_schnuffi import SchnuffiApp
 
 LOGGER = init_logging(__name__)
 
@@ -74,13 +75,16 @@ class RenderKnechtGui(QtWidgets.QApplication):
     intro_timer.setInterval(500)
     intro_widget = None
 
-    def __init__(self, version, knecht_except_hook):
+    pos_schnuffi = None
+
+    def __init__(self, version, knecht_except_hook, logging_queue):
         super(RenderKnechtGui, self).__init__(sys.argv)
 
         load_style(self)
 
         # Version
         self.version = version
+        self.logging_queue = logging_queue
 
         if SHOW_SPLASH:
             splash = show_splash_screen_movie(self)
@@ -164,6 +168,7 @@ class RenderKnechtGui(QtWidgets.QApplication):
         self.ui.action_fakom.triggered.connect(self.menu.ImportFakom)
         self.ui.actionPresetWizard.triggered.connect(self.menu.preset_wizard)
         self.ui.actionPNG_Konverter.triggered.connect(self.menu.png_converter)
+        self.ui.actionSchnuffi.triggered.connect(self.start_pos_schnuffi)
         self.ui.actionSave.triggered.connect(self.menu.file_save)
         self.ui.actionSave_as.triggered.connect(partial(self.menu.file_save, True))
         self.ui.actionExit.triggered.connect(self.ui.close)
@@ -360,6 +365,9 @@ class RenderKnechtGui(QtWidgets.QApplication):
         self.intro_widget.deleteLater()
         self.intro_widget = None
         knechtSettings.app['introduction_shown'] = True
+
+    def start_pos_schnuffi(self):
+        self.pos_schnuffi = SchnuffiApp(self)
 
     def set_undo_stack_active(self, clean_state):
         """ Receives cleanChanged from Undo Grp to set last stack active if current stack is changed """

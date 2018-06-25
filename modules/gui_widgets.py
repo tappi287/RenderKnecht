@@ -123,7 +123,7 @@ class FakomWindow(QtWidgets.QDialog):
     def __init__(self, parent, app, wizard: bool=False, widget=None):
         super(FakomWindow, self).__init__(parent)
 
-        # Parent should be MainWindow
+        # Parent should be SchnuffiWindow
         self.parent, self.app, self.ui, self.wizard, self.widget = parent, app, app.ui, wizard, widget
 
         # Instance
