@@ -180,10 +180,13 @@ class TreeKeyEvents(QtCore.QObject):
                     return True
 
                 # Send alphanumeric keys to LineEdit filter widget
-                if event.text().isalnum() or event.key() == QtCore.Qt.Key_Space:
+                filter_keys = [QtCore.Qt.Key_Space, QtCore.Qt.Key_Underscore, QtCore.Qt.Key_Minus]
+
+                if event.text().isalnum() or event.key() in filter_keys:
                     filter_txt = self.widget.filter_txt_widget.text()
                     filter_txt += event.text()
                     overlay_txt = Msg.OVERLAY_FILTER + filter_txt
+
                     self.widget.info_overlay.display(overlay_txt, 1500, True)
                     self.widget.filter_txt_widget.setText(filter_txt)
                     return True

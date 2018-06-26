@@ -26,6 +26,7 @@ from PyQt5.QtGui import QColor, QPalette
 
 from modules.knecht_log import init_logging
 from modules.app_globals import ItemColumn
+from modules.tree_methods import iterate_item_childs
 
 LOGGER = init_logging(__name__)
 
@@ -38,9 +39,13 @@ class filter_on_timer(QtCore.QObject):
         self.tree_filter_thread = TreeFilterThread()
         self.tree_filter_thread.create_thread()
 
+        filter_children = True
+        if kwargs.get('filter_children') is not None:
+            filter_children = kwargs.get('filter_children')
+
         # Init filter
         self.filter = filter(self.tree_filter_thread, txt_widget, tree_widget,
-                             kwargs['filter_column'])
+                             kwargs['filter_column'], filter_children)
 
         # Init timer
         self.typing_timer = QtCore.QTimer()
@@ -60,19 +65,21 @@ class filter_on_timer(QtCore.QObject):
 class filter:
     """ Filter TreeWidget with text from text widget """
 
-    def __init__(self, filter_thread, txt_widget, tree_widget, column):
+    def __init__(self, filter_thread, txt_widget, tree_widget, column, filter_children=True):
         self.txt_widget = txt_widget
         self.tree_widget = tree_widget
         self.column = column
         self.filter_thread = filter_thread
+        self.filter_children = filter_children
 
         self.txt_anim = BgrAnimation(txt_widget, (255, 255, 255))
 
     def filter_tree(self):
         txt = self.txt_widget.text()
-        LOGGER.debug('Calling filter thread %s %s', self.column, txt)
+        LOGGER.debug('Calling filter thread %s %s filtering children: %s', self.column, txt, self.filter_children)
         # Call filter thread
-        self.filter_thread.filter_items(self.column, txt, self.tree_widget)
+        self.filter_thread.filter_items(self.column, txt, self.tree_widget,
+                                        pattern=1, filter_children=self.filter_children)
 
         if txt:
             self.txt_anim.active_pulsate()
@@ -85,7 +92,7 @@ class filter:
 
 class TreeFilterThread(QtCore.QObject):
     """ Creates a worker thread to take search operations of the main GUI thread """
-    request_filter = QtCore.pyqtSignal(list, str, QtWidgets.QTreeWidget, int)
+    request_filter = QtCore.pyqtSignal(list, str, QtWidgets.QTreeWidget, int, bool)
 
     def __init__(self):
         super(TreeFilterThread, self).__init__()
@@ -119,12 +126,13 @@ class TreeFilterThread(QtCore.QObject):
                      column,
                      filter_txt: str,
                      tree_widget: QtWidgets.QTreeWidget,
-                     pattern=1):
+                     pattern=1,
+                     filter_children=True):
         # Search column to list
         if type(column) is not list:
             column = [column]
 
-        self.request_filter.emit(column, filter_txt, tree_widget, pattern)
+        self.request_filter.emit(column, filter_txt, tree_widget, pattern, filter_children)
 
     def get_item_from_index(self, index, widget):
         try:
@@ -171,7 +179,7 @@ class tree_worker_thread(QtCore.QObject):
     def __init__(self):
         super(tree_worker_thread, self).__init__()
 
-    def filter_widget(self, column: int, txt, tree_widget, pattern):
+    def filter_widget(self, column: int, txt, tree_widget, pattern, filter_children=True):
         """ Filter TreeWidget with text from text widget """
 
         def search_pattern(txt, pattern):
@@ -210,7 +218,12 @@ class tree_worker_thread(QtCore.QObject):
             id_search.remove('')
 
         if txt is not '':
+            LOGGER.debug('Filtering children: %s', filter_children)
+
             for item in self.iterate_tree_widget_items_flat(tree_widget):
+                if not filter_children and item.parent():
+                    continue
+
                 index = tree_widget.indexFromItem(item)
 
                 match = False

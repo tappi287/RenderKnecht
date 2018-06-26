@@ -44,7 +44,7 @@ LOGGER = init_logging(__name__)
 
 
 class MainWindow(QtWidgets.QMainWindow):
-    """ SchnuffiWindow of the RenderKnecht Preset Editor """
+    """ Window of the RenderKnecht Preset Editor """
 
     def __init__(self, app_class):
         super(MainWindow, self).__init__()

@@ -68,7 +68,7 @@ class Msg:
     UNSAVED_CHANGES = 'Die Benutzer Vorgaben enthalten <i>ungespeicherte</i> Änderungen!<br><br>'
     UNSAVED_CHANGES += 'Sollen die Änderungen gespeichert werden?'
     UNSAVED_CHANGES_YES = '&Speichern'
-    UNSAVED_CHANGES_NO = '&Beenden'
+    UNSAVED_CHANGES_NO = 'B&eenden'
     UNSAVED_CHANGES_CANCEL = '&Abbrechen'
 
     CMD_FILE_MSG = 'CMD Datei ausgewählt. Starte Konvertierung von ALLEN CMD Files '
@@ -121,6 +121,15 @@ class Msg:
     PNG_CONV_TITLE = 'Verzeichnis mit Bilddaten auswählen...'
     PNG_INFO_TITLE = 'PNG Konverter'
 
+    POS_INTRO = '<h4><img src=":/ovr/welcome.png" width="21" height="21" style="float: left;">' \
+                'POS Schnuffi</h4>' \
+                '<p>Lädt zwei POS Xml Dateien und vergleicht hinzugefügte, entfernte und geänderte ' \
+                'Action Listen.</p>' \
+                '<p>Zeigt nur Änderungen in actors vom Typ <i>appearance</i> und <i>switch</i> an! ' \
+                'State Objects werden ignoriert da sie nur innerhalb derselben Xml relevant sind.</p>'
+    POS_RUNNING_TITLE = 'POS Schnuffi'
+    POS_RUNNING_MSG = 'POS Schnuffi Prozess läuft. Trotzdem beenden?'
+
     REF_ERROR_TITLE = 'Referenz Rekursion gefunden'
     REF_ERROR = ['Das Preset<br><b>', ' Id: ', '</b><br><br>enthält eine Referenz zum Preset:<br><b>', ' Id: ']
     REF_ERROR += ['</b><br><br>welches vorher bereits referenziert wurde.<br>Diese Referenz wird übersprungen.<br>'
@@ -135,9 +144,6 @@ class Msg:
                   '1 Trimline(trim_setup) und 1 Farbkombination(fakom_setup) werden benötigt.'
     REF_IMG_COLLECTED = 'Es wurden {trim:02d} Trim; {fakom:02d} FaKom; {pkg:03d} Pakete; ' \
                         '{pr:03d} PR-Optionen gesammelt.'
-
-    POS_RUNNING_TITLE = 'POS Schnuffi'
-    POS_RUNNING_MSG = 'POS Schnuffi Prozess läuft. Trotzdem beenden?'
 
     SAVE_FILTER = 'Variant Preset Dateien (*.xml)'
     SAVE_DIALOG_TITLE = 'Benutzer Presets als *.XML speichern...'

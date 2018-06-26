@@ -38,6 +38,8 @@ class knechtSettings:
     app = dict(
         current_path='',
         render_path='',
+        pos_old_path='',
+        pos_new_path='',
         log_window=True,
         version='0.0.0',
         app_style='windowsvista',

@@ -5,9 +5,14 @@ from PyQt5.uic import loadUi
 from PyQt5 import QtWidgets, QtCore
 
 from modules.app_globals import UI_POS_WIN, UI_POS_FILE
+from modules.app_strings import Msg
 from modules.gui_set_path import SetDirectoryPath
 from modules.pos_schnuffi_compare import GuiCompare
+from modules.knecht_settings import knechtSettings
 from modules.knecht_log import init_logging
+from modules.tree_filter_thread import filter_on_timer
+from modules.tree_events import TreeKeyEvents
+from modules.tree_overlay import InfoOverlay
 
 LOGGER = init_logging(__name__)
 
@@ -58,6 +63,7 @@ class FileWindow(QtWidgets.QWidget):
                                              dialog_args=('POS XML wählen', 'DeltaGen POS Datei (*.xml;*.pos)'),
                                              reject_invalid_path_edits=True,
                                              )
+        self.old_file_dlg.path_changed.connect(self.save_old_path_setting)
 
         self.new_file_dlg = SetDirectoryPath(app_class, ui,
                                              mode='file',
@@ -66,10 +72,13 @@ class FileWindow(QtWidgets.QWidget):
                                              dialog_args=('POS XML wählen', 'DeltaGen POS Datei (*.xml;*.pos)'),
                                              reject_invalid_path_edits=True,
                                              )
+        self.new_file_dlg.path_changed.connect(self.save_new_path_setting)
 
         self.okBtn.pressed.connect(self.validate_and_close)
         self.cancelBtn.pressed.connect(self.close)
         self.swapBtn.pressed.connect(self.swap_paths)
+
+        self.load_settings()
 
         self.show()
 
@@ -94,6 +103,24 @@ class FileWindow(QtWidgets.QWidget):
             return False
 
         return True
+
+    def load_settings(self):
+        old_path = Path(knechtSettings.app['pos_old_path'])
+        new_path = Path(knechtSettings.app['pos_new_path'])
+
+        if self.verify_pos_path(old_path):
+            self.old_file_dlg.set_path(old_path)
+
+        if self.verify_pos_path(new_path):
+            self.new_file_dlg.set_path(new_path)
+
+    @staticmethod
+    def save_old_path_setting(old_path: Path):
+        knechtSettings.app['pos_old_path'] = old_path.as_posix()
+
+    @staticmethod
+    def save_new_path_setting(new_path: Path):
+        knechtSettings.app['pos_new_path'] = new_path.as_posix()
 
     @staticmethod
     def verify_pos_path(pos_path: Path):
@@ -128,6 +155,15 @@ class SchnuffiApp(QtCore.QObject):
     # Comparision thread
     cmp_thread = None
 
+    intro_timer = QtCore.QTimer()
+    intro_timer.setSingleShot(True)
+    intro_timer.setInterval(500)
+
+    expand_worker = QtCore.QTimer()
+    expand_worker.setInterval(25)
+    chunk_size = 5
+    expand_item_ls = list()
+
     def __init__(self, app):
         super(SchnuffiApp, self).__init__()
         self.app = app
@@ -135,11 +171,61 @@ class SchnuffiApp(QtCore.QObject):
 
         self.ui.actionOpen.triggered.connect(self.open_file_window)
         self.widget_list = [self.ui.AddedWidget, self.ui.ModifiedWidget, self.ui.RemovedWidget]
+        self.setup_widgets()
+
+        self.ui.show()
+
+    def setup_widgets(self):
+        self.ui.filterLabel.mouseDoubleClickEvent = self.sort_all_headers
+        self.ui.expandBtn.pressed.connect(self.expand_all_items)
+        self.expand_worker.timeout.connect(self.expand_work_chunk)
 
         for widget in self.widget_list:
             widget.clear()
 
-        self.ui.show()
+            # Setup Filtering
+            widget.filter_txt_widget = self.ui.lineEditFilter
+            widget.filter = filter_on_timer(self.ui.lineEditFilter,
+                                            widget, filter_column=[0, 1, 2], filter_children=False)
+
+            self.ui.lineEditFilter.textChanged.connect(widget.filter.start_timer)
+
+            # Widget overlay
+            widget.info_overlay = InfoOverlay(widget)
+
+            # Add key events
+            widget.keys = TreeKeyEvents(widget, self.app.ui, self.app,
+                                        wizard=True, no_edit=True)
+            widget.keys.add_event_filter()
+
+        self.intro_timer.timeout.connect(self.show_intro_msg)
+        self.intro_timer.start()
+
+    def show_intro_msg(self):
+        self.ui.ModifiedWidget.info_overlay.display_confirm(Msg.POS_INTRO, ('[X]', None))
+
+    def sort_all_headers(self, event = None):
+        for widget in self.widget_list:
+            sort_widget(widget)
+
+    def expand_all_items(self):
+        for widget in self.widget_list:
+            self.expand_item_ls += widget.findItems('*', QtCore.Qt.MatchWildcard)
+
+        self.expand_worker.start()
+
+    def expand_work_chunk(self):
+        count = self.chunk_size
+
+        while count > 0:
+            if self.expand_item_ls:
+                item = self.expand_item_ls.pop(0)
+                item.setExpanded(True)
+            else:
+                self.expand_worker.stop()
+                break
+
+            count -= 1
 
     def open_file_window(self):
         self.file_win = FileWindow(self.app, self.ui)
@@ -164,7 +250,5 @@ class SchnuffiApp(QtCore.QObject):
         target.addTopLevelItem(item)
 
     def finished_compare(self):
-        for widget in self.widget_list:
-            sort_widget(widget)
-
+        self.sort_all_headers()
         self.ui.statusBar().showMessage('POS Daten laden und vergleichen abgeschlossen.', 8000)
