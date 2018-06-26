@@ -4,14 +4,12 @@ from pathlib import Path
 from PyQt5.uic import loadUi
 from PyQt5 import QtWidgets, QtCore
 
+from modules.app_globals import UI_POS_WIN, UI_POS_FILE
 from modules.gui_set_path import SetDirectoryPath
 from modules.pos_schnuffi_compare import GuiCompare
 from modules.knecht_log import init_logging
 
 LOGGER = init_logging(__name__)
-
-UI_FILE_MAIN = 'gui/POS_Schnuffi.ui'
-UI_FILE_FILE = 'gui/POS_Schnuffi_File_Dialog.ui'
 
 
 def sort_widget(widget, maximum_width: int=800):
@@ -50,7 +48,7 @@ class FileWindow(QtWidgets.QWidget):
         self.app, self.ui = app_class, ui
 
         LOGGER.setLevel(logging.ERROR)
-        loadUi(UI_FILE_FILE, self)
+        loadUi(UI_POS_FILE, self)
         LOGGER.setLevel(logging.DEBUG)
 
         self.old_file_dlg = SetDirectoryPath(app_class, ui,
@@ -117,7 +115,7 @@ class SchnuffiWindow(QtWidgets.QMainWindow):
         self.app = app_class
 
         LOGGER.setLevel(logging.ERROR)
-        loadUi(UI_FILE_MAIN, self)
+        loadUi(UI_POS_WIN, self)
         LOGGER.setLevel(logging.DEBUG)
 
         self.actionBeenden.triggered.connect(self.close)
