@@ -3,6 +3,7 @@ import logging
 from pathlib import Path
 from PyQt5.uic import loadUi
 from PyQt5 import QtWidgets, QtCore
+from PyQt5.QtGui import QBrush, QColor
 
 from modules.app_globals import UI_POS_WIN, UI_POS_FILE
 from modules.app_strings import Msg
@@ -13,6 +14,7 @@ from modules.knecht_log import init_logging
 from modules.tree_filter_thread import filter_on_timer
 from modules.tree_events import TreeKeyEvents
 from modules.tree_overlay import InfoOverlay
+from modules.tree_methods import iterate_item_childs
 
 LOGGER = init_logging(__name__)
 
@@ -245,9 +247,27 @@ class SchnuffiApp(QtCore.QObject):
         self.cmp_thread.start()
         self.ui.statusBar().showMessage('POS Daten werden geladen und verglichen...', 8000)
 
-    @staticmethod
-    def add_widget_item(item: QtWidgets.QTreeWidgetItem, target: QtWidgets.QTreeWidget):
+    @classmethod
+    def add_widget_item(cls, item: QtWidgets.QTreeWidgetItem, target: QtWidgets.QTreeWidget):
+        cls.color_items(item)
         target.addTopLevelItem(item)
+
+    @staticmethod
+    def color_items(parent_item):
+        iter_children = iterate_item_childs(parent_item.treeWidget())
+
+        for item in iter_children.iterate_childs(parent_item):
+            value = item.text(1)
+            old_value = item.text(2)
+
+            if not value:
+                # No new value, actor removed
+                for c in range(0, 4):
+                    item.setForeground(c, QBrush(QColor(190, 90, 90)))
+            elif not old_value and value:
+                # New actor added
+                for c in range(0, 4):
+                    item.setForeground(c, QBrush(QColor(90, 140, 90)))
 
     def finished_compare(self):
         self.sort_all_headers()

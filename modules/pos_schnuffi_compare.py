@@ -2,7 +2,6 @@ from modules.pos_schnuffi_xml_diff import PosDiff
 
 from PyQt5.QtWidgets import QTreeWidgetItem
 from PyQt5 import QtCore
-from PyQt5.QtGui import QBrush, QColor
 
 
 class GuiCompare(QtCore.QThread):
@@ -59,17 +58,4 @@ class GuiCompare(QtCore.QThread):
             actor_item = QTreeWidgetItem(list_item, [actor, value, old_value, actor_type])
             actor_item.setFlags(cls.item_flags)
 
-            cls.color_item(actor_item, value, old_value)
-
         return list_item
-
-    @staticmethod
-    def color_item(item, value, old_value):
-        if not value:
-            # No new value, actor removed
-            for c in range(0, 4):
-                item.setForeground(c, QBrush(QColor(190, 90, 90)))
-        elif not old_value and value:
-            # New actor added
-            for c in range(0, 4):
-                item.setForeground(c, QBrush(QColor(90, 140, 90)))
