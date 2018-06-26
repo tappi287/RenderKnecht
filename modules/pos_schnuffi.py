@@ -139,15 +139,20 @@ class FileWindow(QtWidgets.QWidget):
 
 
 class SchnuffiWindow(QtWidgets.QMainWindow):
-    def __init__(self, app_class):
+    def __init__(self, app_class, pos_app):
         super(SchnuffiWindow, self).__init__()
         self.app = app_class
+        self.pos_app = pos_app
 
         LOGGER.setLevel(logging.ERROR)
         loadUi(UI_POS_WIN, self)
         LOGGER.setLevel(logging.DEBUG)
 
         self.actionBeenden.triggered.connect(self.close)
+
+    def closeEvent(self, close_event):
+        self.pos_app.end_app()
+        close_event.accept()
 
 
 class SchnuffiApp(QtCore.QObject):
@@ -169,7 +174,7 @@ class SchnuffiApp(QtCore.QObject):
     def __init__(self, app):
         super(SchnuffiApp, self).__init__()
         self.app = app
-        self.ui = SchnuffiWindow(app)
+        self.ui = SchnuffiWindow(app, self)
 
         self.ui.actionOpen.triggered.connect(self.open_file_window)
         self.widget_list = [self.ui.AddedWidget, self.ui.ModifiedWidget, self.ui.RemovedWidget]
@@ -202,6 +207,17 @@ class SchnuffiApp(QtCore.QObject):
 
         self.intro_timer.timeout.connect(self.show_intro_msg)
         self.intro_timer.start()
+
+    def end_app(self):
+        if self.cmp_thread:
+            self.cmp_thread.quit()
+            self.cmp_thread.wait(5000)
+
+        for widget in self.widget_list:
+            try:
+                widget.filter.end_thread()
+            except Exception as e:
+                LOGGER.debug('Could not end widget filter thread! %s', e)
 
     def show_intro_msg(self):
         self.ui.ModifiedWidget.info_overlay.display_confirm(Msg.POS_INTRO, ('[X]', None))
