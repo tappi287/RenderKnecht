@@ -293,6 +293,142 @@
         </item>
        </layout>
       </widget>
+      <widget class="QWidget" name="tab_4">
+       <attribute name="title">
+        <string>Switches</string>
+       </attribute>
+       <layout class="QHBoxLayout" name="horizontalLayout_2">
+        <property name="spacing">
+         <number>0</number>
+        </property>
+        <property name="leftMargin">
+         <number>0</number>
+        </property>
+        <property name="topMargin">
+         <number>0</number>
+        </property>
+        <property name="rightMargin">
+         <number>0</number>
+        </property>
+        <property name="bottomMargin">
+         <number>0</number>
+        </property>
+        <item>
+         <widget class="QTreeWidget" name="switchesWidget">
+          <property name="sortingEnabled">
+           <bool>true</bool>
+          </property>
+          <column>
+           <property name="text">
+            <string>Action List</string>
+           </property>
+          </column>
+          <column>
+           <property name="text">
+            <string>Wert</string>
+           </property>
+          </column>
+          <column>
+           <property name="text">
+            <string>Wert(alt)</string>
+           </property>
+          </column>
+          <column>
+           <property name="text">
+            <string>Typ</string>
+           </property>
+          </column>
+          <item>
+           <property name="text">
+            <string>List_1</string>
+           </property>
+           <item>
+            <property name="text">
+             <string>actor_name</string>
+            </property>
+            <property name="text">
+             <string>0</string>
+            </property>
+            <property name="text">
+             <string>1</string>
+            </property>
+            <property name="text">
+             <string>switch</string>
+            </property>
+           </item>
+          </item>
+         </widget>
+        </item>
+       </layout>
+      </widget>
+      <widget class="QWidget" name="tab_5">
+       <attribute name="title">
+        <string>Looks</string>
+       </attribute>
+       <layout class="QVBoxLayout" name="verticalLayout_5">
+        <property name="spacing">
+         <number>0</number>
+        </property>
+        <property name="leftMargin">
+         <number>0</number>
+        </property>
+        <property name="topMargin">
+         <number>0</number>
+        </property>
+        <property name="rightMargin">
+         <number>0</number>
+        </property>
+        <property name="bottomMargin">
+         <number>0</number>
+        </property>
+        <item>
+         <widget class="QTreeWidget" name="looksWidget">
+          <property name="sortingEnabled">
+           <bool>true</bool>
+          </property>
+          <column>
+           <property name="text">
+            <string>Action List</string>
+           </property>
+          </column>
+          <column>
+           <property name="text">
+            <string>Wert</string>
+           </property>
+          </column>
+          <column>
+           <property name="text">
+            <string>Wert(alt)</string>
+           </property>
+          </column>
+          <column>
+           <property name="text">
+            <string>Typ</string>
+           </property>
+          </column>
+          <item>
+           <property name="text">
+            <string>List_1</string>
+           </property>
+           <item>
+            <property name="text">
+             <string>actor_name</string>
+            </property>
+            <property name="text">
+             <string>0</string>
+            </property>
+            <property name="text">
+             <string>1</string>
+            </property>
+            <property name="text">
+             <string>switch</string>
+            </property>
+           </item>
+          </item>
+         </widget>
+        </item>
+       </layout>
+      </widget>
      </widget>
     </item>
    </layout>
@@ -317,13 +453,29 @@
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
   <action name="actionBeenden">
+   <property name="icon">
+    <iconset resource="res/preset_editor_rsc.qrc">
+     <normaloff>:/main/log-in.png</normaloff>:/main/log-in.png</iconset>
+   </property>
    <property name="text">
     <string>Beenden</string>
    </property>
   </action>
   <action name="actionOpen">
+   <property name="icon">
+    <iconset resource="res/preset_editor_rsc.qrc">
+     <normaloff>:/main/folder.png</normaloff>:/main/folder.png</iconset>
+   </property>
    <property name="text">
     <string>Vergleichen ...</string>
+   </property>
+  </action>
+  <action name="actionSearch">
+   <property name="text">
+    <string>Suche</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+F</string>
    </property>
   </action>
  </widget>

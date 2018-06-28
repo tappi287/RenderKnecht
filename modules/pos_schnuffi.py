@@ -15,6 +15,7 @@ from modules.tree_filter_thread import filter_on_timer
 from modules.tree_events import TreeKeyEvents
 from modules.tree_overlay import InfoOverlay
 from modules.tree_methods import iterate_item_childs
+from modules.tree_search_replace import SearchReplace
 
 LOGGER = init_logging(__name__)
 
@@ -150,6 +151,10 @@ class SchnuffiWindow(QtWidgets.QMainWindow):
 
         self.actionBeenden.triggered.connect(self.close)
 
+    @staticmethod
+    def get_tree_name(widget):
+        return widget.objectName()
+
     def closeEvent(self, close_event):
         self.pos_app.end_app()
         close_event.accept()
@@ -177,7 +182,8 @@ class SchnuffiApp(QtCore.QObject):
         self.ui = SchnuffiWindow(app, self)
 
         self.ui.actionOpen.triggered.connect(self.open_file_window)
-        self.widget_list = [self.ui.AddedWidget, self.ui.ModifiedWidget, self.ui.RemovedWidget]
+        self.widget_list = [self.ui.AddedWidget, self.ui.ModifiedWidget, self.ui.RemovedWidget,
+                            self.ui.switchesWidget, self.ui.looksWidget]
         self.setup_widgets()
 
         self.ui.show()
@@ -192,8 +198,9 @@ class SchnuffiApp(QtCore.QObject):
 
             # Setup Filtering
             widget.filter_txt_widget = self.ui.lineEditFilter
+            widget.filter_column = [0, 1, 2]
             widget.filter = filter_on_timer(self.ui.lineEditFilter,
-                                            widget, filter_column=[0, 1, 2], filter_children=False)
+                                            widget, filter_column=widget.filter_column, filter_children=False)
 
             self.ui.lineEditFilter.textChanged.connect(widget.filter.start_timer)
 
@@ -275,6 +282,10 @@ class SchnuffiApp(QtCore.QObject):
         for item in iter_children.iterate_childs(parent_item):
             value = item.text(1)
             old_value = item.text(2)
+
+            # Skip actor's without values
+            if not value and not old_value:
+                continue
 
             if not value:
                 # No new value, actor removed

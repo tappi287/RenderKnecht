@@ -218,12 +218,7 @@ class tree_worker_thread(QtCore.QObject):
             id_search.remove('')
 
         if txt is not '':
-            LOGGER.debug('Filtering children: %s', filter_children)
-
             for item in self.iterate_tree_widget_items_flat(tree_widget):
-                if not filter_children and item.parent():
-                    continue
-
                 index = tree_widget.indexFromItem(item)
 
                 match = False
@@ -281,8 +276,20 @@ class tree_worker_thread(QtCore.QObject):
                             # Show and expand parent
                             self.delayed_signal(parent_index, tree_widget, False, 1)
                 else:
-                    # Hide items
-                    self.delayed_signal(index, tree_widget, True, 0)
+                    if filter_children:
+                        # Hide all items that do not match
+                        self.delayed_signal(index, tree_widget, True, 0)
+                    else:
+                        # Do not hide any children if parent or any children matches
+                        parent = item.parent()
+                        if parent:
+                            if parent.isHidden():
+                                self.delayed_signal(index, tree_widget, True, 0)
+                            else:
+                                # Do not hide children of parent matches
+                                pass
+                        else:
+                            self.delayed_signal(index, tree_widget, True, 0)
         else:
             for item in self.iterate_tree_widget_items_flat(tree_widget):
                 # Show everything and collapse parents

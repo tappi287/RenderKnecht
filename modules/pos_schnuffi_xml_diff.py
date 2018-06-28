@@ -21,6 +21,12 @@ class PosDiff(object):
         # Modified actionList's
         self.mod_action_ls = self.__create_diff_action_lists(action_diff.changed())
 
+        # Newly added switches, removed switches, modified switches
+        self.add_switches, self.rem_switches, self.mod_switches = \
+            self.__create_diff_actors(self.new_xml.switches, self.old_xml.switches)
+        self.add_looks, self.rem_looks, self.mod_looks = \
+            self.__create_diff_actors(self.new_xml.looks, self.old_xml.looks)
+
     def __create_diff_action_lists(self, action_list_keys):
         action_lists = list()
 
@@ -39,14 +45,21 @@ class PosDiff(object):
 
         return action_lists
 
+    @staticmethod
+    def __create_diff_actors(new_actor_dict, old_actor_dict):
+        actor_diff = DictDiffer(new_actor_dict, old_actor_dict)
+        return actor_diff.added(), actor_diff.removed(), actor_diff.changed()
+
 
 class PosXml(object):
     def __init__(self, xml_file):
         self.xml_tree = None
         self.xml_dict = dict()
+        self.switches = dict()
+        self.looks = dict()
         self.xml_file = xml_file
 
-        # Load the Xml content into a dictonary
+        # Load the Xml content into a dictionary
         self.__load()
 
     def __load(self):
@@ -65,12 +78,21 @@ class PosXml(object):
                 actor = a.find('./actor').text
                 value = a.find('./value').text
                 self.xml_dict[name][actor] = {'value': value, 'type': 'switch'}
+                self.update_actor_dict(self.switches, actor, value)
 
             # Add appearance actors
             for a in e.iterfind("./*[@type='appearance']"):
                 actor = a.find('./actor').text
                 value = a.find('./value').text
                 self.xml_dict[name][actor] = {'value': value, 'type': 'appearance'}
+                self.update_actor_dict(self.looks, actor, value)
+
+    @staticmethod
+    def update_actor_dict(actor_dict, actor, value):
+        if actor not in actor_dict.keys():
+            actor_dict[actor] = set()
+
+        actor_dict[actor].add(value)
 
 
 class ActionList(object):
