@@ -64,13 +64,14 @@ class XML:
         'root': 'renderknecht_varianten', 'sub_lvl_1': 'variant_presets', 'sub_lvl_2': 'preset',
         'settings': 'renderknecht_settings', 'origin': 'origin'}
 
-    def __init__(self, variants_xml_path, widget):
+    def __init__(self, variants_xml_path, widget, no_knecht_tags: bool=False):
         """
         :param variants_xml_path: path to non-existing xml file
         :type variants_xml_path: Path or str
         :param widget: treeWidget to read from and parse xml to
         :type widget: QTreeWidget
         """
+        self.no_knecht_tags = no_knecht_tags
         # Unique id per Tree
         self.id = 0
 
@@ -100,8 +101,10 @@ class XML:
     @root.setter
     def root(self, val='root'):
         self.__root = Et.Element(val)
-        Et.SubElement(self.__root, self.dom_tags['origin'])
-        Et.SubElement(self.__root, self.dom_tags['settings'])
+
+        if not self.no_knecht_tags:
+            Et.SubElement(self.__root, self.dom_tags['origin'])
+            Et.SubElement(self.__root, self.dom_tags['settings'])
 
     @property
     def xml_tree(self):
@@ -109,10 +112,12 @@ class XML:
 
     @xml_tree.setter
     def xml_tree(self, val):
-        if type(val) is not Et.Element:
-            self.__xml_tree = self.parse_xml_file(val)
-        else:
+        if type(val) is Et.Element:
             self.__xml_tree = Et.ElementTree(val)
+        elif type(val) is Et.ElementTree:
+            self.__xml_tree = val
+        else:
+            self.__xml_tree = self.parse_xml_file(val)
 
     @property
     def xml_element(self):

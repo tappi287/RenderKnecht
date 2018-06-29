@@ -11,11 +11,12 @@ from modules.gui_set_path import SetDirectoryPath
 from modules.pos_schnuffi_compare import GuiCompare
 from modules.knecht_settings import knechtSettings
 from modules.knecht_log import init_logging
+from modules.pos_schnuffi_xml_diff import PosXml
 from modules.tree_filter_thread import filter_on_timer
 from modules.tree_events import TreeKeyEvents
 from modules.tree_overlay import InfoOverlay
 from modules.tree_methods import iterate_item_childs
-from modules.tree_search_replace import SearchReplace
+from modules.knecht_xml import XML
 
 LOGGER = init_logging(__name__)
 
@@ -51,15 +52,15 @@ def sort_widget(widget, maximum_width: int=800):
 class FileWindow(QtWidgets.QWidget):
     compare = QtCore.pyqtSignal()
 
-    def __init__(self, app_class, ui):
+    def __init__(self, knecht_app, pos_ui):
         super(FileWindow, self).__init__()
-        self.app, self.ui = app_class, ui
+        self.knecht_app, self.pos_ui = knecht_app, pos_ui
 
         LOGGER.setLevel(logging.ERROR)
         loadUi(UI_POS_FILE, self)
         LOGGER.setLevel(logging.DEBUG)
 
-        self.old_file_dlg = SetDirectoryPath(app_class, ui,
+        self.old_file_dlg = SetDirectoryPath(knecht_app, pos_ui,
                                              mode='file',
                                              line_edit=self.OldLineEdit,
                                              tool_button=self.OldToolButton,
@@ -68,7 +69,7 @@ class FileWindow(QtWidgets.QWidget):
                                              )
         self.old_file_dlg.path_changed.connect(self.save_old_path_setting)
 
-        self.new_file_dlg = SetDirectoryPath(app_class, ui,
+        self.new_file_dlg = SetDirectoryPath(knecht_app, pos_ui,
                                              mode='file',
                                              line_edit=self.NewLineEdit,
                                              tool_button=self.NewToolButton,
@@ -142,18 +143,24 @@ class FileWindow(QtWidgets.QWidget):
 class SchnuffiWindow(QtWidgets.QMainWindow):
     def __init__(self, app_class, pos_app):
         super(SchnuffiWindow, self).__init__()
-        self.app = app_class
+        self.knecht_app = app_class
         self.pos_app = pos_app
 
         LOGGER.setLevel(logging.ERROR)
         loadUi(UI_POS_WIN, self)
         LOGGER.setLevel(logging.DEBUG)
 
-        self.actionBeenden.triggered.connect(self.close)
-
     @staticmethod
     def get_tree_name(widget):
         return widget.objectName()
+
+    def widget_with_focus(self):
+        """ Return the current QTreeWidget in focus """
+        widget_in_focus = self.focusWidget()
+        LOGGER.debug('Widget in Focus: %s', widget_in_focus.objectName())
+
+        if widget_in_focus in self.pos_app.widget_list:
+            return widget_in_focus
 
     def closeEvent(self, close_event):
         self.pos_app.end_app()
@@ -179,30 +186,37 @@ class SchnuffiApp(QtCore.QObject):
     def __init__(self, app):
         super(SchnuffiApp, self).__init__()
         self.app = app
-        self.ui = SchnuffiWindow(app, self)
+        self.pos_ui = SchnuffiWindow(app, self)
+        self.export = ExportActionList(self, self.pos_ui)
 
-        self.ui.actionOpen.triggered.connect(self.open_file_window)
-        self.widget_list = [self.ui.AddedWidget, self.ui.ModifiedWidget, self.ui.RemovedWidget,
-                            self.ui.switchesWidget, self.ui.looksWidget]
+        self.widget_list = [self.pos_ui.AddedWidget, self.pos_ui.ModifiedWidget, self.pos_ui.RemovedWidget,
+                            self.pos_ui.switchesWidget, self.pos_ui.looksWidget]
         self.setup_widgets()
 
-        self.ui.show()
+        self.pos_ui.show()
 
     def setup_widgets(self):
-        self.ui.filterLabel.mouseDoubleClickEvent = self.sort_all_headers
-        self.ui.expandBtn.pressed.connect(self.expand_all_items)
+        # Buttons
+        self.pos_ui.filterLabel.mouseDoubleClickEvent = self.sort_all_headers
+        self.pos_ui.expandBtn.pressed.connect(self.expand_all_items)
         self.expand_worker.timeout.connect(self.expand_work_chunk)
+
+        # Menu
+        self.pos_ui.actionOpen.triggered.connect(self.open_file_window)
+        self.pos_ui.actionBeenden.triggered.connect(self.pos_ui.close)
+        self.pos_ui.actionExport.triggered.connect(self.export.export_selection)
+        self.pos_ui.actionExportPos.triggered.connect(self.export.export_updated_pos_xml)
 
         for widget in self.widget_list:
             widget.clear()
 
             # Setup Filtering
-            widget.filter_txt_widget = self.ui.lineEditFilter
+            widget.filter_txt_widget = self.pos_ui.lineEditFilter
             widget.filter_column = [0, 1, 2]
-            widget.filter = filter_on_timer(self.ui.lineEditFilter,
+            widget.filter = filter_on_timer(self.pos_ui.lineEditFilter,
                                             widget, filter_column=widget.filter_column, filter_children=False)
 
-            self.ui.lineEditFilter.textChanged.connect(widget.filter.start_timer)
+            self.pos_ui.lineEditFilter.textChanged.connect(widget.filter.start_timer)
 
             # Widget overlay
             widget.info_overlay = InfoOverlay(widget)
@@ -227,7 +241,7 @@ class SchnuffiApp(QtCore.QObject):
                 LOGGER.debug('Could not end widget filter thread! %s', e)
 
     def show_intro_msg(self):
-        self.ui.ModifiedWidget.info_overlay.display_confirm(Msg.POS_INTRO, ('[X]', None))
+        self.pos_ui.ModifiedWidget.info_overlay.display_confirm(Msg.POS_INTRO, ('[X]', None))
 
     def sort_all_headers(self, event = None):
         for widget in self.widget_list:
@@ -253,7 +267,7 @@ class SchnuffiApp(QtCore.QObject):
             count -= 1
 
     def open_file_window(self):
-        self.file_win = FileWindow(self.app, self.ui)
+        self.file_win = FileWindow(self.app, self.pos_ui)
         self.file_win.compare.connect(self.compare)
 
     def compare(self):
@@ -268,7 +282,7 @@ class SchnuffiApp(QtCore.QObject):
         self.cmp_thread.finished.connect(self.finished_compare)
 
         self.cmp_thread.start()
-        self.ui.statusBar().showMessage('POS Daten werden geladen und verglichen...', 8000)
+        self.pos_ui.statusBar().showMessage('POS Daten werden geladen und verglichen...', 8000)
 
     @classmethod
     def add_widget_item(cls, item: QtWidgets.QTreeWidgetItem, target: QtWidgets.QTreeWidget):
@@ -298,4 +312,169 @@ class SchnuffiApp(QtCore.QObject):
 
     def finished_compare(self):
         self.sort_all_headers()
-        self.ui.statusBar().showMessage('POS Daten laden und vergleichen abgeschlossen.', 8000)
+        self.pos_ui.statusBar().showMessage('POS Daten laden und vergleichen abgeschlossen.', 8000)
+
+
+class ExportActionList(object):
+    xml_dom = {'root': 'stateMachine', 'sub_lvl_1': 'stateEngine'}
+
+    def __init__(self, pos_app: SchnuffiApp, pos_ui: SchnuffiWindow):
+        """ Export selected items as Xml ActionList """
+        self.pos_app, self.pos_ui = pos_app, pos_ui
+
+    def export(self):
+        widget = self.get_widget()
+        if not widget:
+            return None, None
+
+        # Collect QTreeWidgetItems
+        items = widget.selectedItems()
+        if not items:
+            return None, None
+
+        # Set export file
+        file = self.set_file()
+        if not file:
+            return None, None
+        file = Path(file)
+        LOGGER.debug('POS Schnuffi Export file set to %s', file.as_posix())
+
+        action_list_names = self.collect_action_lists(items)
+        LOGGER.debug('Found %s actionLists to export.', len(action_list_names))
+
+        return action_list_names, file
+
+    def export_selection(self):
+        """ Export the selected widget action list items as custom user Xml """
+        action_list_names, file = self.export()
+        if not file or not action_list_names:
+            return
+
+        self.export_custom_xml(action_list_names, file)
+
+    def export_updated_pos_xml(self):
+        """ Export an updated version of the old POS Xml, updating selected action lists """
+        action_list_names, file = self.export()
+        if not file or not action_list_names:
+            return
+
+        self.update_old_pos_xml(action_list_names, file)
+
+    def update_old_pos_xml(self, action_list_names, out_file):
+        # Get current -old- xml file path
+        if self.pos_app.file_win:
+            old_pos_xml_file = self.pos_app.file_win.old_file_dlg.path
+            new_pos_xml_file = self.pos_app.file_win.new_file_dlg.path
+        else:
+            return
+
+        # Parse old and new xml file
+        pos_xml = self.parse_pos_xml(old_pos_xml_file)
+        if not pos_xml:
+            return
+        new_xml = self.parse_pos_xml(new_pos_xml_file)
+        if not new_xml:
+            return
+
+        # Prepare storage of updated POS Xml
+        updated_xml = self.prepare_updated_pos_xml_export(pos_xml.xml_tree, out_file)
+        updated_elements = set()
+
+        for al_name in action_list_names:
+            parent = updated_xml.xml_tree.find(f'*actionList[@name="{al_name}"]/..')
+            old_action_list_elem = updated_xml.xml_tree.find(f'*actionList[@name="{al_name}"]')
+            new_action_list_elem = new_xml.xml_tree.find(f'*actionList[@name="{al_name}"]')
+
+            if not parent or not old_action_list_elem or not new_action_list_elem:
+                # Skip elements not present in both POS Xml's
+                continue
+
+            updated_elements.add(al_name)
+
+            parent.remove(old_action_list_elem)
+            parent.append(new_action_list_elem)
+
+        # Try to write the POS mess as a file, this will fail
+        LOGGER.info('Exporting POS Xml with the following action lists replaced:\n%s', updated_elements)
+        try:
+            updated_xml.save_tree()
+        except Exception as e:
+            LOGGER.error('POS Xml is malformed and could not be written/serialized.\n%s', e)
+
+    def export_custom_xml(self, action_list_names: set, out_file):
+        # Get current -new- xml file path
+        if self.pos_app.file_win:
+            new_pos_xml_file = self.pos_app.file_win.new_file_dlg.path
+        else:
+            return
+
+        pos_xml = self.parse_pos_xml(new_pos_xml_file)
+        if not pos_xml:
+            return
+
+        # Prepare export Xml
+        xml, xml_elem = self.prepare_custom_xml_export(out_file)
+
+        # Iterate Action Lists and collect matching xml elements
+        for e in pos_xml.xml_tree.iterfind('*actionList'):
+            name = e.get('name')
+
+            if name in action_list_names:
+                xml_elem.append(e)
+
+        xml.save_tree()
+
+    def prepare_custom_xml_export(self, xml_path):
+        session_xml = XML(xml_path, None, no_knecht_tags=True)
+        session_xml.root = self.xml_dom['root']
+
+        session_xml.xml_sub_element = session_xml.root, self.xml_dom['sub_lvl_1']
+        xml_elem = session_xml.xml_sub_element
+        xml_elem.set('autoType', 'variant')
+        return session_xml, xml_elem
+
+    @staticmethod
+    def prepare_updated_pos_xml_export(pos_xml_tree, updated_xml_path):
+        """ Parse POS Xml tree to knecht_xml Xml tree """
+        session_xml = XML(updated_xml_path, None, no_knecht_tags=True)
+        session_xml.xml_tree = pos_xml_tree
+        session_xml.root = session_xml.xml_tree.getroot()
+
+        return session_xml
+
+    def get_widget(self):
+        return self.pos_ui.widget_with_focus()
+
+    def set_file(self):
+        """ open a file dialog and return the file name """
+        file, file_type = QtWidgets.QFileDialog.getSaveFileName(
+            self.pos_ui,
+            Msg.SAVE_DIALOG_TITLE,
+            self.pos_app.app.ui.current_path,
+            Msg.SAVE_FILTER)
+
+        return file
+
+    @staticmethod
+    def parse_pos_xml(xml_file_path: Path):
+        # Parse to Xml
+        if xml_file_path.exists():
+            try:
+                pos_xml = PosXml(xml_file_path)
+                return pos_xml
+            except Exception as e:
+                LOGGER.debug('Error parsing POS Xml: %s', e)
+                return
+        else:
+            return
+
+    @staticmethod
+    def collect_action_lists(items):
+        """ Collect actionList names from QTreeWidgetItems """
+        action_list_names = set()
+        for i in items:
+            if i.parent():
+                continue  # Skip children
+            action_list_names.add(i.text(0))
+
+        return action_list_names
