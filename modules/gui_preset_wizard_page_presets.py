@@ -177,7 +177,7 @@ class PresetWizardPage(QtWidgets.QWizardPage):
         self.show_nav_btn()
         self.ready_timer.start()
 
-        if self.load_xml_content:
+        if self.load_xml_content is not None:
             LOGGER.debug('Loading Preset Page content.')
             self.load_session_content()
 

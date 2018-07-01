@@ -1,5 +1,6 @@
-import xml.etree.ElementTree as Et
+import lxml.etree as Et
 
+from pathlib import Path
 from modules.dictdiffer import DictDiffer
 
 
@@ -67,7 +68,7 @@ class PosXml(object):
         Parse the Xml file and store items in xml_dict:
             actionList[name]: {actor.text: {value: value.text, type: type.text}}
         """
-        self.xml_tree = Et.parse(self.xml_file)
+        self.xml_tree = Et.parse(Path(self.xml_file).as_posix())
 
         for e in self.xml_tree.iterfind('*actionList'):
             name = e.get('name')

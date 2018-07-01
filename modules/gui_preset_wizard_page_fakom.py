@@ -180,7 +180,7 @@ class FakomWizardPage(QtWidgets.QWizardPage):
             __search = f'./{dom_pg}[@id="{page_id}"]'
             __page_xml = self.parent.preset_page_content.find(__search)
 
-            if __page_xml:
+            if __page_xml is not None:
                 page.load_xml_content = __page_xml
 
         self.load_preset_page_content = False
@@ -448,7 +448,7 @@ class FakomWizardPage(QtWidgets.QWizardPage):
                 __pkg_id = __read(__pkg, 'reference')
 
                 __pkg = self.parent.fakom_xml.root.find(f'./*/preset[@id="{__pkg_id}"]')
-                if __pkg:
+                if __pkg is not None:
                     __s = __read(__pkg, 'value')
                 else:
                     __s = 'PKG'
@@ -467,7 +467,7 @@ class FakomWizardPage(QtWidgets.QWizardPage):
             if __v:
                 __model_name = 'Nicht gefunden'
                 __e = self.parent.vplus_xml.root.find(f'./*/preset[@value="{__v}"][@type="trim_setup"]')
-                if __e:
+                if __e is not None:
                     __model_name = __read(__e, 'name')
 
                 __model_dict[__v] = f'{__model_name} - {__v}'

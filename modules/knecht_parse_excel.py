@@ -67,7 +67,7 @@ Copyright (C) 2017 Stefan Tapper, All rights reserved.
 
 import os
 import re
-import xml.etree.ElementTree as ET
+import lxml.etree as ET
 from PyQt5 import QtCore
 from openpyxl import load_workbook
 from openpyxl.utils import get_column_letter

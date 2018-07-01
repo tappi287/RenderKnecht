@@ -21,7 +21,8 @@ Copyright (C) 2017 Stefan Tapper, All rights reserved.
 """
 import os
 import shutil
-import xml.etree.ElementTree as Et
+import lxml.etree as Et
+from pathlib import Path
 
 from PyQt5.QtWidgets import QTreeWidgetItem
 
@@ -100,7 +101,12 @@ class XML:
 
     @root.setter
     def root(self, val='root'):
-        self.__root = Et.Element(val)
+        if type(val) is str:
+            self.__root = Et.Element(val)
+        elif type(val) is Et._ElementTree:
+            self.__root = val.getroot()
+        elif type(val) is Et._Element:
+            self.__root = val
 
         if not self.no_knecht_tags:
             Et.SubElement(self.__root, self.dom_tags['origin'])
@@ -112,9 +118,9 @@ class XML:
 
     @xml_tree.setter
     def xml_tree(self, val):
-        if type(val) is Et.Element:
+        if type(val) is Et._Element:
             self.__xml_tree = Et.ElementTree(val)
-        elif type(val) is Et.ElementTree:
+        elif type(val) is Et._ElementTree:
             self.__xml_tree = val
         else:
             self.__xml_tree = self.parse_xml_file(val)
@@ -158,7 +164,7 @@ class XML:
 
     @staticmethod
     def parse_xml_file(file):
-        return Et.parse(file)
+        return Et.parse(Path(file).as_posix())
 
     def _overwrite_root(self, val):
         """ only used to directly set root element if parsing from a treeWidget is not useful """
@@ -304,7 +310,7 @@ class XML:
 
         __e = Et.Element(tag, attrib)
 
-        if xml_element_parent:
+        if xml_element_parent is not None:
             __e = Et.SubElement(xml_element_parent, tag, attrib)
 
         return __e
@@ -408,9 +414,6 @@ class XML:
         if file:
             self.variants_xml_path = file
 
-        # Pretty print for save file
-        self.pretty_print_xml(self.root)
-
         # Replace current ElementTree with pretty printed
         self.xml_tree = self.root
 
@@ -422,4 +425,20 @@ class XML:
                 LOGGER.exception('Exception while saving Xml bak file.\n%s', e)
 
         with open(self.variants_xml_path, 'wb') as f:
-            self.xml_tree.write(f, encoding='UTF-8', xml_declaration=True)
+            self.xml_tree.write(f, encoding='UTF-8', xml_declaration=True, pretty_print=True)
+
+    def save_tree_as_string(self, xml_element, file=None):
+        """ Save an malformed Xml Tree as string data which can not be serialized """
+        if file:
+            self.variants_xml_path = file
+
+        if type(xml_element) is Et.ElementTree:
+            xml_element = xml_element.getroot()
+
+        self.pretty_print_xml(xml_element)
+
+        # Convert Element to string
+        xml_str = Et.tostring(xml_element, encoding='UTF-8').decode(encoding='utf-8')
+
+        with open(self.variants_xml_path, 'w') as f:
+            f.write(xml_str)

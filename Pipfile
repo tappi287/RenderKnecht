@@ -10,6 +10,7 @@ openpyxl = "*"
 qt-ledwidget = "*"
 pyinstaller = "*"
 "pyqt5" = "==5.9.2"
+lxml = "*"
 
 [dev-packages]
 

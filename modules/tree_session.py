@@ -123,7 +123,7 @@ class TreeSessionManager(QtCore.QObject):
             name = tree_session.name
 
             tree_xml = self.load_xml.find(f'./{name}/')
-            if tree_xml:
+            if tree_xml is not None:
                 tree_session.xml.parse_element_to_tree_widget(tree_xml)
                 LOGGER.debug('Loading session elements for %s.', tree_session.name)
 

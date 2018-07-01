@@ -516,7 +516,7 @@
     <string>Aktualisierte POS Xml ...</string>
    </property>
    <property name="statusTip">
-    <string>Exportiert selektierte Action Listen aus neuer XML Datei und aktualisiert diesen in alter POS Xml Datei. (In neue Datei)</string>
+    <string>Ersetzt im Baum selektierte actionList Elemente in alter POS Xml mit Elementen aus neuer POS Xml Datei.</string>
    </property>
   </action>
  </widget>

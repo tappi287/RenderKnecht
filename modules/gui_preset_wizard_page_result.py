@@ -19,6 +19,7 @@ Copyright (C) 2017 Stefan Tapper, All rights reserved.
     along with RenderKnecht Strink Kerker.  If not, see <http://www.gnu.org/licenses/>.
 
 """
+import copy
 
 from PyQt5 import QtCore, QtWidgets
 from PyQt5.QtGui import QPixmap
@@ -263,6 +264,11 @@ class ResultWizardPage(QtWidgets.QWizardPage):
                 self.treeWidget_Trim.addTopLevelItem(__new_item)
                 style_database_preset(__new_item, self.parent.ui, type_txt='fakom_setup')
 
+    @staticmethod
+    def append_element(element, child):
+        child = copy.deepcopy(child)
+        element.append(child)
+
     def create_reference_presets(self):
         # Prepare Xml elements
         xml = XML('', self.parent.ui.treeWidget_SrcPreset)
@@ -304,27 +310,27 @@ class ResultWizardPage(QtWidgets.QWizardPage):
         for __t in trim_ids:
             __trim = self.vplus.find(f'./*/preset[@id="{__t}"]')
 
-            variants.append(__trim)
+            self.append_element(variants, __trim)
             LOGGER.debug('Trim: %s of %s', __trim.get('id'), trim_ids)
 
             # Add options preset
             __options = self.vplus.find(f'./*/preset[@value="{__trim.get("value")}"][@type="options"]')
             if __options is not None:
                 __options.set('id', self.item_id)
-                variants.append(__options)
+                self.append_element(variants, __options)
 
         # Add packages
         for __p in pkg_ids:
             __pkg = self.vplus.find(f'./*/preset[@id="{__p}"]')
             if __pkg is not None:
-                variants.append(__pkg)
+                self.append_element(variants, __pkg)
 
         # Add FaKom presets
         for __idx, __f in enumerate(fakom_ids):
             __fakom = self.fakom.find(f'./*/preset[@id="{__f}"]')
             self.update_element_id(__fakom, variants)
 
-            variants.insert(__idx, __fakom)
+            variants.insert(__idx, copy.deepcopy(__fakom))
             LOGGER.debug('FaKom: %s of %s', __fakom.get('id'), fakom_ids)
 
         # Create trim line preset per model
@@ -385,9 +391,11 @@ class ResultWizardPage(QtWidgets.QWizardPage):
                 # Reference trim element
                 __search = f'./*/preset[@value="{__m}"][@type="trim_setup"]'
                 __trim = self.vplus.find(__search)
+                __trim = copy.deepcopy(__trim)
                 xml.xml_sub_element = self.ref_xml_var(__trim, __preset, '000')
 
                 # Reference FaKom element
+                __p = copy.deepcopy(__p)
                 xml.xml_sub_element = self.ref_xml_var(__p, __preset, '001')
 
     @staticmethod
@@ -404,12 +412,13 @@ class ResultWizardPage(QtWidgets.QWizardPage):
         # Trim element
         __search = f'./*/preset[@id="{trim_id}"]'
         __trim = self.vplus.find(__search)
+        __trim = copy.deepcopy(__trim)
         xml.xml_sub_element = self.ref_xml_var(__trim, preset, '000')
 
         # FaKom element
         __search = f'./*/preset[@id="{fakom_id}"]'
         __fakom = self.fakom.find(__search)
-
+        __fakom = copy.deepcopy(__fakom)
         xml.xml_sub_element = self.ref_xml_var(__fakom, preset, '001')
 
         # Replace FaKom packages with Vplus packages
@@ -436,6 +445,7 @@ class ResultWizardPage(QtWidgets.QWizardPage):
             # Create option
             if __name in self.parent.used_pr_options:
                 __o = __options.find(f'./variant[@name="{__name}"]')
+                __o = copy.deepcopy(__o)
                 __o.attrib['order'] = f'{__order:03d}'
                 preset.append(__o)
 

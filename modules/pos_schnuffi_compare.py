@@ -5,14 +5,15 @@ from PyQt5 import QtCore
 
 
 class GuiCompare(QtCore.QThread):
-    add_item = QtCore.pyqtSignal(object, object)
+    add_item = QtCore.pyqtSignal()
     finished = QtCore.pyqtSignal()
 
     item_flags = (QtCore.Qt.ItemIsEnabled | QtCore.Qt.ItemIsSelectable | QtCore.Qt.ItemIsEditable)
 
-    def __init__(self, old_path, new_path, widgets):
+    def __init__(self, old_path, new_path, widgets, cmp_queue):
         super(GuiCompare, self).__init__()
         self.old_path, self.new_path = old_path, new_path
+        self.cmp_queue = cmp_queue
 
         self.widgets = widgets
 
@@ -42,7 +43,7 @@ class GuiCompare(QtCore.QThread):
         """
         for al in action_list:
             item = self.__create_action_list_item(al)
-            self.add_item.emit(item, self.widgets[target])
+            self.add_item_queued(item, self.widgets[target])
 
     def add_actor_items(self, diff_cls: PosDiff):
         """
@@ -70,7 +71,12 @@ class GuiCompare(QtCore.QThread):
                     item.setFlags(self.item_flags)
 
                 if parent.childCount():
-                    self.add_item.emit(parent, widget)
+                    self.add_item_queued(parent, widget)
+
+    def add_item_queued(self, item, widget):
+        self.add_item.emit()
+        __q = (item, widget)
+        self.cmp_queue.put(__q)
 
     @classmethod
     def __create_action_list_item(cls, al):

@@ -129,6 +129,12 @@ class Msg:
                 'State Objects werden ignoriert da sie nur innerhalb derselben Xml relevant sind.</p>'
     POS_RUNNING_TITLE = 'POS Schnuffi'
     POS_RUNNING_MSG = 'POS Schnuffi Prozess läuft. Trotzdem beenden?'
+    POS_ERR_MSG_LS = ['Kann nicht exportieren: kein fokusierter Baum erkannt. Element(e) im Baum selektieren.',
+                      'Kann nicht exportieren: keine selektierten Elemente erkannt.',
+                      'Kann nicht exportieren: keine Exportdatei gewählt.',
+                      'Kann Nichts exportieren: Keine POS Xml geladen.',
+                      'Fehler beim Export. Das Quelldokument ist keine gültige Xml Datei.']
+    POS_EXPORT_MSG = 'POS Xml exportiert in:<br>{}'
 
     REF_ERROR_TITLE = 'Referenz Rekursion gefunden'
     REF_ERROR = ['Das Preset<br><b>', ' Id: ', '</b><br><br>enthält eine Referenz zum Preset:<br><b>', ' Id: ']

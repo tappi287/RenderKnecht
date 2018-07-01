@@ -258,7 +258,7 @@ class PresetWizard(QtWidgets.QWizard):
         for __ref_id in __references:
             __ref_element = self.fakom_xml.root.find(f'./*/preset[@id="{__ref_id}"]')
 
-            if __ref_element:
+            if __ref_element is not None:
                 self.used_pr_options = __read(__ref_element, 'value')
 
                 for __ref_variant in __ref_element.iterfind('.//'):

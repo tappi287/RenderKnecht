@@ -20,7 +20,7 @@ Copyright (C) 2017 Stefan Tapper, All rights reserved.
 
 """
 import os
-import xml.etree.ElementTree as Et
+import lxml.etree as Et
 
 _APPDATA_PATH = os.getenv('APPDATA')
 
