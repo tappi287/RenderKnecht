@@ -4,13 +4,13 @@ verify_ssl = true
 name = "pypi"
 
 [packages]
-imageio = "*"
+imageio = "==2.3.0"
 requests = "*"
-openpyxl = "*"
-qt-ledwidget = "*"
-pyinstaller = "*"
+openpyxl = "==2.5.4"
+qt-ledwidget = "==0.2"
+pyinstaller = "==3.3.1"
 "pyqt5" = "==5.9.2"
-lxml = "*"
+lxml = "==4.2.3"
 
 [dev-packages]
 

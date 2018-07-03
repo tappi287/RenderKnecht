@@ -351,7 +351,7 @@ class XML:
         list(map(self.read_item, iterate_tree_widget_items_flat(self.widget)))
 
         # Nothing to save, return False
-        if self.__p_count == 0 and not self.__orphan_preset:
+        if self.__p_count == 0 and self.__orphan_preset is None:
             return False
         return True
 
@@ -384,7 +384,7 @@ class XML:
                 Et.SubElement(self.__current_preset, self.xmlTypeDict[item.UserType], read_item_attributes())
             else:
                 # Save orphan in orphan_preset
-                if not self.__orphan_preset:
+                if self.__orphan_preset is None:
                     self.create_orphan_preset()
 
                 Et.SubElement(self.__orphan_preset, self.xmlTypeDict[item.UserType], read_item_attributes())
