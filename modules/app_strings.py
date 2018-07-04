@@ -129,6 +129,7 @@ class Msg:
                 'State Objects werden ignoriert da sie nur innerhalb derselben Xml relevant sind.</p>'
     POS_RUNNING_TITLE = 'POS Schnuffi'
     POS_RUNNING_MSG = 'POS Schnuffi Prozess läuft. Trotzdem beenden?'
+    POS_ALREADY_RUNNING = 'POS Schnuffi Vergleichsthread läuft bereits.'
     POS_ERR_MSG_LS = ['Kann nicht exportieren: kein fokusierter Baum erkannt. Element(e) im Baum selektieren.',
                       'Kann nicht exportieren: keine selektierten Elemente erkannt.',
                       'Kann nicht exportieren: keine Exportdatei gewählt.',

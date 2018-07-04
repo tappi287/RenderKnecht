@@ -50,11 +50,10 @@ def sort_widget(widget, maximum_width: int=800):
 
 
 class FileWindow(QtWidgets.QWidget):
-    compare = QtCore.pyqtSignal()
 
-    def __init__(self, knecht_app, pos_ui):
+    def __init__(self, knecht_app, pos_ui, pos_app):
         super(FileWindow, self).__init__()
-        self.knecht_app, self.pos_ui = knecht_app, pos_ui
+        self.knecht_app, self.pos_ui, self.pos_app = knecht_app, pos_ui, pos_app
 
         LOGGER.setLevel(logging.ERROR)
         loadUi(UI_POS_FILE, self)
@@ -78,6 +77,7 @@ class FileWindow(QtWidgets.QWidget):
                                              )
         self.new_file_dlg.path_changed.connect(self.save_new_path_setting)
 
+        self.okBtn.setEnabled(True)
         self.okBtn.pressed.connect(self.validate_and_close)
         self.cancelBtn.pressed.connect(self.close)
         self.swapBtn.pressed.connect(self.swap_paths)
@@ -98,8 +98,9 @@ class FileWindow(QtWidgets.QWidget):
             self.okLabel.setText('Gültigen Pfad für alte und neue POS Datei angeben.')
             return
         else:
+            self.okBtn.setEnabled(False)
             self.okLabel.setText('')
-            self.compare.emit()
+            self.pos_app.compare()
             self.close()
 
     def validate_paths(self):
@@ -261,7 +262,7 @@ class SchnuffiApp(QtCore.QObject):
         self.pos_ui.ModifiedWidget.info_overlay.display_exit()
         self.pos_ui.ModifiedWidget.info_overlay.display_confirm(error_str, ('[X]', None))
 
-    def sort_all_headers(self, event = None):
+    def sort_all_headers(self, event=None):
         for widget in self.widget_list:
             sort_widget(widget)
 
@@ -285,10 +286,14 @@ class SchnuffiApp(QtCore.QObject):
             count -= 1
 
     def open_file_window(self):
-        self.file_win = FileWindow(self.app, self.pos_ui)
-        self.file_win.compare.connect(self.compare)
+        self.file_win = FileWindow(self.app, self.pos_ui, self)
 
     def compare(self):
+        if self.cmp_thread is not None:
+            if self.cmp_thread.isRunning():
+                self.error_msg(Msg.POS_ALREADY_RUNNING)
+                return
+
         for widget in self.widget_list:
             widget.clear()
 
