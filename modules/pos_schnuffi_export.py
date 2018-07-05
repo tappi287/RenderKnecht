@@ -52,7 +52,10 @@ class ExportActionList(object):
         if not file or not action_list_names:
             return
 
-        self.export_custom_xml(action_list_names, file)
+        if not self.export_custom_xml(action_list_names, file):
+            # break on error
+            return
+
         self.pos_app.export_sig.emit()
 
     def export_updated_pos_xml(self):
@@ -61,7 +64,10 @@ class ExportActionList(object):
         if not file or not action_list_names:
             return
 
-        self.update_old_pos_xml(action_list_names, file)
+        if not self.update_old_pos_xml(action_list_names, file):
+            # break on error
+            return
+
         self.pos_app.export_sig.emit()
 
     def update_old_pos_xml(self, action_list_names, out_file):
@@ -70,17 +76,17 @@ class ExportActionList(object):
             old_pos_xml_file = self.pos_app.file_win.old_file_dlg.path
             new_pos_xml_file = self.pos_app.file_win.new_file_dlg.path
         else:
-            return
+            return False
 
         # Parse old and new xml file
         pos_xml = self.parse_pos_xml(old_pos_xml_file)
         if not pos_xml:
             self.err.emit(self.err_msg[3])
-            return
+            return False
         new_xml = self.parse_pos_xml(new_pos_xml_file)
         if not new_xml:
             self.err.emit(self.err_msg[3])
-            return
+            return False
 
         # Prepare storage of updated POS Xml
         updated_xml = self.prepare_updated_pos_xml_export(pos_xml.xml_tree, out_file)
@@ -102,30 +108,40 @@ class ExportActionList(object):
             parent.remove(old_action_list_elem)
             parent.insert(al_index, new_action_list_elem)
 
+        if not updated_elements:
+            # No elements to update found
+            # ActionList needs to be available in old and new document
+            # adding ActionList is not supported yet
+            self.err.emit(self.err_msg[4])
+            return False
+
         # Add info comment
         self.add_export_info_comment(updated_xml.root, updated_elements,
                                      old_pos_xml_file, new_pos_xml_file)
 
-        # Try to write the POS mess as a file, this will fail
+        # Try to write the POS mess as a file, this will fail with xml.etree
         LOGGER.info('Exporting POS Xml with the following action lists replaced:\n%s', updated_elements)
         try:
             updated_xml.save_tree()
             self.err.emit(Msg.POS_EXPORT_MSG.format(updated_xml.variants_xml_path.as_posix()))
         except Exception as e:
-            self.err.emit(self.err_msg[4])
+            self.err.emit(self.err_msg[5])
             LOGGER.error('POS Xml is malformed and could not be written/serialized.\n%s', e)
+            return False
+
+        return True
 
     def export_custom_xml(self, action_list_names: set, out_file):
         # Get current -new- xml file path
         if self.pos_app.file_win:
             new_pos_xml_file = self.pos_app.file_win.new_file_dlg.path
         else:
-            return
+            return False
 
         pos_xml = self.parse_pos_xml(new_pos_xml_file)
         if not pos_xml:
             self.err.emit(self.err_msg[3])
-            return
+            return False
 
         # Prepare export Xml
         xml, xml_elem = self.prepare_custom_xml_export(out_file)
@@ -142,6 +158,9 @@ class ExportActionList(object):
         except Exception as e:
             self.err.emit(self.err_msg[4])
             LOGGER.error('POS Xml is malformed and could not be written/serialized.\n%s', e)
+            return False
+
+        return True
 
     def prepare_custom_xml_export(self, xml_path):
         session_xml = XML(xml_path, None, no_knecht_tags=True)

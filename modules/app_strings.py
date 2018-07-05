@@ -134,6 +134,8 @@ class Msg:
                       'Kann nicht exportieren: keine selektierten Elemente erkannt.',
                       'Kann nicht exportieren: keine Exportdatei gewählt.',
                       'Kann Nichts exportieren: Keine POS Xml geladen.',
+                      'Kann Nichts exportieren: Keine geänderten Action Listen erkannt. ActionList muss in '
+                      'alter und neuer POS Xml vorhanden sein.',
                       'Fehler beim Export. Das Quelldokument ist keine gültige Xml Datei.']
     POS_EXPORT_MSG = 'POS Xml exportiert in:<br>{}'
 
