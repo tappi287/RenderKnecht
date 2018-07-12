@@ -28,6 +28,7 @@ from PyQt5.QtGui import QColor, QBrush
 
 from modules.knecht_deltagen import SendToDeltaGen
 from modules.knecht_log import init_logging
+from modules.gui_set_path import SetDirectoryPath
 from modules.app_globals import LEAD_ZEROS, ItemColumn, Msg, DEFAULT_TYPES
 from modules.app_globals import Itemstyle, INVALID_CHR, DETAIL_PRESET_PREFIXS
 
@@ -388,6 +389,29 @@ def tree_setup_header_format(widget_list, maximum_width: int = 650):
         widget.sortByColumn(0, QtCore.Qt.AscendingOrder)
 
 
+class SetPathItemWidget:
+    """ Create an item widget that can select a path """
+
+    def __init__(self, app, item):
+        self.widget, self.app = item.treeWidget(), app
+        self.btn = QtWidgets.QPushButton('...', self.widget)
+
+        # Get the mask_path child item
+        for child in list_child_items(item):
+            if child.text(ItemColumn.TYPE) == 'mask_path':
+                self.item = child
+
+        # Setup path dialog
+        self.set_path = SetDirectoryPath(app, app.ui, tool_button=self.btn)
+        self.set_path.path_changed.connect(self.set_path_value)
+
+        # Set item widget
+        self.widget.setItemWidget(self.item, ItemColumn.VALUE, self.btn)
+
+    def set_path_value(self, path):
+        self.item.setText(ItemColumn.NAME, path.as_posix())
+
+
 class render_settings_combo_box:
     """ Create Combo Box Widget for Render Setting row's """
 
@@ -475,6 +499,7 @@ class SortTree:
         self.widget = widget
         self.item_id_list = []
         self.render_widgets = []
+        self.masked_viewset_widgets = []
         self.column = column
         self.ui = ui
 
@@ -592,11 +617,22 @@ class SortTree:
             self.item_idx = 0
 
         # Create Item Widgets for render_settings
-        if item.UserType == 1004 and item.treeWidget() is not self.ui.treeWidget_SrcPreset:
-            if not item.treeWidget().itemWidget(item, ItemColumn.VALUE):
-                # Create item widget if not already present
-                LOGGER.debug('Creating Combo Box Widget for item %s', item.text(1))
-                self.render_widgets.append(render_settings_combo_box(item))
+        if item.UserType == 1004:
+            widget = item.treeWidget()
+
+            if widget is not self.ui.treeWidget_SrcPreset:
+                if not widget.itemWidget(item, ItemColumn.VALUE):
+                    # Create item widget if not already present
+                    LOGGER.debug('Creating Combo Box Widget for item %s', item.text(1))
+                    self.render_widgets.append(render_settings_combo_box(item))
+
+        # Create Item Widgets for masked_viewset
+        if item.text(ItemColumn.TYPE) == 'viewset_mask':
+            widget = item.treeWidget()
+            if widget is not self.ui.treeWidget_SrcPreset and item.childCount() > 1:
+                # Create item set path widget
+                if not widget.itemWidget(item, ItemColumn.VALUE):
+                    self.masked_viewset_widgets.append(SetPathItemWidget(self.ui.app_class, item))
 
         # Style default presets
         style_database_preset(item, self.ui, self.widget.toggle_preset_vis)

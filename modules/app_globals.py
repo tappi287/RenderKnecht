@@ -107,6 +107,7 @@ class Itemstyle:
         'package': 'pkg',
         'reset': 'reset',
         'viewset': 'view',
+        'viewset_mask': 'viewset_mask',
         'preset': 'preset',
         'preset_ref': 'preset_ref',
         'OPT': 'img',
@@ -171,6 +172,7 @@ class Itemstyle:
         'img_path': ':/type/img_path.png',
         'render': ':/type/render.png',
         'copy': ':/type/copy.png',
+        'viewset_mask': ':/type/viewset_mask.png',
         'empty': None,
         # Main icons
         'link_intact': ':/main/link-intact.png',

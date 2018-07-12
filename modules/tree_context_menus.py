@@ -708,6 +708,18 @@ class TreeContextMenu(QtWidgets.QMenu):
         add_viewset.setIcon(self.ui.icon[Itemstyle.TYPES['viewset']])
         self.create_menu.addAction(add_viewset)
 
+        # Add masked viewset
+        add_masked_view = QtWidgets.QAction('Maskiertes Viewset\tEnthält **eine** Shot '
+                                            'Variante und einen Pfad zur Maske', self)
+        shot = ('variant', '000', '#_Shot', 'Shot_05_Lightplanes', '', '', '', 'Schalter des Shot Varianten Sets')
+        mask = ('variant', '001', 'Pfad zur Maske angeben...', 'Button', 'mask_path', '', '', 'Pfad zur Maskenbilddatei.')
+        preset_item_list = [shot, mask]
+        add_masked_view.triggered.connect(
+            partial(self.create_preset_from_selected, True, False, preset_name='Masked_Viewset_',
+                    preset_type='viewset_mask', preset_items=preset_item_list))
+        add_masked_view.setIcon(self.ui.icon[Itemstyle.TYPES['viewset_mask']])
+        self.create_menu.addAction(add_masked_view)
+
         # Add Reset
         add_reset = QtWidgets.QAction('Reset\tVarianten für eine Resetschaltung', self)
         reset_on = (

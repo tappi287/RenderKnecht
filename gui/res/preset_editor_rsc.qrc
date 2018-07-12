@@ -54,6 +54,7 @@
     <file>warn.png</file>
   </qresource>
   <qresource prefix="type">
+    <file>viewset_mask.png</file>
     <file>img_path.png</file>
     <file>img_free.png</file>
     <file>checkmark.png</file>
