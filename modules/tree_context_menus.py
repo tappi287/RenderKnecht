@@ -280,6 +280,7 @@ class TreeContextMenu(QtWidgets.QMenu):
         # Shortcut
         self.add = self.add_menu_action
 
+        # -----------------------
         # Create Render preset
         self.render_preset_action = self.add(self.create_render_preset, Itemstyle.TYPES['render_preset'],
                                              'Render Preset aus Selektion erstellen',
@@ -287,6 +288,11 @@ class TreeContextMenu(QtWidgets.QMenu):
 
         # Create Preset from selected
         self.add(self.create_preset_from_selected, Itemstyle.TYPES['preset'], 'Preset aus Selektion erstellen')
+
+        # Create masked Preset from selected presets
+        if self.parent is self.ui.treeWidget_DestPreset:
+            self.add(self.create_masked_presets_from_selected, Itemstyle.TYPES['preset_mask'],
+                     'Masken Presets aus selektierten Presets erstellen')
 
         # -----------------------
         # Create menu
@@ -549,6 +555,27 @@ class TreeContextMenu(QtWidgets.QMenu):
         render_preset_item.setSelected(True)
         self.ui.sort_tree_widget.sort_current_level(render_preset_item, self.parent)
 
+    def create_masked_presets_from_selected(self):
+        # Collect selected presets
+        preset_ls = []
+
+        for item in self.parent.selectedItems():
+            if item.UserType != 1000:
+                # Skip everything but User Presets
+                continue
+            preset_ls.append(item)
+
+        for preset in preset_ls:
+            # Clear selection and select current preset only
+            self.parent.clearSelection()
+            preset.setSelected(True)
+
+            # Define preset name
+            name = preset.text(ItemColumn.NAME) + '_Mask'
+
+            # Create preset and add selected preset
+            self.create_preset_from_selected(True, True, preset_name=name, skip_name_count=True)
+
     def create_preset_from_selected(self, action_bool, add_selected=True, **kwargs):
         """ Create new User Preset from selected items """
         self.preset_count += 1
@@ -559,13 +586,19 @@ class TreeContextMenu(QtWidgets.QMenu):
             # Preset Name
             'preset_name': 'User_Preset_',  # Preset Type
             'preset_type': 'preset', 'preset_items': [],  # Preset child items as list of tuples (type, name, value)
-            'has_id'     : True, }
+            'has_id': True, 'skip_name_count': False
+            }
 
         options.update(kwargs)
 
         # Item attributes
         order = lead_zeros(dest_tree.topLevelItemCount() + 1)
-        name = options['preset_name'] + lead_zeros(self.preset_count)
+
+        if not options['skip_name_count']:
+            name = options['preset_name'] + lead_zeros(self.preset_count)
+        else:
+            name = options['preset_name']
+
         preset_type = options['preset_type']
         item_user_type = 1000  # Preset
         if preset_type == 'seperator':
@@ -712,7 +745,8 @@ class TreeContextMenu(QtWidgets.QMenu):
         add_masked_view = QtWidgets.QAction('Maskiertes Viewset\tEnthält **eine** Shot '
                                             'Variante und einen Pfad zur Maske', self)
         shot = ('variant', '000', '#_Shot', 'Shot_05_Lightplanes', '', '', '', 'Schalter des Shot Varianten Sets')
-        mask = ('variant', '001', 'Pfad zur Maske angeben...', 'Button', 'mask_path', '', '', 'Pfad zur Maskenbilddatei.')
+        mask = ('variant', '001', 'Pfad zum Maskenordner angeben...', 'Button', 'mask_path', '', '',
+                'Pfad zur Maskenbilddatei.')
         preset_item_list = [shot, mask]
         add_masked_view.triggered.connect(
             partial(self.create_preset_from_selected, True, False, preset_name='Masked_Viewset_',

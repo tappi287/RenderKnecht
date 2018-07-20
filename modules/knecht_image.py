@@ -5,10 +5,10 @@ from pathlib import Path
 
 base_path = Path(r'C:\Users\CADuser\Nextcloud\py\py_knecht\RenderKnecht\_TestDocs\img')
 
-orig_img = base_path / 'input.hdr'
-over_img = base_path / 'masked_input.hdr'
-mask_img = base_path / 'DG_masked_view.png'
-result_img = base_path / 'output.png'
+orig_img_path = base_path / 'input.hdr'
+over_img_path = base_path / 'masked_input.hdr'
+mask_img_path = base_path / 'DG_masked_view.png'
+result_img_path = base_path / 'output.png'
 
 
 def read_image(image_path: Path):
@@ -33,6 +33,25 @@ def save_image(img: Image.Image, file_path: Path):
         img.save(f)
 
 
+def composite_image(orig: Path, over: Path, mask: Path):
+    orig_image = read_image(orig)
+    over_image = read_image(over)
+    mask_image = read_image(mask)
+
+    # Convert mask to gray scale image
+    mask_image = mask_image.convert('L')
+
+    return Image.composite(orig_image, over_image, mask_image)
+
+
+def convert_to_black_white_mask(img: Image.Image):
+    """
+        Convert an RGB image to a black white mask.
+        Setting every pixel that is not white(255) to black(0)
+    """
+    return Image.eval(img, lambda px: 0 if px <= 254 else px)
+
+
 if __name__ == '__main__':
-    im = read_image(mask_img)
-    save_image(im, result_img)
+    im = composite_image(orig_img_path, over_img_path, mask_img_path)
+    save_image(im, result_img_path)
