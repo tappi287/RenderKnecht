@@ -178,6 +178,9 @@ class MainWindow(QtWidgets.QMainWindow):
         # hide variants type column
         self.treeWidget_Variants.header().hideSection(ItemColumn.TYPE)
 
+        # Reset treeWidgets splitter to equal sizes
+        self.presetTreeSplitter.setSizes([100, 100])
+
     def enable_load_actions(self, enabled: bool = True):
         self.menuImport.setEnabled(enabled)
         self.actionOpen.setEnabled(enabled)

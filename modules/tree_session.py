@@ -67,6 +67,11 @@ class TreeSessionManager(QtCore.QObject):
     load_ovr_timer.setSingleShot(True)
     load_ovr_timer.setInterval(500)
 
+    # Deferred initial session load time
+    init_load_timer = QtCore.QTimer()
+    init_load_timer.setSingleShot(True)
+    init_load_timer.setInterval(100)
+
     def __init__(self, app, ui):
         super(TreeSessionManager, self).__init__()
         self.app, self.ui = app, ui
