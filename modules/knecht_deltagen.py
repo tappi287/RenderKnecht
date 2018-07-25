@@ -27,8 +27,9 @@ from pathlib import Path
 from PyQt5 import QtWidgets
 from PyQt5.QtCore import QObject, QThread, QUrl, Qt, pyqtSignal, pyqtSlot
 from PyQt5.QtGui import QBrush, QColor, QDesktopServices
-from imageio import imread, imwrite
+from imageio import imread
 
+from modules.knecht_image import create_png_images
 from modules.app_globals import HELPER_DIR, INVALID_CHR, ItemColumn, Itemstyle, Msg, RENDER_MACHINE_FACTOR, \
     RENDER_RES_FACTOR, TCP_IP, TCP_PORT
 from modules.knecht_log import init_logging
@@ -36,58 +37,6 @@ from modules.knecht_socket import Ncat
 
 # Initialize logging for this module
 LOGGER = init_logging(__name__)
-
-
-def create_png_images(img_list, contains_render_preset_dir=False, converted_dir_name='non_converted_render_output'):
-    return_msg = '\nErstelle PNG Bildaten:\n'
-
-    for img_file_path in img_list:
-        skip_img = False
-
-        # Skip if target is of target format
-        if img_file_path.suffix == '.png':
-            skip_img = True
-
-        # Read image
-        try:
-            img_hdr = imread(str(img_file_path))
-        except ValueError or OSError as exception_message:
-            # Image may not be completly written yet
-            LOGGER.error('Could not open image: %s, %s', img_file_path, exception_message)
-            return_msg += '\nBild konnte nicht gelesen werden: '\
-                          + img_file_path.name + '\n' + str(exception_message) + '\n'
-
-            skip_img = True
-
-        if not skip_img:
-            # Set target png file
-            img_png = img_file_path.parent / Path(img_file_path.stem).with_suffix('.png')
-
-            # Convert image file
-            try:
-                imwrite(str(img_png), img_hdr)
-                return_msg += str(img_png.name) + '\n'
-            except Exception as e:
-                LOGGER.error('Could not write png image: %s\n%s', img_png, e)
-                return_msg += 'Konnte Bild nicht schreiben: ' + str(img_png) + '\n'
-
-            # Move source file to 'converted' directory
-            if contains_render_preset_dir:
-                new_img_hdr = img_file_path.parent.parent / converted_dir_name / img_file_path.name
-            else:
-                new_img_hdr = img_file_path.parent / converted_dir_name / img_file_path.name
-
-            # Create converted directory
-            if not new_img_hdr.parent.exists():
-                new_img_hdr.parent.mkdir()
-
-            # Move the file
-            try:
-                img_file_path.replace(new_img_hdr)
-            except FileNotFoundError or FileExistsError:
-                pass
-
-    return return_msg
 
 
 def time_string(time_f):
@@ -355,7 +304,7 @@ class SendToDeltaGen(QObject):
                     value += ' ' + viewset_list[0].child(0).text(ItemColumn.VALUE) + ';'
                     return value
                 except AttributeError:
-                    LOGGER.error('Can not read empty viewset. Returning dummy value.')
+                    LOGGER.error('Viewset empty. Returning dummy value.')
                     self.widget.info_overlay.display(Msg.OVERLAY_NO_VIEWSET_WARN, 3000, True)
                     ask_abort_viewset()
                     return 'VARIANT DUMMY EMPTY_VIEWSET;'
@@ -1155,7 +1104,8 @@ class send_to_dg_worker(QObject):
         # 0h:00min:00sec
         return time_string(render_seconds_remaining)
 
-    def calc_render_time(self, render_dict):
+    @staticmethod
+    def calc_render_time(render_dict):
         """ Calculate render time in seconds """
         render_time = 0
         image_num_all = 0
@@ -1166,6 +1116,7 @@ class send_to_dg_worker(QObject):
 
             # Resolution X
             resolution = render_dict[r].get('resolution')
+            res_x = 0
             if len(resolution.split(' ')) >= 1:
                 res_x = int(resolution.split(' ')[0])
 

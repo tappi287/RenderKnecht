@@ -70,6 +70,13 @@ class RenderKnechtGui(QtWidgets.QApplication):
     quit_timer.setSingleShot(True)
     quit_timer.setInterval(1000)
 
+    # Delay render time calculation
+    # so not every copy or sort action triggers
+    # an immediate calculation
+    render_list_changed_delay = QtCore.QTimer()
+    render_list_changed_delay.setSingleShot(True)
+    render_list_changed_delay.setInterval(800)
+
     intro_timer = QtCore.QTimer()
     intro_timer.setSingleShot(True)
     intro_timer.setInterval(500)
@@ -115,6 +122,7 @@ class RenderKnechtGui(QtWidgets.QApplication):
 
         # Session mgr
         self.session = TreeSessionManager(self, self.ui)
+        self.session.init_load_timer.timeout.connect(self.initial_session_load)
 
         # Set app class for delete class
         AddRemoveItemsCommand.app = self
@@ -319,8 +327,9 @@ class RenderKnechtGui(QtWidgets.QApplication):
         # Start Rendering with DeltaGen
         self.ui.pushButton_startRender.pressed.connect(self.dg_render)
 
-        # Update estimated render time
-        self.ui.treeWidget_render.itemChanged.connect(self.dg_estimate_render_timer)
+        # Update estimated render time with a delay
+        self.ui.treeWidget_render.itemChanged.connect(self.render_list_changed_delay.start)
+        self.render_list_changed_delay.timeout.connect(self.dg_estimate_render_time)
 
         # init path render service
         self.path_render_service = PathRenderService(self, self.ui)
@@ -331,9 +340,6 @@ class RenderKnechtGui(QtWidgets.QApplication):
         if not intro_shown:
             self.intro_timer.timeout.connect(self.show_intro)
             self.intro_timer.start()
-
-        # Load session
-        self.session.load_session()
 
         # Show window and finish splash screen
         self.ui.show()
@@ -347,6 +353,9 @@ class RenderKnechtGui(QtWidgets.QApplication):
         # Report ImageIO Libary Path
         img_io = os.getenv('IMAGEIO_FREEIMAGE_LIB')
         LOGGER.info('ImageIO Freelib path: %s', img_io)
+
+        # Trigger initial session load
+        self.session.init_load_timer.start()
 
     def show_intro(self):
         # Reset GUI Size to default to play introduction
@@ -365,6 +374,9 @@ class RenderKnechtGui(QtWidgets.QApplication):
         self.intro_widget.deleteLater()
         self.intro_widget = None
         knechtSettings.app['introduction_shown'] = True
+
+    def initial_session_load(self):
+        self.session.load_session()
 
     def start_pos_schnuffi(self):
         self.pos_schnuffi = SchnuffiApp(self)
@@ -690,7 +702,7 @@ class RenderKnechtGui(QtWidgets.QApplication):
 
         self.deltagen_send_instance.resize_viewer()
 
-    def dg_estimate_render_timer(self):
+    def dg_estimate_render_time(self):
         """ Update estimated render time """
         if self.ui.treeWidget_render.topLevelItemCount() > 0:
             self.deltagen_render_instance.collect_render_settings(skip_variants=True)

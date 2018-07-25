@@ -28,7 +28,7 @@ from modules.knecht_parse_excel import LoadVplus
 from modules.gui_excel_dialog import VplusWindow
 from modules.knecht_log import init_logging
 from modules.knecht_legacy_variants import convertVariants
-from modules.knecht_deltagen import create_png_images
+from modules.knecht_image import create_png_images
 
 # Initialize logging for this module
 LOGGER = init_logging(__name__)
