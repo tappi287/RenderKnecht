@@ -37,6 +37,7 @@ class Msg:
            '<img src=":/main/social-github-b.png" width="24" height="24" ' \
            'style="float: left;vertical-align: middle;">Quellcode nun verfügbar auf Github!</a>' \
            '</li>' \
+           '<li>Ausgabepfade länger als 260 Zeichen werden vor dem Render Vorgang gemeldet</li>' \
            '<li>Ausnahmen werden als Fehlermeldungen gezeigt und lassen den Interpreter nicht abstürzen</li>' \
            '<li>Pfad Render Service Client GUI hinzugefügt</li>' \
            '<li>Preset Wizard Kontext Menü für PR und Paket Optionen + Filter verbessert</li>' \
@@ -254,6 +255,9 @@ class Msg:
     RENDER_FILE_DIALOG = 'Pfad zum Render Ausgabeverzeichnis angeben...'
     RENDER_INVALID_PATH = 'Ausgabe Pfad ungültig. Gültigen Pfad angeben.'
     RENDER_NO_PRESETS = 'Render Presets konnten nicht verifiziert werden. Vorgang abgebrochen.'
+    RENDER_NAMES_TOO_LONG = 'Die Ausgabepfade der folgenden Presets sind <b>zu lang:</b><br><br>' \
+                            '{name_list}' \
+                            'Ausgabepfad oder Preset Namen müssen gekürzt werden.'
     RENDER_LOG = ['RenderKnecht Render Log erstellt am ', 'Erzeuge Bild mit Namen: ', 'Varianten: ']
     RENDER_TOGGLE_TIMEOUT_ON = 'Feedbackloop je gesendeter Variante und Varianten State Check aktiviert.'
     RENDER_TOGGLE_TIMEOUT_OFF = 'Feedbackloop deaktiviert. Für korrekte Schaltungen, stelle sicher das '

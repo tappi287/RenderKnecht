@@ -363,6 +363,12 @@ class RenderKnechtGui(QtWidgets.QApplication):
         y = self.ui.geometry().y()
         self.ui.setGeometry(x, y, UI_SIZE[2], UI_SIZE[3])
 
+        # Reset treeWidgets splitter to equal sizes
+        self.ui.presetTreeSplitter.setSizes([100, 100])
+
+        # Focus Variants tab
+        self.ui.tabWidget.setCurrentWidget(self.ui.Varianten)
+
         # Intro overlay
         self.intro_widget = IntroOverlay(self.ui.centralWidget())
         self.intro_widget.generic_center()

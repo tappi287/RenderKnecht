@@ -50,6 +50,26 @@ def time_string(time_f):
         return '{:=01.0f}h:{:=02.0f}min:{:=02.0f}sec'.format(h, m, s)
 
 
+def get_viewset_name(viewset):
+    """
+        'Variant Viewset View;' will return '_View' or ''
+    """
+    # Viewset name if supplied as "Variant Viewset View;"
+    viewset_name = viewset.split(' ', 2)
+    if len(viewset_name) >= 2:
+        # VARIANT #_Shot Shot;
+        return '_' + viewset_name[2].replace(';', '')
+    else:
+        return ''
+
+
+def to_valid_chrs(string):
+    """ Replace invalid characters in provided string """
+    for k, v in INVALID_CHR.items():
+        string = string.replace(k, v)
+    return string
+
+
 class SendToDeltaGen(QObject):
     """ Sends variants to DeltaGen in a seperate thread """
     reset = True
@@ -400,18 +420,57 @@ class SendToDeltaGen(QObject):
             QtWidgets.QMessageBox.critical(self.widget, Msg.GENERIC_ERROR_TITLE, Msg.RENDER_INVALID_PATH)
             return False
 
-        # Check if all settings are available
-        if render_preset_dict:
-            for idx in range(0, len(render_preset_dict)):
-                for k in ['resolution', 'sampling', 'file_extension']:
-                    if not k in render_preset_dict[idx].keys():
-                        LOGGER.error('Render Preset #%s is invalid. Setting: %s is missing', idx, k)
-                        render_msg = 'Render preset #' + str(idx + 1) + ' has no setting:<br><b>' + k
-                        render_msg += '</b><br><br>Can not start render process.'
-                        QtWidgets.QMessageBox.critical(self.widget, 'Render Preset', render_msg)
-                        render_preset_dict.pop(idx)
-                        return False
-        else:
+        if not render_preset_dict:
+            return False
+
+        out_dir_name = 'out_' + str(time.time())
+        out_dir = self.render_user_path / out_dir_name
+        too_long_names = list()
+
+        for idx in range(0, len(render_preset_dict)):
+            # ----------------------
+            # Check render settings
+            for k in ['resolution', 'sampling', 'file_extension']:
+                if k not in render_preset_dict[idx].keys():
+                    LOGGER.error('Render Preset #%s is invalid. Setting: %s is missing', idx, k)
+                    render_msg = 'Render preset #' + str(idx + 1) + ' has no setting:<br><b>' + k
+                    render_msg += '</b><br><br>Can not start render process.'
+                    QtWidgets.QMessageBox.critical(self.widget, 'Render Preset', render_msg)
+                    render_preset_dict.pop(idx)
+                    return False
+
+            # ----------------------
+            # Check file name length
+            file_extension = render_preset_dict[idx]['file_extension']
+
+            if self.create_render_preset_dir:
+                render_preset_name = render_preset_dict[idx]['render_preset_name']
+                out_dir = self.render_user_path / out_dir_name / render_preset_name
+
+            for preset in render_preset_dict[idx]['preset'].items():
+                __i, preset = preset
+                name = preset.get('name')
+
+                # Iterate Render Preset viewset's
+                for viewset in render_preset_dict[idx]['viewsets']:
+                    viewset_name = get_viewset_name(viewset)
+                    img_name = '{:03d}_{name}{viewset}{ext}'.format(__i, name=name, viewset=viewset_name,
+                                                                    ext=file_extension)
+                    img_path = out_dir / img_name
+
+                    if len(str(img_path)) >= 259:
+                        too_long_names.append(img_name)
+
+        #  Output names longer than 260 characters, abort
+        if too_long_names:
+            LOGGER.error('Render images names too long:\n%s', too_long_names)
+
+            long_names_str = ''
+            for name in too_long_names:
+                long_names_str += '<i>{img_name}</i><br><br>'.format(img_name=name)
+
+            render_msg = Msg.RENDER_NAMES_TOO_LONG.format(name_list=long_names_str)
+            QtWidgets.QMessageBox.critical(self.widget, 'Render Preset', render_msg)
             return False
 
         return True
@@ -870,9 +929,7 @@ class send_to_dg_worker(QObject):
 
             # Create Render Preset Output Directory
             if self.create_render_preset_dir:
-                # Replace invalid file name characters
-                for k, v in INVALID_CHR.items():
-                    render_preset_name = render_preset_name.replace(k, v)
+                render_preset_name = to_valid_chrs(render_preset_name)
 
                 new_out_dir = self.initial_out_dir / render_preset_name
                 self.out_dir = self.create_directory(new_out_dir, out_dir_name)
@@ -936,21 +993,18 @@ class send_to_dg_worker(QObject):
         variant_list = []
         variant_list += preset.get('variants')
 
-        # Viewset name if supplied as "Variant Viewset View;"
-        viewset_name = viewset.split(' ', 2)
-        if len(viewset_name) >= 2:
-            # VARIANT #_Shot Shot;
-            viewset_name = '_' + viewset_name[2].replace(';', '')
+        # Viewset name if supplied as "Variant Viewset View;" else will return ''
+        viewset_name = get_viewset_name(viewset)
+
+        # Append viewset variant if name and therefore a valid viewset variant was supplied
+        if viewset_name:
             variant_list.append(viewset)
-        else:
-            viewset_name = ''
 
         # Output Image Name
         img_name = '{:03d}_{name}{viewset}{ext}'.format(img_count, name=name, viewset=viewset_name, ext=file_extension)
 
         # Replace invalid file name characters
-        for k, v in INVALID_CHR.items():
-            img_name = img_name.replace(k, v)
+        img_name = to_valid_chrs(img_name)
 
         LOGGER.info('Rendering: %s\nAA: %s RES: %s EXT: %s', img_name, sampling, resolution, file_extension)
         self.render_log += self.return_time() + ' ' + Msg.RENDER_LOG[1] + img_name + '\n' + Msg.RENDER_LOG[2]
