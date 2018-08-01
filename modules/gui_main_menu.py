@@ -48,6 +48,11 @@ class MenuBar(QtCore.QObject):
     render_path = QtCore.pyqtSignal(Path)
     open_file = QtCore.pyqtSignal()
 
+    # Future thread or window instances
+    fakom_window = None
+    preset_wizard_win = None
+    png_convert = None
+
     def __init__(self, app, ui, log, tree_widget_source, tree_widget_dest, ui_action_open):
         super(MenuBar, self).__init__()
 
@@ -167,10 +172,17 @@ class MenuBar(QtCore.QObject):
         img_list = []
         conv_path = self.get_directory_file_dialog(self.ui.current_path, Msg.PNG_CONV_TITLE)
 
+        if not conv_path:
+            self.dest_overlay.display(Msg.PNG_CONV_NO_DIR, 8000)
+            return
+
         if conv_path.exists():
             for img_file in conv_path.glob('*.*'):
                 if img_file.suffix in ['.hdr', '.exr', '.jpg', '.bmp', '.tif']:
                     img_list.append(img_file)
+
+        if not img_list:
+            self.dest_overlay.display(Msg.PNG_CONV_NO_FILES, 8000)
 
         if img_list:
             self.png_convert = PngConvertThread(self.ui, self.ui.actionPNG_Konverter, img_list)

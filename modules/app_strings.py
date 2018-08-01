@@ -37,7 +37,8 @@ class Msg:
            '<img src=":/main/social-github-b.png" width="24" height="24" ' \
            'style="float: left;vertical-align: middle;">Quellcode nun verfügbar auf Github!</a>' \
            '</li>' \
-           '<li>Ausgabepfade länger als 260 Zeichen werden vor dem Render Vorgang gemeldet</li>' \
+           '<li>Benutzer können den PNG Konverter nun auch mit leeren oder garkeinem Verzeichnis füttern</li>' \
+           '<li>Ausgabepfade länger als 260 Zeichen werden vor dem Render Vorgang gemeldet(von DG nicht unterstützt)</li>' \
            '<li>Ausnahmen werden als Fehlermeldungen gezeigt und lassen den Interpreter nicht abstürzen</li>' \
            '<li>Pfad Render Service Client GUI hinzugefügt</li>' \
            '<li>Preset Wizard Kontext Menü für PR und Paket Optionen + Filter verbessert</li>' \
@@ -48,10 +49,7 @@ class Msg:
            '<li>FaKom Lutscher kann Paketumfänge optional als Referenz zum Paket einfügen</li>' \
            '<li>Referenzen mit identischer ID aber unterschiedlichem Namen werden ' \
            'automatsich korrigiert</li>' \
-           '<li>Auto Save alle 5min bei ungespeicherten Änderungen</li>' \
-           '<li>Variantenbaum zeigt zuletzte hinzugefügtes Preset an</li>' \
-           '<li>Schalt-/Renderergebniss wird im Baum angezeigt und ' \
-           'Öffnen des Ausgabeordners per Dialog möglich</li>'
+           '<li>Auto Save alle 5min bei ungespeicherten Änderungen</li>'
 
     APP_VERSION_GREETING = _APP
     APP_EXT_LINK_BTN = 'Report issues'
@@ -121,6 +119,8 @@ class Msg:
     PATH_DIALOG = 'Verzeichnis auswählen'
     PNG_CONV_TITLE = 'Verzeichnis mit Bilddaten auswählen...'
     PNG_INFO_TITLE = 'PNG Konverter'
+    PNG_CONV_NO_DIR = 'Kein Verzeichnis zum konvertieren gewählt. Es wird nichts konvertiert werden.'
+    PNG_CONV_NO_FILES = 'Verzeichnis enthält keine Bilddaten zum konvertieren. Es wird nichts konvertiert werden.'
 
     POS_INTRO = '<h4><img src=":/ovr/welcome.png" width="21" height="21" style="float: left;">' \
                 'POS Schnuffi</h4>' \
