@@ -25,30 +25,30 @@ class ExportActionList(object):
         widget = self.get_widget()
         if not widget:
             self.err.emit(self.err_msg[0])
-            return None, None
+            return None, None, None
 
         # Collect QTreeWidgetItems
         items = widget.selectedItems()
         if not items:
             self.err.emit(self.err_msg[1])
-            return None, None
+            return None, None, None
 
         # Set export file
         file = self.set_file()
         if not file:
             self.err.emit(self.err_msg[2])
-            return None, None
+            return None, None, None
         file = Path(file)
         LOGGER.debug('POS Schnuffi Export file set to %s', file.as_posix())
 
         action_list_names = self.collect_action_lists(items)
         LOGGER.debug('Found %s actionLists to export.', len(action_list_names))
 
-        return action_list_names, file
+        return action_list_names, file, widget
 
     def export_selection(self):
         """ Export the selected widget action list items as custom user Xml """
-        action_list_names, file = self.export()
+        action_list_names, file, widget = self.export()
         if not file or not action_list_names:
             return
 
@@ -59,33 +59,45 @@ class ExportActionList(object):
         self.pos_app.export_sig.emit()
 
     def export_updated_pos_xml(self):
-        """ Export an updated version of the old POS Xml, updating selected action lists """
-        action_list_names, file = self.export()
+        """
+        Export an updated version of the old POS Xml:
+            - updating selected action lists from new POS Xml, if in "changed" widget
+            - adding selected action lists from new POS Xml, if in "NewXml_actionList" widget
+        """
+        action_list_names, file, widget = self.export()
         if not file or not action_list_names:
             return
 
-        if not self.update_old_pos_xml(action_list_names, file):
-            # break on error
+        if widget is self.pos_ui.ModifiedWidget:
+            if not self.update_old_pos_xml_with_changed_action_lists(action_list_names, file):
+                return
+        elif widget is self.pos_ui.actionListWidget:
+            if not self.update_old_pos_xml_with_new_action_lists(action_list_names, file):
+                return
+        else:
             return
 
         self.pos_app.export_sig.emit()
 
-    def update_old_pos_xml(self, action_list_names, out_file):
-        # Get current -old- xml file path
-        if self.pos_app.file_win:
-            old_pos_xml_file = self.pos_app.file_win.old_file_dlg.path
-            new_pos_xml_file = self.pos_app.file_win.new_file_dlg.path
-        else:
+    def update_old_pos_xml_with_new_action_lists(self, action_list_names, out_file):
+        """
+        Export an updated version of the old POS Xml, adding selected action lists
+        from new POS Xml, if in "NewXml_actionList" widget
+        """
+        # Read old and new POS Xml and return as PosXml class objects
+        pos_xml, new_xml = self.get_pos_xmls()
+
+        if not pos_xml or not new_xml:
             return False
 
-        # Parse old and new xml file
-        pos_xml = self.parse_pos_xml(old_pos_xml_file)
-        if not pos_xml:
-            self.err.emit(self.err_msg[3])
-            return False
-        new_xml = self.parse_pos_xml(new_pos_xml_file)
-        if not new_xml:
-            self.err.emit(self.err_msg[3])
+    def update_old_pos_xml_with_changed_action_lists(self, action_list_names, out_file):
+        """
+        Export an updated version of the old POS Xml, updating selected action lists with the
+        content from the new POS Xml.
+        """
+        # Read old and new POS Xml and return as PosXml class objects
+        pos_xml, new_xml = self.get_pos_xmls()
+        if not pos_xml or not new_xml:
             return False
 
         # Prepare storage of updated POS Xml
@@ -117,7 +129,8 @@ class ExportActionList(object):
 
         # Add info comment
         self.add_export_info_comment(updated_xml.root, updated_elements,
-                                     old_pos_xml_file, new_pos_xml_file)
+                                     self.pos_app.file_win.old_file_dlg.path,
+                                     self.pos_app.file_win.new_file_dlg.path)
 
         # Try to write the POS mess as a file, this will fail with xml.etree
         LOGGER.info('Exporting POS Xml with the following action lists replaced:\n%s', updated_elements)
@@ -132,13 +145,7 @@ class ExportActionList(object):
         return True
 
     def export_custom_xml(self, action_list_names: set, out_file):
-        # Get current -new- xml file path
-        if self.pos_app.file_win:
-            new_pos_xml_file = self.pos_app.file_win.new_file_dlg.path
-        else:
-            return False
-
-        pos_xml = self.parse_pos_xml(new_pos_xml_file)
+        pos_xml, _ = self.get_pos_xmls()
         if not pos_xml:
             self.err.emit(self.err_msg[3])
             return False
@@ -189,9 +196,30 @@ class ExportActionList(object):
             self.pos_ui,
             Msg.SAVE_DIALOG_TITLE,
             self.pos_app.app.ui.current_path,
-            Msg.SAVE_FILTER)
+            Msg.SAVE_FILTER
+            )
 
         return file
+
+    def get_pos_xmls(self):
+        """ Read old and new POS Xml and return as PosXml class objects """
+        if self.pos_app.file_win:
+            old_pos_xml_file = self.pos_app.file_win.old_file_dlg.path
+            new_pos_xml_file = self.pos_app.file_win.new_file_dlg.path
+        else:
+            return None, None
+
+        # Parse old and new xml file
+        pos_xml = self.parse_pos_xml(old_pos_xml_file)
+        if not pos_xml:
+            self.err.emit(self.err_msg[3])
+            return None, None
+        new_xml = self.parse_pos_xml(new_pos_xml_file)
+        if not new_xml:
+            self.err.emit(self.err_msg[3])
+            return None, None
+
+        return pos_xml, new_xml
 
     @staticmethod
     def parse_pos_xml(xml_file_path: Path):
