@@ -70,12 +70,15 @@ def add_context_action(menu, action_call, icon_type, desc='Description',
 class JobManagerContextMenu(QtWidgets.QMenu):
     cancel_job = QtCore.pyqtSignal(object)
     move_job = QtCore.pyqtSignal(object, bool)
+    force_psd = QtCore.pyqtSignal(object)
 
     def __init__(self, widget, ui):
         super(JobManagerContextMenu, self).__init__(widget)
         self.widget, self.ui = widget, ui
 
         add_context_action(self, self.cancel_job_item, Itemstyle.MAIN['close'], desc='Job abbrechen')
+        add_context_action(self, self.force_psd_creation, Itemstyle.MAIN['reset_state'],
+                           desc='PSD Erstellung erzwingen.')
         add_context_action(self, self.open_output_dir, Itemstyle.MAIN['folder'], desc='Ausgabe Verzeichnis öffnen')
         add_context_action(self, self.remove_render_file, Itemstyle.MAIN['trash'], desc='Maya Rendering Szene löschen')
         add_context_action(self, self.move_job_top, Itemstyle.TYPES['options'], desc='An den Anfang der Warteschlange')
@@ -92,6 +95,12 @@ class JobManagerContextMenu(QtWidgets.QMenu):
 
         if item:
             self.cancel_job.emit(item)
+
+    def force_psd_creation(self):
+        item = self.get_item()
+
+        if item:
+            self.force_psd.emit(item)
 
     def open_output_dir(self):
         item = self.get_item()

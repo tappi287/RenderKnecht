@@ -37,7 +37,7 @@ class Msg:
            '<img src=":/main/social-github-b.png" width="24" height="24" ' \
            'style="float: left;vertical-align: middle;">Quellcode nun verfügbar auf Github!</a>' \
            '</li>' \
-           '<li>Benutzer können den PNG Konverter nun auch mit leeren oder garkeinem Verzeichnis füttern</li>' \
+           '<li>PSD Erstellung erzwingen zum Kontextmenu des Job Managers hinzugefügt.</li>' \
            '<li>Ausgabepfade länger als 260 Zeichen werden vor dem Render Vorgang gemeldet(von DG nicht unterstützt)</li>' \
            '<li>Ausnahmen werden als Fehlermeldungen gezeigt und lassen den Interpreter nicht abstürzen</li>' \
            '<li>Pfad Render Service Client GUI hinzugefügt</li>' \
