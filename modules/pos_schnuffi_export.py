@@ -21,7 +21,7 @@ class ExportActionList(object):
         self.pos_app, self.pos_ui = pos_app, pos_ui
         self.err = self.pos_app.err_sig
 
-    def export(self):
+    def _prepare_export(self):
         widget = self.get_widget()
         if not widget:
             self.err.emit(self.err_msg[0])
@@ -48,7 +48,7 @@ class ExportActionList(object):
 
     def export_selection(self):
         """ Export the selected widget action list items as custom user Xml """
-        action_list_names, file, widget = self.export()
+        action_list_names, file, widget = self._prepare_export()
         if not file or not action_list_names:
             return
 
@@ -64,7 +64,7 @@ class ExportActionList(object):
             - updating selected action lists from new POS Xml, if in "changed" widget
             - adding selected action lists from new POS Xml, if in "NewXml_actionList" widget
         """
-        action_list_names, file, widget = self.export()
+        action_list_names, file, widget = self._prepare_export()
         if not file or not action_list_names:
             return
 
