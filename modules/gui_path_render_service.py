@@ -128,9 +128,11 @@ class PathRenderService(QtCore.QObject):
         self.ui.widgetJobManager.manager_open_scene_btn = self.manager_open_scene_btn
         self.ui.widgetJobManager.manager_delete_render_file = self.manager_delete_render_file
 
+        # --------- Job Manager Context Menu ------------
         self.context_menu = JobManagerContextMenu(self.ui.widgetJobManager, self.ui)
         self.context_menu.move_job.connect(self.manager_move_job)
         self.context_menu.cancel_job.connect(self.manager_cancel_job)
+        self.context_menu.force_psd.connect(self.manager_force_psd_creation)
 
         # Sort Job Manager columns
         self.ui.label_PfadAeffchen.mouseDoubleClickEvent = self.manager_sort_header
@@ -407,6 +409,19 @@ class PathRenderService(QtCore.QObject):
         msg = f'CANCEL_JOB {job.remote_index}'
 
         self.send_message(msg)
+
+    def manager_force_psd_creation(self, item):
+        job = self.get_job_from_item_index(item)
+
+        if not job:
+            return
+
+        msg = f'FORCE_PSD_CREATION {job.remote_index}'
+
+        self.send_message(msg)
+        self.ovr.display(f'<b>{job.title}</b><br>'
+                         '<i>Die bereits ausgegebenen Bilddaten werden in einem PSD zusammengestellt '
+                         'und der Job wird abgeschlossen. Dies kann wenige Minuten dauern.</i>', 7500)
 
     def request_job_queue(self):
         """ Request the remote job queue as pickled data """
