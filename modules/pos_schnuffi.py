@@ -196,7 +196,7 @@ class SchnuffiApp(QtCore.QObject):
         self.export = ExportActionList(self, self.pos_ui)
 
         self.widget_list = [self.pos_ui.AddedWidget, self.pos_ui.ModifiedWidget, self.pos_ui.RemovedWidget,
-                            self.pos_ui.switchesWidget, self.pos_ui.looksWidget]
+                            self.pos_ui.switchesWidget, self.pos_ui.looksWidget, self.pos_ui.actionListWidget]
         self.setup_widgets()
 
         self.pos_ui.show()

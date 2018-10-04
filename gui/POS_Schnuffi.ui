@@ -87,7 +87,7 @@
     <item>
      <widget class="QTabWidget" name="widgetTabs">
       <property name="currentIndex">
-       <number>0</number>
+       <number>5</number>
       </property>
       <widget class="QWidget" name="modifiedTab">
        <attribute name="title">
@@ -392,6 +392,77 @@
         </property>
         <item>
          <widget class="QTreeWidget" name="looksWidget">
+          <property name="sortingEnabled">
+           <bool>true</bool>
+          </property>
+          <column>
+           <property name="text">
+            <string>Action List</string>
+           </property>
+          </column>
+          <column>
+           <property name="text">
+            <string>Wert</string>
+           </property>
+          </column>
+          <column>
+           <property name="text">
+            <string>Wert(alt)</string>
+           </property>
+          </column>
+          <column>
+           <property name="text">
+            <string>Typ</string>
+           </property>
+          </column>
+          <item>
+           <property name="text">
+            <string>List_1</string>
+           </property>
+           <item>
+            <property name="text">
+             <string>actor_name</string>
+            </property>
+            <property name="text">
+             <string>0</string>
+            </property>
+            <property name="text">
+             <string>1</string>
+            </property>
+            <property name="text">
+             <string>switch</string>
+            </property>
+           </item>
+          </item>
+         </widget>
+        </item>
+       </layout>
+      </widget>
+      <widget class="QWidget" name="actionListTab">
+       <attribute name="title">
+        <string>Neue Xml - Action Listen</string>
+       </attribute>
+       <layout class="QVBoxLayout" name="verticalLayout_6">
+        <property name="spacing">
+         <number>0</number>
+        </property>
+        <property name="leftMargin">
+         <number>0</number>
+        </property>
+        <property name="topMargin">
+         <number>0</number>
+        </property>
+        <property name="rightMargin">
+         <number>0</number>
+        </property>
+        <property name="bottomMargin">
+         <number>0</number>
+        </property>
+        <item>
+         <widget class="QTreeWidget" name="actionListWidget">
+          <property name="selectionMode">
+           <enum>QAbstractItemView::ExtendedSelection</enum>
+          </property>
           <property name="sortingEnabled">
            <bool>true</bool>
           </property>

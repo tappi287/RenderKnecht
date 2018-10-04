@@ -170,7 +170,7 @@ class TreeSessionManager(QtCore.QObject):
         variants = list()
         variants_xml = xml_tree.find('./treeWidget_Variants/')
 
-        if not variants_xml:
+        if variants_xml is None:
             return
 
         # Get all variants from orphan preset
