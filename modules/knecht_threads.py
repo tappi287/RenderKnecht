@@ -152,7 +152,14 @@ class ExcelConversionThread(QObject):
                 LOGGER.error(
                     'Could not convert Excel file or conversion aborted: %s',
                     self.file)
-                QtWidgets.QMessageBox.information(self.open_dialog.parent,
+
+                # Find parent widget to display info message above
+                try:
+                    parent_dialog = self.open_dialog.parent
+                except AttributeError:
+                    parent_dialog = self.open_dialog.ui
+
+                QtWidgets.QMessageBox.information(parent_dialog,
                                                   Msg.MSG_EXC_BOX_TITLE,
                                                   Msg.EXC_FILE_ERROR)
                 if self.wizard:
