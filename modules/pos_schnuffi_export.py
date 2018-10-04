@@ -189,7 +189,7 @@ class ExportActionList(object):
         for s in new_xml.xml_tree.iterfind('*stateObject'):
             state_object_name = s.get('name')
             if state_object_name in state_object_names:
-                xml_elem.append(s)
+                xml_elem.insert(0, s)
 
         try:
             xml.save_tree()
