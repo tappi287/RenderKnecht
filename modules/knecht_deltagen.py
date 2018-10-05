@@ -211,6 +211,7 @@ class SendToDeltaGen(QObject):
         self.obj.status.connect(self.status_changed)
         self.obj.display_msg.connect(self.display_message)
         self.obj.render_progress.connect(self.update_progress_bar)
+        self.obj.task_progress.connect(self.update_task_progress)
         self.obj.green_on.connect(self.green_on)
         self.obj.green_off.connect(self.green_off)
         self.obj.yellow_on.connect(self.yellow_on)
@@ -584,7 +585,13 @@ class SendToDeltaGen(QObject):
         self.widget.info_overlay.display(msg, duration, immediate=True)
 
     def update_progress_bar(self, progress):
+        progress = min(100, max(0, progress))
         self.app.ui.progressBar_render.setValue(progress)
+        self.app.ui.progress.setValue(progress)
+
+    def update_task_progress(self, progress):
+        progress = min(100, max(0, progress))
+        self.app.ui.progress.setValue(progress)
 
     def rendering_finished_overlay(self):
         try:
@@ -641,6 +648,8 @@ class SendToDeltaGen(QObject):
 
         # Reset progress bar
         self.app.ui.progressBar_render.setValue(0)
+        self.app.ui.progress.reset()
+        self.app.alert(self.app.ui, 0)
 
         # Enable send button
         self.btn.setEnabled(True)
@@ -656,6 +665,7 @@ class send_to_dg_worker(QObject):
     display_msg = pyqtSignal(str, object)
     strReady = pyqtSignal(object, object, object)
     render_progress = pyqtSignal(int)
+    task_progress = pyqtSignal(int)
 
     green_on = pyqtSignal()
     green_off = pyqtSignal()
@@ -801,13 +811,19 @@ class send_to_dg_worker(QObject):
         except:
             LOGGER.error('Sending viewer freeze command failed.')
 
-    def send_and_check_variant(self, variant, idx):
+    def send_and_check_variant(self, variant, idx, variants_num: int=0):
         """
             Send variant switch command and wait for variant_state EVENT
             variant: VARIANT SET STATE; as string
             idx: List index as integer, identifies the corresponding item in self.variants_list in thread class
         """
         self.status.emit('Schaltung wird gesendet...')
+
+        # Update taskbar progress
+        if not variants_num:
+            variants_num = len(self.variants_list)
+        __p = round(100 / variants_num * (1 + idx))
+        self.task_progress.emit(__p)
 
         # Extract variant set and value
         var_split = variant.split(' ', 2)
@@ -1012,7 +1028,7 @@ class send_to_dg_worker(QObject):
         # Send variants
         for idx, variant in enumerate(variant_list):
             time.sleep(0.001)
-            self.send_and_check_variant(variant, idx)
+            self.send_and_check_variant(variant, idx, len(variant_list))
 
             self.render_log += variant.replace('VARIANT ', '')
 

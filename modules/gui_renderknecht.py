@@ -343,6 +343,8 @@ class RenderKnechtGui(QtWidgets.QApplication):
 
         # Show window and finish splash screen
         self.ui.show()
+        self.ui.init_taskbar()
+
         splash.finish(self.ui)
 
         LOGGER.info('Preset Editor GUI initialized. Log Level root: %s',
