@@ -23,6 +23,7 @@ import logging
 
 from PyQt5 import QtWidgets
 from PyQt5.QtGui import QIcon
+from PyQt5.QtWinExtras import QWinTaskbarProgress, QWinTaskbarButton
 from PyQt5.uic import loadUi
 
 from modules.app_strings import InfoMessage, Msg
@@ -61,6 +62,10 @@ class MainWindow(QtWidgets.QMainWindow):
         self.led_ovr = LedCornerWidget(parent=self.tabWidget)
 
         logging.root.setLevel(log_level)
+
+        # Windows taskbar progress indicator
+        self.taskbar_btn = QWinTaskbarButton(self)
+        self.progress = QWinTaskbarProgress()
 
         # Clipboard
         self.clipboard = []
@@ -345,6 +350,15 @@ class MainWindow(QtWidgets.QMainWindow):
         self.sort_tree_widget.sort_current_level(item, item.treeWidget())
 
         return __new_item_name
+
+    def init_taskbar(self):
+        """ Initializes the MS Windows taskbar button"""
+        # Needs to be called after window is created/shown
+        self.taskbar_btn.setWindow(self.windowHandle())
+
+        self.progress = self.taskbar_btn.progress()
+        self.progress.setRange(0, 100)
+        self.progress.valueChanged.connect(self.progress.show)
 
     def end_threads(self):
         for w_tuple in self.widget_pairs:
