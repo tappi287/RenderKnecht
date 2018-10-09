@@ -307,6 +307,7 @@ class SchnuffiApp(QtCore.QObject):
 
         self.cmp_thread.add_item.connect(self.add_widget_item)
         self.cmp_thread.finished.connect(self.finished_compare)
+        self.cmp_thread.error_report.connect(self.add_error_report)
 
         self.cmp_thread.start()
         self.pos_ui.statusBar().showMessage('POS Daten werden geladen und verglichen...', 8000)
@@ -315,6 +316,10 @@ class SchnuffiApp(QtCore.QObject):
         item, target_widget = self.cmp_queue.get()
         self.color_items(item)
         target_widget.addTopLevelItem(item)
+
+    def add_error_report(self, error_report):
+        self.pos_ui.errorTextWidget.clear()
+        self.pos_ui.errorTextWidget.append(error_report)
 
     @staticmethod
     def color_items(parent_item):

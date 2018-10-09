@@ -7,6 +7,7 @@ from PyQt5 import QtCore
 class GuiCompare(QtCore.QThread):
     add_item = QtCore.pyqtSignal()
     finished = QtCore.pyqtSignal()
+    error_report = QtCore.pyqtSignal(str)
 
     item_flags = (QtCore.Qt.ItemIsEnabled | QtCore.Qt.ItemIsSelectable | QtCore.Qt.ItemIsEditable)
 
@@ -28,6 +29,9 @@ class GuiCompare(QtCore.QThread):
 
         # Populate removed tree widget
         self.add_action_list_items(diff.rem_action_ls, 2)
+
+        # Populate error tab widget
+        self.error_report.emit(diff.error_report)
 
         # Populate actor widgets
         self.add_actor_items(diff)

@@ -87,7 +87,7 @@
     <item>
      <widget class="QTabWidget" name="widgetTabs">
       <property name="currentIndex">
-       <number>5</number>
+       <number>6</number>
       </property>
       <widget class="QWidget" name="modifiedTab">
        <attribute name="title">
@@ -506,6 +506,31 @@
            </item>
           </item>
          </widget>
+        </item>
+       </layout>
+      </widget>
+      <widget class="QWidget" name="errorsTab">
+       <attribute name="title">
+        <string>Errors</string>
+       </attribute>
+       <layout class="QVBoxLayout" name="verticalLayout_7">
+        <property name="spacing">
+         <number>0</number>
+        </property>
+        <property name="leftMargin">
+         <number>0</number>
+        </property>
+        <property name="topMargin">
+         <number>0</number>
+        </property>
+        <property name="rightMargin">
+         <number>0</number>
+        </property>
+        <property name="bottomMargin">
+         <number>0</number>
+        </property>
+        <item>
+         <widget class="QTextEdit" name="errorTextWidget"/>
         </item>
        </layout>
       </widget>

@@ -37,6 +37,7 @@ class Msg:
            '<img src=":/main/social-github-b.png" width="24" height="24" ' \
            'style="float: left;vertical-align: middle;">Quellcode nun verfügbar auf Github!</a>' \
            '</li>' \
+           '<li>POS Schnuffi prüft Xml auf fehlende actionList bzw. condition Elemente</li>' \
            '<li>PSD Erstellung erzwingen zum Kontextmenu des Job Managers hinzugefügt.</li>' \
            '<li>Ausgabepfade länger als 260 Zeichen werden vor dem Render Vorgang gemeldet(von DG nicht unterstützt)</li>' \
            '<li>Ausnahmen werden als Fehlermeldungen gezeigt und lassen den Interpreter nicht abstürzen</li>' \
@@ -139,6 +140,9 @@ class Msg:
                       'alter und neuer POS Xml vorhanden sein.',
                       'Fehler beim Export. Das Quelldokument ist keine gültige Xml Datei.']
     POS_EXPORT_MSG = 'POS Xml exportiert in:<br>{}'
+    POS_AL_ERROR = '<p style="color: red">Fehlende actionList Element(e):</p>'
+    POS_CO_ERROR = '<p style="color: red">Fehlende condition Element(e):</p>'
+    POS_NO_ERROR = 'actionList und condition Elemente weisen keine Differenz aus. (Duplikate ignoriert falls vorhanden)'
 
     REF_ERROR_TITLE = 'Referenz Rekursion gefunden'
     REF_ERROR = ['Das Preset<br><b>', ' Id: ', '</b><br><br>enthält eine Referenz zum Preset:<br><b>', ' Id: ']
