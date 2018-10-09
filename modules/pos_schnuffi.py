@@ -317,7 +317,15 @@ class SchnuffiApp(QtCore.QObject):
         self.color_items(item)
         target_widget.addTopLevelItem(item)
 
-    def add_error_report(self, error_report):
+    def add_error_report(self, error_report, error_num):
+        # Reset error tab name
+        self.pos_ui.widgetTabs.setTabText(6, Msg.POS_ERROR_TAB)
+
+        if error_num:
+            # Switch to error tab and report number of errors in tab title
+            self.pos_ui.widgetTabs.setCurrentIndex(6)
+            self.pos_ui.widgetTabs.setTabText(6, f'{Msg.POS_ERROR_TAB} ({error_num})')
+
         self.pos_ui.errorTextWidget.clear()
         self.pos_ui.errorTextWidget.append(error_report)
 
@@ -345,7 +353,7 @@ class SchnuffiApp(QtCore.QObject):
     def finished_compare(self):
         self.sort_all_headers()
 
-        self.pos_ui.widgetTabs.setCurrentIndex(0)
+        # self.pos_ui.widgetTabs.setCurrentIndex(0)
         self.pos_ui.ModifiedWidget.overlay.load_finished()
 
         self.pos_ui.statusBar().showMessage('POS Daten laden und vergleichen abgeschlossen.', 8000)

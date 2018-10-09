@@ -7,7 +7,7 @@ from PyQt5 import QtCore
 class GuiCompare(QtCore.QThread):
     add_item = QtCore.pyqtSignal()
     finished = QtCore.pyqtSignal()
-    error_report = QtCore.pyqtSignal(str)
+    error_report = QtCore.pyqtSignal(str, int)
 
     item_flags = (QtCore.Qt.ItemIsEnabled | QtCore.Qt.ItemIsSelectable | QtCore.Qt.ItemIsEditable)
 
@@ -31,7 +31,7 @@ class GuiCompare(QtCore.QThread):
         self.add_action_list_items(diff.rem_action_ls, 2)
 
         # Populate error tab widget
-        self.error_report.emit(diff.error_report)
+        self.error_report.emit(diff.error_report, diff.error_num)
 
         # Populate actor widgets
         self.add_actor_items(diff)

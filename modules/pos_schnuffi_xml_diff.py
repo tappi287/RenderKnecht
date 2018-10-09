@@ -24,6 +24,7 @@ class PosDiff(object):
         self.mod_action_ls = self.__create_diff_action_lists(action_diff.changed())
 
         # Error report
+        self.error_num = 0
         self.error_report = self.__create_error_report(new_xml_path, old_xml_path)
 
         # Newly added switches, removed switches, modified switches
@@ -50,11 +51,15 @@ class PosDiff(object):
 
         return action_lists
 
-    def __create_error_report(self, new_xml_path, old_xml_path):
-        report = f'<h4>{Path(new_xml_path).name}</h4>'
-        report += self.new_xml.check_conditions()
-        report += f'<br><br><h4>{Path(old_xml_path).name}</h4>'
-        report += self.old_xml.check_conditions()
+    def __create_error_report(self, new_xml_path, old_xml_path, report: str=''):
+        for xml, file_path in zip([self.new_xml, self.old_xml], [new_xml_path, old_xml_path]):
+            report += f'<h4>{Path(file_path).name}</h4>'
+
+            # Report missing elements
+            report += xml.check_conditions()
+
+            # Report number of errors
+            self.error_num += len(xml.missing_al) + len(xml.missing_co)
 
         return report
 
@@ -72,6 +77,10 @@ class PosXml(object):
         self.looks = dict()
         self.conditions = dict()
         self.xml_file = xml_file
+
+        # List missing elements
+        self.missing_al = list()
+        self.missing_co = list()
 
         # Load the Xml content into a dictionary
         self.__load()
@@ -143,15 +152,15 @@ class PosXml(object):
         action_lists = list(self.xml_dict)
         conditions = list(self.conditions)
 
-        missing_al = self.__list_difference(conditions, action_lists)
-        missing_co = self.__list_difference(action_lists, conditions)
+        self.missing_al = self.__list_difference(conditions, action_lists)
+        self.missing_co = self.__list_difference(action_lists, conditions)
 
         # Return result as string
-        if not missing_al and not missing_co:
+        if not self.missing_al and not self.missing_co:
             return Msg.POS_NO_ERROR
         else:
-            al_s = f'{Msg.POS_AL_ERROR}    {"<br>".join(str(x) for x in missing_al)}'
-            co_s = f'{Msg.POS_CO_ERROR}    {"<br>".join(str(x) for x in missing_co)}'
+            al_s = f'{Msg.POS_AL_ERROR}    {"<br>".join(str(x) for x in self.missing_al)}'
+            co_s = f'{Msg.POS_CO_ERROR}    {"<br>".join(str(x) for x in self.missing_co)}'
             return al_s + '<br><br>' + co_s
 
 

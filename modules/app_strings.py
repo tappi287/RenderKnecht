@@ -143,6 +143,7 @@ class Msg:
     POS_AL_ERROR = '<p style="color: red">Fehlende actionList Element(e):</p>'
     POS_CO_ERROR = '<p style="color: red">Fehlende condition Element(e):</p>'
     POS_NO_ERROR = 'actionList und condition Elemente weisen keine Differenz aus. (Duplikate ignoriert falls vorhanden)'
+    POS_ERROR_TAB = 'Error'
 
     REF_ERROR_TITLE = 'Referenz Rekursion gefunden'
     REF_ERROR = ['Das Preset<br><b>', ' Id: ', '</b><br><br>enthält eine Referenz zum Preset:<br><b>', ' Id: ']
