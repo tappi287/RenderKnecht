@@ -184,10 +184,17 @@ class SchnuffiApp(QtCore.QObject):
     intro_timer.setSingleShot(True)
     intro_timer.setInterval(500)
 
+    # Expand item worker
     expand_worker = QtCore.QTimer()
     expand_worker.setInterval(25)
     chunk_size = 5
     expand_item_ls = list()
+
+    # Add item worker
+    item_worker = QtCore.QTimer()
+    item_worker.setInterval(15)
+    remaining_items = 0
+    item_chunk_size = 15
 
     def __init__(self, app):
         super(SchnuffiApp, self).__init__()
@@ -196,7 +203,7 @@ class SchnuffiApp(QtCore.QObject):
         self.export = ExportActionList(self, self.pos_ui)
 
         self.widget_list = [self.pos_ui.AddedWidget, self.pos_ui.ModifiedWidget, self.pos_ui.RemovedWidget,
-                            self.pos_ui.switchesWidget, self.pos_ui.looksWidget, self.pos_ui.actionListWidget]
+                            self.pos_ui.switchesWidget, self.pos_ui.looksWidget]
         self.setup_widgets()
 
         self.pos_ui.show()
@@ -205,7 +212,12 @@ class SchnuffiApp(QtCore.QObject):
         # Buttons
         self.pos_ui.filterLabel.mouseDoubleClickEvent = self.sort_all_headers
         self.pos_ui.expandBtn.pressed.connect(self.expand_all_items)
+
+        # Work Timer
         self.expand_worker.timeout.connect(self.expand_work_chunk)
+        self.item_worker.timeout.connect(self.add_widget_item)
+
+        self.pos_ui.progressBar.hide()
 
         # Menu
         self.pos_ui.actionOpen.triggered.connect(self.open_file_window)
@@ -243,13 +255,27 @@ class SchnuffiApp(QtCore.QObject):
     def end_app(self):
         if self.cmp_thread:
             self.cmp_thread.quit()
-            self.cmp_thread.wait(5000)
+            self.cmp_thread.wait(800)
 
         for widget in self.widget_list:
             try:
                 widget.filter.end_thread()
             except Exception as e:
                 LOGGER.debug('Could not end widget filter thread! %s', e)
+
+    def clear_queue(self):
+        if self.cmp_queue.qsize():
+            LOGGER.debug('Clearing %s items from the queue.', self.cmp_queue.qsize())
+
+        while not self.cmp_queue.empty():
+            try:
+                _, _ = self.cmp_queue.get(block=False)
+            except Exception as e:
+                LOGGER.error('Error clearing queue %s', e)
+
+            self.cmp_queue.task_done()
+
+        LOGGER.debug('Queue cleared!')
 
     def show_intro_msg(self):
         self.pos_ui.ModifiedWidget.info_overlay.display_confirm(Msg.POS_INTRO, ('[X]', None))
@@ -289,6 +315,8 @@ class SchnuffiApp(QtCore.QObject):
         self.file_win = FileWindow(self.app, self.pos_ui, self)
 
     def compare(self):
+        self.clear_queue()
+
         if self.cmp_thread is not None:
             if self.cmp_thread.isRunning():
                 self.error_msg(Msg.POS_ALREADY_RUNNING)
@@ -305,17 +333,50 @@ class SchnuffiApp(QtCore.QObject):
                                      self.widget_list,
                                      self.cmp_queue)
 
-        self.cmp_thread.add_item.connect(self.add_widget_item)
+        self.cmp_thread.add_item.connect(self.request_item_add)
         self.cmp_thread.finished.connect(self.finished_compare)
         self.cmp_thread.error_report.connect(self.add_error_report)
+
+        # Prepare add item worker
+        self.item_worker.stop()
+        self.remaining_items = 0
+        self.pos_ui.progressBar.setMaximum(0)
+        self.pos_ui.progressBar.setValue(0)
 
         self.cmp_thread.start()
         self.pos_ui.statusBar().showMessage('POS Daten werden geladen und verglichen...', 8000)
 
+    def request_item_add(self):
+        self.remaining_items += 1
+
+        self.pos_ui.progressBar.setMaximum(max(self.remaining_items, self.pos_ui.progressBar.maximum()))
+
+        if not self.item_worker.isActive():
+            self.item_worker.start()
+            self.pos_ui.progressBar.show()
+
     def add_widget_item(self):
-        item, target_widget = self.cmp_queue.get()
-        self.color_items(item)
-        target_widget.addTopLevelItem(item)
+        if not self.remaining_items:
+            self.item_worker.stop()
+            self.pos_ui.progressBar.hide()
+            return
+
+        count = 0
+
+        while self.remaining_items:
+            item, target_widget = self.cmp_queue.get()
+            self.color_items(item)
+            target_widget.addTopLevelItem(item)
+
+            self.remaining_items -= 1
+            self.cmp_queue.task_done()
+
+            count += 1
+
+            self.pos_ui.progressBar.setValue(self.pos_ui.progressBar.value() + 1)
+
+            if count >= self.item_chunk_size:
+                break
 
     def add_error_report(self, error_report, error_num):
         # Reset error tab name

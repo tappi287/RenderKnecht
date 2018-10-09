@@ -75,9 +75,6 @@ class ExportActionList(object):
         if widget is self.pos_ui.ModifiedWidget:
             if not self.update_old_pos_xml_with_changed_action_lists(action_list_names, file):
                 return
-        elif widget is self.pos_ui.actionListWidget:
-            if not self.update_old_pos_xml_with_new_action_lists(action_list_names, file):
-                return
         else:
             return
 

@@ -80,7 +80,7 @@ class GuiCompare(QtCore.QThread):
     def add_item_queued(self, item, widget):
         self.add_item.emit()
         __q = (item, widget)
-        self.cmp_queue.put(__q)
+        self.cmp_queue.put(__q, block=False)
 
     @classmethod
     def __create_action_list_item(cls, al):
