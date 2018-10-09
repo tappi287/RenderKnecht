@@ -263,20 +263,6 @@ class SchnuffiApp(QtCore.QObject):
             except Exception as e:
                 LOGGER.debug('Could not end widget filter thread! %s', e)
 
-    def clear_queue(self):
-        if self.cmp_queue.qsize():
-            LOGGER.debug('Clearing %s items from the queue.', self.cmp_queue.qsize())
-
-        while not self.cmp_queue.empty():
-            try:
-                _, _ = self.cmp_queue.get(block=False)
-            except Exception as e:
-                LOGGER.error('Error clearing queue %s', e)
-
-            self.cmp_queue.task_done()
-
-        LOGGER.debug('Queue cleared!')
-
     def show_intro_msg(self):
         self.pos_ui.ModifiedWidget.info_overlay.display_confirm(Msg.POS_INTRO, ('[X]', None))
 
@@ -315,7 +301,7 @@ class SchnuffiApp(QtCore.QObject):
         self.file_win = FileWindow(self.app, self.pos_ui, self)
 
     def compare(self):
-        self.clear_queue()
+        self.clear_item_queue()
 
         if self.cmp_thread is not None:
             if self.cmp_thread.isRunning():
@@ -411,10 +397,23 @@ class SchnuffiApp(QtCore.QObject):
                 for c in range(0, 4):
                     item.setForeground(c, QBrush(QColor(90, 140, 90)))
 
+    def clear_item_queue(self):
+        if self.cmp_queue.qsize():
+            LOGGER.debug('Clearing %s items from the queue.', self.cmp_queue.qsize())
+
+        while not self.cmp_queue.empty():
+            try:
+                _, _ = self.cmp_queue.get()
+            except Exception as e:
+                LOGGER.error('Error clearing queue %s', e)
+
+            self.cmp_queue.task_done()
+
+        LOGGER.debug('Queue cleared!')
+
     def finished_compare(self):
         self.sort_all_headers()
 
-        # self.pos_ui.widgetTabs.setCurrentIndex(0)
         self.pos_ui.ModifiedWidget.overlay.load_finished()
 
         self.pos_ui.statusBar().showMessage('POS Daten laden und vergleichen abgeschlossen.', 8000)
