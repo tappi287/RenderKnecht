@@ -59,7 +59,8 @@ class PosDiff(object):
             report += xml.check_conditions()
 
             # Report number of errors
-            self.error_num += len(xml.missing_al) + len(xml.missing_co)
+            self.error_num += len(xml.missing_al)
+            self.error_num += len(xml.missing_co)
 
         return report
 
