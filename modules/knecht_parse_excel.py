@@ -636,7 +636,8 @@ class LoadVplus(QtCore.QObject):
                         option = pkg_sheet.cell(row=current_row - 1, column=current_col).value
                         skip_package = True
 
-                        if option != '-' and option != 'F' and option is not None:
+                        # and option != 'F' - removed
+                        if option != '-' and option is not None:
                             skip_package = False
                             pkg_count += 1
                             preset_count += 1
