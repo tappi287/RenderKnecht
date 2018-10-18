@@ -758,12 +758,8 @@ class RenderKnechtGui(QtWidgets.QApplication):
             if not save:
                 return
 
-        # Disable tree widgets before session save
-        for widget in self.ui.tree_widget_list:
-            widget.setEnabled(False)
-
         # Save current session
-        self.session.save_session()
+        self.session.save_last_session()
 
         self.ui.end_threads()
         self.ui.close()

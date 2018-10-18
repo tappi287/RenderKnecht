@@ -314,5 +314,5 @@ class SourceWizardPage(QtWidgets.QWizardPage):
 
     def qob_9000_speaks(self):
         quote = random.choice(self.qob_quotes)
-        message = '<b>Qub 9000 Nachricht:</b><br><i>{}</i>'.format(quote)
+        message = '<b>QOB 9000 Nachricht:</b><br><i>{}</i>'.format(quote)
         self.QobQuote.setText(message)

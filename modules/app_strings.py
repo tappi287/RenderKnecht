@@ -37,6 +37,7 @@ class Msg:
            '<img src=":/main/social-github-b.png" width="24" height="24" ' \
            'style="float: left;vertical-align: middle;">Quellcode nun verfügbar auf Github!</a>' \
            '</li>' \
+           '<li>Auto-Save speichert nun Lokal die gesamte Session anstatt der aktuellen Datei.</li>' \
            '<li>POS Schnuffi prüft Xml auf fehlende actionList bzw. condition Elemente</li>' \
            '<li>PSD Erstellung erzwingen zum Kontextmenu des Job Managers hinzugefügt.</li>' \
            '<li>Ausgabepfade länger als 260 Zeichen werden vor dem Render Vorgang gemeldet(von DG nicht unterstützt)</li>' \
@@ -47,10 +48,7 @@ class Msg:
            '<li>Neue Kontextaktionen Variantenbaum und Textfeld, siehe Kontextmenü</li>' \
            '<li>Referenzbild-Preset-Assistent - QOB 9000 - in Betrieb genommen, Dave</li>' \
            '<li>temporäres Zeilenfärben zur besseren Übersicht möglich</li>' \
-           '<li>FaKom Lutscher kann Paketumfänge optional als Referenz zum Paket einfügen</li>' \
-           '<li>Referenzen mit identischer ID aber unterschiedlichem Namen werden ' \
-           'automatsich korrigiert</li>' \
-           '<li>Auto Save alle 5min bei ungespeicherten Änderungen</li>'
+           '<li>FaKom Lutscher kann Paketumfänge optional als Referenz zum Paket einfügen</li>'
 
     APP_VERSION_GREETING = _APP
     APP_EXT_LINK_BTN = 'Report issues'

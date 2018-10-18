@@ -51,7 +51,7 @@ class MainWindow(QtWidgets.QMainWindow):
     idle_timer = QtCore.QTimer()
     idle_timer.setSingleShot(True)
     idle_timer.setTimerType(QtCore.Qt.VeryCoarseTimer)
-    idle_timer.setInterval(5000)
+    idle_timer.setInterval(10000)
 
     def __init__(self, app_class):
         super(MainWindow, self).__init__()
@@ -216,7 +216,6 @@ class MainWindow(QtWidgets.QMainWindow):
 
     def eventFilter(self, obj, eve):
         if eve is None or obj is None:
-            LOGGER.debug('No event')
             return False
 
         if eve.type() == QtCore.QEvent.KeyPress or \
@@ -226,7 +225,6 @@ class MainWindow(QtWidgets.QMainWindow):
             return False
 
         if not self.idle_timer.isActive():
-            LOGGER.debug('Event: %s', eve.type())
             self.idle_timer.start()
 
         return False

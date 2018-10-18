@@ -111,7 +111,7 @@ class Itemstyle:
         'preset': 'preset',
         'preset_mask': 'preset_mask',
         'preset_ref': 'preset_ref',
-        'OPT': 'img',
+        'OPT': 'img', 'COL': 'img',
         'RAD': 'img_free', 'SWL': 'img_free', 'SEA': 'img_free',
         'render_preset': 'render',
         'sampling': 'render',
@@ -513,7 +513,7 @@ PACKAGE_FILTER = ['Argentinien', 'Australien', 'Balkan', 'Baltikum', 'Belgien', 
 FAKOM_READER_PR_FAM = {'SIB', 'LUM', 'VOS'}
 
 # Detail Img Prefixes
-DETAIL_PRESET_PREFIXS = {'OPT', 'RAD', 'SWL', 'SEA'}
+DETAIL_PRESET_PREFIXS = {'OPT', 'RAD', 'SWL', 'SEA', 'COL'}
 
 ENABLED_ITEM_FLAGS = (QtCore.Qt.ItemIsEnabled | QtCore.Qt.ItemIsSelectable | QtCore.Qt.ItemIsDragEnabled |
                       QtCore.Qt.ItemIsDropEnabled)

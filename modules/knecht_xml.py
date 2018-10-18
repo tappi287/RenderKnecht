@@ -425,7 +425,10 @@ class XML:
                 LOGGER.exception('Exception while saving Xml bak file.\n%s', e)
 
         with open(self.variants_xml_path, 'wb') as f:
-            self.xml_tree.write(f, encoding='UTF-8', xml_declaration=True, pretty_print=True)
+            try:
+                self.xml_tree.write(f, encoding='UTF-8', xml_declaration=True, pretty_print=True)
+            except Exception as e:
+                LOGGER.fatal('Could not save file! %s', e)
 
     def save_tree_as_string(self, xml_element, file=None):
         """ Save an malformed Xml Tree as string data which can not be serialized """

@@ -74,9 +74,9 @@ class TreeSessionManager(QtCore.QObject):
 
     # -- Auto Save --
     # Interval 5 Minutes - 300000ms
-    auto_save_interval = 10000
+    auto_save_interval = 100000
     # Interval to postpone when user is active
-    auto_save_post_interval = 10000
+    auto_save_post_interval = 80000
 
     auto_save_timer = QtCore.QTimer()
     auto_save_timer.setTimerType(QtCore.Qt.VeryCoarseTimer)
@@ -99,23 +99,29 @@ class TreeSessionManager(QtCore.QObject):
         if self.ui.idle:
             # If user is inactive, save
             self.auto_save_timer.setInterval(self.auto_save_interval)
-            self.save_session()
+            self.__save_session('Automatic Save')
         else:
             # If user is active, postpone auto-save
-            self.ui.treeWidget_DestPreset.info_overlay.display(
-                'Session wird bei nächster Inaktivität gespeichert.', 3000
-                )
             self.auto_save_timer.start(self.auto_save_post_interval)
 
-    def save_session(self):
+    def save_last_session(self):
+        """ Called on application exit """
+        self.auto_save_timer.stop()
+        self.__save_session('Exit')
+
+    def __save_session(self, description: str=''):
         self.ui.treeWidget_DestPreset.info_overlay.display(Msg.SESSION_SAVING, 3000)
 
         session_xml = XML(_SESSION_PATH, None)
         session_xml.root = self.session_xml_dom['root']
 
         for tree_session in self.tree_sessions:
+            tree_session.widget.setEnabled(False)
+
             # Read items from widget
             has_data = tree_session.xml.update_xml_tree_from_widget()
+
+            tree_session.widget.setEnabled(True)
 
             # Skip empty treeWidgets
             if not has_data:
@@ -128,8 +134,8 @@ class TreeSessionManager(QtCore.QObject):
             current_tree_element = session_xml.xml_sub_element
             current_tree_element.append(tree_session.xml.root)
 
-        self.describe_origin(session_xml)
-        self.save_settings(session_xml)
+        self.describe_origin(session_xml, description)
+        self.__save_settings(session_xml)
 
         session_xml.save_tree()
         LOGGER.debug('Saved tree contents to session file:\n%s', _SESSION_PATH.as_posix())
@@ -218,12 +224,12 @@ class TreeSessionManager(QtCore.QObject):
         variant_presets.remove(orphan_preset)
 
     @classmethod
-    def describe_origin(cls, session_xml_cls):
+    def describe_origin(cls, session_xml_cls, description: str=''):
         __origin = session_xml_cls.root.find(f'./{cls.session_xml_dom.get("origin")}')
 
-        __o_txt = 'RenderKnecht Session on '+\
-                  os.getenv('COMPUTERNAME', 'Unknown_System') + ' @ ' +\
-                  time.strftime('%Y-%m-%d_%H:%M:%S')
+        __o_txt = f"RenderKnecht Session {description} on " \
+                  f"{os.getenv('COMPUTERNAME', 'Unknown_System')} " \
+                  f"@ {time.strftime('%Y-%m-%d_%H:%M:%S')}"
         __origin.text = __o_txt
 
     def load_settings(self):
@@ -254,7 +260,7 @@ class TreeSessionManager(QtCore.QObject):
                 # Update window title
                 self.ui.set_window_title(save_file.name)
 
-    def save_settings(self, session_xml):
+    def __save_settings(self, session_xml):
         __settings = session_xml.root.find(f'./{self.session_xml_dom.get("settings")}')
 
         if __settings is None:
