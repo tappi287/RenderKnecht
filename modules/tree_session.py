@@ -74,9 +74,9 @@ class TreeSessionManager(QtCore.QObject):
 
     # -- Auto Save --
     # Interval 5 Minutes - 300000ms
-    auto_save_interval = 5000
+    auto_save_interval = 10000
     # Interval to postpone when user is active
-    auto_save_post_interval = 5000
+    auto_save_post_interval = 10000
 
     auto_save_timer = QtCore.QTimer()
     auto_save_timer.setTimerType(QtCore.Qt.VeryCoarseTimer)

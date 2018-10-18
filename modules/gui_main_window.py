@@ -46,9 +46,11 @@ LOGGER = init_logging(__name__)
 
 class MainWindow(QtWidgets.QMainWindow):
     """ Window of the RenderKnecht Preset Editor """
+
     # Report user inactivity
     idle_timer = QtCore.QTimer()
     idle_timer.setSingleShot(True)
+    idle_timer.setTimerType(QtCore.Qt.VeryCoarseTimer)
     idle_timer.setInterval(5000)
 
     def __init__(self, app_class):
@@ -210,26 +212,23 @@ class MainWindow(QtWidgets.QMainWindow):
         self.idle_timer.stop()
 
     def set_inactive(self):
-        LOGGER.debug('App is idle.')
         self.idle = True
 
     def eventFilter(self, obj, eve):
         if eve is None or obj is None:
+            LOGGER.debug('No event')
             return False
 
-        if eve.type() == QtCore.QEvent.KeyPress:
+        if eve.type() == QtCore.QEvent.KeyPress or \
+           eve.type() == QtCore.QEvent.MouseMove or \
+           eve.type() == QtCore.QEvent.MouseButtonPress:
             self.set_active()
             return False
 
-        if eve.type() == QtCore.QEvent.MouseMove:
-            self.set_active()
-            return False
+        if not self.idle_timer.isActive():
+            LOGGER.debug('Event: %s', eve.type())
+            self.idle_timer.start()
 
-        if eve.type() == QtCore.QEvent.MouseButtonPress:
-            self.set_active()
-            return False
-
-        self.idle_timer.start()
         return False
 
     def enable_load_actions(self, enabled: bool = True):
