@@ -122,7 +122,7 @@ class RenderKnechtGui(QtWidgets.QApplication):
 
         # Session mgr
         self.session = TreeSessionManager(self, self.ui)
-        self.session.init_load_timer.timeout.connect(self.initial_session_load)
+        self.session.init_load_timer.timeout.connect(self.session.load_session)
 
         # Set app class for delete class
         AddRemoveItemsCommand.app = self
@@ -382,9 +382,6 @@ class RenderKnechtGui(QtWidgets.QApplication):
         self.intro_widget.deleteLater()
         self.intro_widget = None
         knechtSettings.app['introduction_shown'] = True
-
-    def initial_session_load(self):
-        self.session.load_session()
 
     def start_pos_schnuffi(self):
         self.pos_schnuffi = SchnuffiApp(self)

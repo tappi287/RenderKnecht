@@ -270,7 +270,7 @@ class Msg:
 
     SET_PATH_REJECTED_TXT = '< Gültigen Pfad eingeben >'
     SESSION_LOADED = 'Vorherige Sitzung wiederhergestellt.'
-    SESSION_SAVING = 'Sitzung wird gespeichert...'
+    SESSION_SAVING = 'Sitzung wird automatisch gespeichert...'
 
     VERSION_MSG = 'Die Anwendung lädt Aktualisierungen automatisch herunter und informiert mit einem Symbol in ' \
                   'der Menüleiste über bereitstehende Versionen.'

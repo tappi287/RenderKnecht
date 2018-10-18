@@ -83,8 +83,10 @@ class SavePreset:
         self.XML_dest = XML_dest
         self.widget = widget
         self.ui = ui
-        self.auto_save_mgr = AutoSave(self, ui)
-        self.auto_save_mgr.enable()
+
+        # Disable Auto save for now, we will auto save the session instead
+        # self.auto_save_mgr = AutoSave(self, ui)
+        # self.auto_save_mgr.enable()
 
     def save(self, save_path='', save_successful=False):
         if save_path:
@@ -177,6 +179,7 @@ class AutoSave(QtCore.QObject):
         # Auto save timer
         self.auto_save_timer = QtCore.QTimer()
         self.auto_save_timer.setTimerType(QtCore.Qt.VeryCoarseTimer)
+        self.auto_save_timer.timeout.connect(self.save)
 
         if AutoSave.initial_auto_save:
             self.auto_save_timer.setInterval(AutoSave.initial_auto_save_interval)
@@ -184,13 +187,14 @@ class AutoSave(QtCore.QObject):
             self.auto_save_timer.setInterval(AutoSave.save_interval)
 
     def enable(self):
-        self.auto_save_timer.timeout.connect(self.save)
-        self.auto_save_timer.start()
+        if not self.auto_save_timer.isActive():
+            self.auto_save_timer.start()
 
     def disable(self):
         self.auto_save_timer.stop()
 
-    def collect_clean_up(self, save_file=Path(''), file_set=set()):
+    @staticmethod
+    def collect_clean_up(save_file=Path(''), file_set=set()):
         for auto_save_file in Path(HELPER_DIR).glob(AutoSave.file_glob):
             if auto_save_file.exists():
                     file_set.add(auto_save_file)
@@ -205,7 +209,10 @@ class AutoSave(QtCore.QObject):
     def clean_up(self, file_set=set(), temp_set=set()):
         for file in file_set:
             if file.exists():
-                os.remove(file)
+                try:
+                    os.remove(file)
+                except OSError as e:
+                    LOGGER.error('Failed to delete auto save file: %s', e)
             else:
                 temp_set.add(file)
 

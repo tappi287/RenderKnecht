@@ -21,7 +21,7 @@ Copyright (C) 2017 Stefan Tapper, All rights reserved.
 """
 import logging
 
-from PyQt5 import QtWidgets
+from PyQt5 import QtWidgets, QtCore
 from PyQt5.QtGui import QIcon
 from PyQt5.QtWinExtras import QWinTaskbarProgress, QWinTaskbarButton
 from PyQt5.uic import loadUi
@@ -46,6 +46,10 @@ LOGGER = init_logging(__name__)
 
 class MainWindow(QtWidgets.QMainWindow):
     """ Window of the RenderKnecht Preset Editor """
+    # Report user inactivity
+    idle_timer = QtCore.QTimer()
+    idle_timer.setSingleShot(True)
+    idle_timer.setInterval(5000)
 
     def __init__(self, app_class):
         super(MainWindow, self).__init__()
@@ -112,10 +116,11 @@ class MainWindow(QtWidgets.QMainWindow):
         # Worker class instances
         self.sort_tree_widget = SortTree(self, self.treeWidget_SrcPreset)
         self.context_menus = []
-        self.widget_pairs = [(self.treeWidget_SrcPreset, self.pushButton_Src_sort, self.lineEdit_Src_filter, [1, 2]),
-                        (self.treeWidget_DestPreset, self.pushButton_Dest_sort, self.lineEdit_Dest_filter, [1, 2]),
-                        (self.treeWidget_Variants, self.pushButton_Var_sort, self.lineEdit_Var_filter, 1),
-                        (self.treeWidget_render, self.pushButton_Ren_sort, self.lineEdit_Ren_filter, 1)]
+        self.widget_pairs = [
+            (self.treeWidget_SrcPreset, self.pushButton_Src_sort, self.lineEdit_Src_filter, [1, 2]),
+            (self.treeWidget_DestPreset, self.pushButton_Dest_sort, self.lineEdit_Dest_filter, [1, 2]),
+            (self.treeWidget_Variants, self.pushButton_Var_sort, self.lineEdit_Var_filter, 1),
+            (self.treeWidget_render, self.pushButton_Ren_sort, self.lineEdit_Ren_filter, 1)]
 
         # Init widget pairs
         for w_tuple in self.widget_pairs:
@@ -186,6 +191,47 @@ class MainWindow(QtWidgets.QMainWindow):
         # Reset treeWidgets splitter to equal sizes
         self.presetTreeSplitter.setSizes([100, 100])
 
+        # Detect inactivity for automatic session save
+        self.idle_timer.timeout.connect(self.set_inactive)
+        self.__idle = False
+
+        self.app_class.installEventFilter(self)
+
+    @property
+    def idle(self):
+        return self.__idle
+
+    @idle.setter
+    def idle(self, val: bool = False):
+        self.__idle = val
+
+    def set_active(self):
+        self.idle = False
+        self.idle_timer.stop()
+
+    def set_inactive(self):
+        LOGGER.debug('App is idle.')
+        self.idle = True
+
+    def eventFilter(self, obj, eve):
+        if eve is None or obj is None:
+            return False
+
+        if eve.type() == QtCore.QEvent.KeyPress:
+            self.set_active()
+            return False
+
+        if eve.type() == QtCore.QEvent.MouseMove:
+            self.set_active()
+            return False
+
+        if eve.type() == QtCore.QEvent.MouseButtonPress:
+            self.set_active()
+            return False
+
+        self.idle_timer.start()
+        return False
+
     def enable_load_actions(self, enabled: bool = True):
         self.menuImport.setEnabled(enabled)
         self.actionOpen.setEnabled(enabled)
@@ -200,7 +246,8 @@ class MainWindow(QtWidgets.QMainWindow):
                 LOGGER.debug('Setting viewer combo box to index: %s', idx)
                 break
 
-    def add_file_string(self, message, file_path):
+    @staticmethod
+    def add_file_string(message, file_path):
         if file_path:
             message = message + '<br><i>' + str(file_path) + '</i>'
         return message

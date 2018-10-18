@@ -72,6 +72,15 @@ class TreeSessionManager(QtCore.QObject):
     init_load_timer.setSingleShot(True)
     init_load_timer.setInterval(100)
 
+    # -- Auto Save --
+    # Interval 5 Minutes - 300000ms
+    auto_save_interval = 5000
+    # Interval to postpone when user is active
+    auto_save_post_interval = 5000
+
+    auto_save_timer = QtCore.QTimer()
+    auto_save_timer.setTimerType(QtCore.Qt.VeryCoarseTimer)
+
     def __init__(self, app, ui):
         super(TreeSessionManager, self).__init__()
         self.app, self.ui = app, ui
@@ -81,8 +90,25 @@ class TreeSessionManager(QtCore.QObject):
             tree_session = _TreeSession(tree)
             self.tree_sessions.append(tree_session)
 
+        # Init auto save
+        self.auto_save_timer.setInterval(self.auto_save_interval)
+        self.auto_save_timer.timeout.connect(self.auto_save_session)
+        self.auto_save_timer.start()
+
+    def auto_save_session(self):
+        if self.ui.idle:
+            # If user is inactive, save
+            self.auto_save_timer.setInterval(self.auto_save_interval)
+            self.save_session()
+        else:
+            # If user is active, postpone auto-save
+            self.ui.treeWidget_DestPreset.info_overlay.display(
+                'Session wird bei nächster Inaktivität gespeichert.', 3000
+                )
+            self.auto_save_timer.start(self.auto_save_post_interval)
+
     def save_session(self):
-        self.ui.treeWidget_SrcPreset.info_overlay.display(Msg.SESSION_SAVING, 3000)
+        self.ui.treeWidget_DestPreset.info_overlay.display(Msg.SESSION_SAVING, 3000)
 
         session_xml = XML(_SESSION_PATH, None)
         session_xml.root = self.session_xml_dom['root']
