@@ -50,19 +50,19 @@ class PathRenderService(QtCore.QObject):
 
     switch_btn_timer = QtCore.QTimer()
     switch_btn_timer.setSingleShot(True)
-    switch_btn_timer.setInterval(1500)
+    switch_btn_timer.setInterval(3000)
 
     refresh_btn_timer = QtCore.QTimer()
     refresh_btn_timer.setSingleShot(True)
-    refresh_btn_timer.setInterval(1500)
+    refresh_btn_timer.setInterval(3000)
 
     update_job_manager_timer = QtCore.QTimer()
     update_job_manager_timer.setTimerType(QtCore.Qt.VeryCoarseTimer)
-    update_job_manager_timer.setInterval(15000)
+    update_job_manager_timer.setInterval(20000)
 
     update_job_alive_timer = QtCore.QTimer()
     update_job_alive_timer.setTimerType(QtCore.Qt.VeryCoarseTimer)
-    update_job_alive_timer.setInterval(5000)
+    update_job_alive_timer.setInterval(10000)
 
     keep_alive_timer = QtCore.QTimer()
     keep_alive_timer.setTimerType(QtCore.Qt.VeryCoarseTimer)
@@ -73,12 +73,20 @@ class PathRenderService(QtCore.QObject):
         super(PathRenderService, self).__init__()
         self.app, self.ui = app, ui
 
-        # --------- Connect button ---------
         self.search_thread = GetPfadAeffchenService()
         self.search_thread.result.connect(self.search_service_result)
 
-        self.ui.pathConnectBtn.pressed.connect(self.search_service)
-        self.ui.pathConnectBtn.setText(self.btn_disconnected)
+        # --------- Connect button ---------
+        self.ui.pathConnectBtn.pressed.connect(self.switch_service_on_off)
+        self.ui.pathConnectBtn.animation = AnimatedButton(self.ui.pathConnectBtn, 900)
+        self.switch_btn_timer.timeout.connect(self.switch_button_timeout)
+
+        # Highlight connect button on tab change/click
+        self.ui.tabWidget.tabBarClicked.connect(self.tab_bar_clicked)
+
+        # --------- Refresh button ------------
+        self.ui.pathRefreshBtn.pressed.connect(self.request_job_queue)
+        self.refresh_btn_timer.timeout.connect(self.refresh_btn_timeout)
 
         # --------- Validate Job Name ---------
         self.ui.pathJobNameLineEdit.editingFinished.connect(self.validate_job_name)
@@ -114,14 +122,6 @@ class PathRenderService(QtCore.QObject):
         self.ui.pathJobSendBtn.pressed.connect(self.create_job)
         self.ui.pathJobSendBtn.setEnabled(False)
 
-        # --------- Connection button ---------
-        self.ui.pathBtnOff.pressed.connect(self.switch_button)
-        self.switch_btn_timer.timeout.connect(self.switch_button_timeout)
-
-        # --------- Job Manager Buttons ------------
-        self.ui.pathRefreshBtn.pressed.connect(self.request_job_queue)
-        self.refresh_btn_timer.timeout.connect(self.refresh_btn_timeout)
-
         # --------- Job Manager Tree Widget ------------
         self.ui.widgetJobManager.manager_open_item = self.manager_open_item
         self.ui.widgetJobManager.itemDoubleClicked.connect(self.manager_open_item)
@@ -149,6 +149,9 @@ class PathRenderService(QtCore.QObject):
         self.text_browser = self.ui.renderServiceBrowser
         self.text_browser.ovr = Overlay(self.text_browser)
 
+        # Set splitter size
+        self.ui.jobStatusSplitter.setSizes([200, 100])
+
         # Prepare message sending
         # Service address
         self.service_host = None
@@ -166,17 +169,26 @@ class PathRenderService(QtCore.QObject):
     def alive_blink(self):
         self.ui.led_ovr.led(2, 2, blink_count=2)
 
-    def switch_button(self):
+    def tab_bar_clicked(self, tab_index: int=0):
+        if tab_index == 2:  # Path Render Service tab index
+            if not self.service_host:
+                # Highlight connect button
+                self.ui.pathConnectBtn.animation.play_highlight()
+
+    def switch_service_on_off(self):
         self.switch_btn_timer.start()
-        self.ui.pathBtnOff.setEnabled(False)
+        self.ui.pathConnectBtn.setEnabled(False)
 
         if self.service_host:
+            # Switch off
+            self.ui.pathConnectBtn.animation.play_off()
             self.service_unavailable()
         else:
+            self.ui.pathConnectBtn.animation.play_on()
             self.search_service()
 
     def switch_button_timeout(self):
-        self.ui.pathBtnOff.setEnabled(True)
+        self.ui.pathConnectBtn.setEnabled(True)
 
     def refresh_btn_timeout(self):
         self.ui.pathRefreshBtn.setEnabled(True)
@@ -199,9 +211,6 @@ class PathRenderService(QtCore.QObject):
         self.ui.led_ovr.led(1, 2)
         self.ui.led_ovr.led(2, 2, timer=100)
         self.ui.led_ovr.yellow_on()
-
-        self.ui.pathConnectBtn.setEnabled(False)
-        self.ui.pathConnectBtn.setText('Suche wird durchgeführt...')
 
         if not self.search_thread.isRunning():
             self.ui.pathJobSendBtn.setEnabled(False)
@@ -291,7 +300,6 @@ class PathRenderService(QtCore.QObject):
             return
 
         # Change to Job Manager tab
-        self.ui.jobTabs.setCurrentIndex(1)
         self.ovr.display(f'{job_title} übertragen für {self.scene_file.stem}', 4000)
 
         msg = 'ADD_JOB '
@@ -426,7 +434,7 @@ class PathRenderService(QtCore.QObject):
     def request_job_queue(self):
         """ Request the remote job queue as pickled data """
         if not self.service_host:
-            self.search_service()
+            self.switch_service_on_off()
             return
 
         self.ui.pathRefreshBtn.setEnabled(False)
@@ -489,12 +497,10 @@ class PathRenderService(QtCore.QObject):
         """ Enabled if we receive a response from the render service """
         self.ui.pathJobSendBtn.setEnabled(True)
         self.ui.pathConnectBtn.setEnabled(True)
-        self.ui.pathConnectBtn.setText(self.btn_connected)
 
     def service_unavailable(self):
         self.ui.pathJobSendBtn.setEnabled(False)
         self.ui.pathConnectBtn.setEnabled(True)
-        self.ui.pathConnectBtn.setText(self.btn_disconnected)
 
         # Clear Job Manager
         self.update_job_manager_timer.stop()
@@ -505,7 +511,6 @@ class PathRenderService(QtCore.QObject):
         self.ui.rendererBox.clear()
 
         # Change to status tab
-        self.ui.jobTabs.setCurrentIndex(0)
         msg = '<span style="color:red;"><b>Verbindung zum Render Dienst getrennt.</b></span>'
         self.ovr.display(msg, 6000)
         self.update_status(msg, 2)
@@ -591,6 +596,46 @@ class PathRenderService(QtCore.QObject):
             return 'No renderer set'
 
         return False
+
+
+class AnimatedButton:
+    def __init__(self, btn, duration):
+        self.btn = btn
+        self.duration = duration
+
+        self.animation = QtCore.QPropertyAnimation(self.btn, b"iconSize")
+
+        self.setup_animation()
+
+    def setup_animation(self):
+        size = self.btn.iconSize()
+        start_value = QtCore.QSize(round(size.width() * 0.2), round(size.height() * 0.2))
+        end_value = size
+
+        self.animation.setDuration(self.duration)
+        self.animation.setKeyValueAt(0.0, end_value)
+        self.animation.setKeyValueAt(0.5, start_value)
+        self.animation.setKeyValueAt(1.0, end_value)
+        self.animation.setEasingCurve(QtCore.QEasingCurve.OutElastic)
+
+    def play_highlight(self):
+        self.animation.setDuration(self.duration)
+        self.animation.setEasingCurve(QtCore.QEasingCurve.OutElastic)
+        self.play()
+
+    def play_on(self):
+        self.animation.setDuration(round(self.duration * 0.3))
+        self.animation.setEasingCurve(QtCore.QEasingCurve.InCirc)
+        self.play()
+
+    def play_off(self):
+        self.animation.setDuration(round(self.duration * 0.3))
+        self.animation.setEasingCurve(QtCore.QEasingCurve.OutCirc)
+        self.play()
+
+    def play(self, event=None):
+        if self.animation.state() != QtCore.QAbstractAnimation.Running:
+            self.animation.start()
 
 
 class SocketSendMessage(QtCore.QThread):
