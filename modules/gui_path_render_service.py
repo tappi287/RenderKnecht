@@ -91,9 +91,11 @@ class PathRenderService(QtCore.QObject):
         # --------- Validate Job Name ---------
         self.ui.pathJobNameLineEdit.editingFinished.connect(self.validate_job_name)
 
-        # --------- CSB Import hidden objects ---------
+        # --------- Job Options ---------
         self.ui.checkBoxCsbIgnoreHidden.toggled.connect(self.update_csb_import_option)
+        self.ui.checkBoxMayaDeleteHidden.toggled.connect(self.update_maya_delete_hidden_option)
         self.csb_ignore_hidden = '1'
+        self.maya_delete_hidden = '1'
 
         # --------- Set scene file ---------
         self.scene_file = Path('.')
@@ -281,6 +283,16 @@ class PathRenderService(QtCore.QObject):
         self.update_status(f'CSB Import Option gesetzt: <i>ignoreHiddenObject={self.csb_ignore_hidden}</i>', 2)
         LOGGER.debug('Toggled CSB import option: %s, set value to %s', ignore_hidden, self.csb_ignore_hidden)
 
+    def update_maya_delete_hidden_option(self, maya_delete_hidden):
+        """ Set CSB Import ignoreHiddenOption=1 or 0 """
+        if maya_delete_hidden:
+            self.maya_delete_hidden = '1'
+        else:
+            self.maya_delete_hidden = '0'
+        self.update_status(f'Maya Prozess Option gesetzt: <i>maya_delete_hidden={self.maya_delete_hidden}</i>', 2)
+        LOGGER.debug('Toggled Maya delete hidden option: %s, set value to %s',
+                     maya_delete_hidden, self.maya_delete_hidden)
+
     def create_job(self):
         self.ui.pathJobSendBtn.setEnabled(False)
 
@@ -304,7 +316,7 @@ class PathRenderService(QtCore.QObject):
 
         msg = 'ADD_JOB '
 
-        for __s in [job_title, scene_file, render_dir, renderer, self.csb_ignore_hidden]:
+        for __s in [job_title, scene_file, render_dir, renderer, self.csb_ignore_hidden, self.maya_delete_hidden]:
             msg += __s + ';'
 
         # Remove trailing semicolon
@@ -382,7 +394,7 @@ class PathRenderService(QtCore.QObject):
     def manager_sort_header(self, click_event=None):
         """ Setup item column widths """
         header = self.ui.widgetJobManager.header()
-        col_widths = [65, 90, 130, 130, 150, 140, 105]
+        col_widths = [65, 90, 130, 130, 150, 140, 105, 50]
 
         for column in range(0, header.count() - 1):
             header.resizeSection(column, col_widths[column])
@@ -497,8 +509,10 @@ class PathRenderService(QtCore.QObject):
         """ Enabled if we receive a response from the render service """
         self.ui.pathJobSendBtn.setEnabled(True)
         self.ui.pathConnectBtn.setEnabled(True)
+        self.ui.jobBox.setEnabled(True)
 
     def service_unavailable(self):
+        self.ui.jobBox.setEnabled(False)
         self.ui.pathJobSendBtn.setEnabled(False)
         self.ui.pathConnectBtn.setEnabled(True)
 
@@ -722,7 +736,8 @@ def update_job_manager_widget(job, widget):
     creation_date = creation_date.strftime('%d.%m.%Y %H:%M')
 
     # Create widget item
-    item_values = ['00', job.title, job.file, job.render_dir, job.status_name, creation_date, expires, job.client]
+    item_values = ['00', job.title, job.file, job.render_dir, job.status_name,
+                   creation_date, expires, job.client, str(job.remote_index)]
     item = QtWidgets.QTreeWidgetItem(widget, item_values)
     item.setText(0, f'{widget.topLevelItemCount():02d}')
 

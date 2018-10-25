@@ -2,18 +2,26 @@ from datetime import datetime
 
 
 class Job(object):
-    """ Holds information about a render path render service render job """
-    status_description = ['Warteschlange', 'Szene wird vorbereitet',
-                          'Rendering', 'Bilderkennung',
-                          'Abgeschlossen', 'Fehlgeschlagen', 'Abgebrochen']
+    """ Holds information about a render job """
+    status_desc_list = ['Warteschlange', 'Szene wird vorbereitet',
+                        'Rendering', 'Bilderkennung',
+                        'Abgeschlossen', 'Fehlgeschlagen', 'Abgebrochen']
     combo_box_items = ['Zum Anfang der Warteschlange', 'Ans Ende der Warteschlange', 'Abbrechen']
     button_txt = 'Ausführen'
 
-    def __init__(self, job_title, scene_file, render_dir, renderer, client='Server',):
+    def __init__(self, job_title, scene_file, render_dir, renderer,
+                 ignore_hidden_objects='1', maya_delete_hidden='1',
+                 client='Server'):
         self.title = job_title
         self.file = scene_file
         self.render_dir = render_dir
         self.renderer = renderer
+
+        # CSB Import option ignoreHiddenObject
+        self.ignore_hidden_objects = ignore_hidden_objects
+
+        # Maya Layer Creation process optional argument
+        self.maya_delete_hidden = maya_delete_hidden
 
         # Class version
         self.version = 1
@@ -31,11 +39,9 @@ class Job(object):
         self.total_img_num = 0
         self.__progress = 0
 
-        # Status
-        # 0 - queue, 1 - scene editing, 2 - rendering, 3 - Image detection,
-        # 4 - finished, 5 - failed, 6 - canceled
+        # Status 0 - queue, 1 - scene editing, 2 - rendering, 3 - Image detection, 4 - finished, 5 - failed
         self.__status = 0
-        self.status_name = self.status_description[self.__status]
+        self.status_name = self.status_desc_list[self.__status]
         self.in_progress = False
 
     @property
@@ -69,10 +75,10 @@ class Job(object):
 
         self.__status = status
 
-        if status > len(self.status_description):
+        if status > len(self.status_desc_list):
             status_desc = 'Unbekannt'
         else:
-            status_desc = self.status_description[status]
+            status_desc = self.status_desc_list[status]
 
         self.status_name = status_desc
 
@@ -114,7 +120,7 @@ class Job(object):
         # Display number of rendered images
         if self.status == 2:
             if self.img_num and self.total_img_num:
-                self.status_name = f'{self.img_num:03d}/{self.total_img_num:03d} Layer erstellt'
+                self.status_name = '{0:03d}/{1:03d} Layer erstellt'.format(self.img_num, self.total_img_num)
 
         value = 0
 

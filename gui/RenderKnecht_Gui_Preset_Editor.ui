@@ -2008,6 +2008,11 @@
                  <string>Klient</string>
                 </property>
                </column>
+               <column>
+                <property name="text">
+                 <string>Remote Index</string>
+                </property>
+               </column>
               </widget>
               <widget class="QTextBrowser" name="renderServiceBrowser">
                <property name="font">
@@ -2180,20 +2185,55 @@ p, li { white-space: pre-wrap; }
              </layout>
             </item>
             <item>
-             <widget class="QCheckBox" name="checkBoxCsbIgnoreHidden">
-              <property name="font">
-               <font>
-                <weight>50</weight>
-                <bold>false</bold>
-               </font>
+             <layout class="QHBoxLayout" name="horizontalLayout_Options">
+              <property name="spacing">
+               <number>9</number>
               </property>
-              <property name="text">
-               <string>CSB Ignore Hidden Objects</string>
+              <property name="leftMargin">
+               <number>0</number>
               </property>
-              <property name="checked">
-               <bool>true</bool>
+              <property name="topMargin">
+               <number>0</number>
               </property>
-             </widget>
+              <property name="rightMargin">
+               <number>0</number>
+              </property>
+              <property name="bottomMargin">
+               <number>0</number>
+              </property>
+              <item alignment="Qt::AlignLeft">
+               <widget class="QCheckBox" name="checkBoxMayaDeleteHidden">
+                <property name="font">
+                 <font>
+                  <weight>50</weight>
+                  <bold>false</bold>
+                 </font>
+                </property>
+                <property name="text">
+                 <string>Maya Delete Hidden Objects</string>
+                </property>
+                <property name="checked">
+                 <bool>true</bool>
+                </property>
+               </widget>
+              </item>
+              <item alignment="Qt::AlignLeft">
+               <widget class="QCheckBox" name="checkBoxCsbIgnoreHidden">
+                <property name="font">
+                 <font>
+                  <weight>50</weight>
+                  <bold>false</bold>
+                 </font>
+                </property>
+                <property name="text">
+                 <string>CSB Ignore Hidden Objects</string>
+                </property>
+                <property name="checked">
+                 <bool>true</bool>
+                </property>
+               </widget>
+              </item>
+             </layout>
             </item>
             <item>
              <layout class="QHBoxLayout" name="horizontalLayout_3">
