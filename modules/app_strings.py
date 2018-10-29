@@ -53,6 +53,7 @@ class Msg:
     APP_VERSION_GREETING = _APP
     APP_EXT_LINK_BTN = 'Report issues'
     APP_EXT_LINK = 'https://github.com/tappi287/RenderKnecht/issues'
+    APP_PATH_HELP_LINK = 'https://github.com/tappi287/pfadaeffchen/wiki/Remote-Client-Options'
     APP_EXIT_WHILE_THREAD_TITLE = 'Beenden'
     APP_EXIT_WHILE_THREAD_RUNNING = 'Ein laufender Prozess rendert oder sendet Daten an DeltaGen.<br><br>'
     APP_EXIT_WHILE_THREAD_RUNNING += 'Die Anwendung wirklich schließen?'

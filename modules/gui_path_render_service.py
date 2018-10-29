@@ -37,6 +37,7 @@ from modules.knecht_socket import Ncat
 from modules.job import Job
 from modules.knecht_log import init_logging
 from modules.app_globals import SocketAddress
+from modules.app_strings import Msg
 
 # Initialize logging for this module
 LOGGER = init_logging(__name__)
@@ -123,6 +124,9 @@ class PathRenderService(QtCore.QObject):
         # --------- Add job button ---------
         self.ui.pathJobSendBtn.pressed.connect(self.create_job)
         self.ui.pathJobSendBtn.setEnabled(False)
+
+        # --------- Help button ---------
+        self.ui.pathBtnHelp.pressed.connect(self.open_help)
 
         # --------- Job Manager Tree Widget ------------
         self.ui.widgetJobManager.manager_open_item = self.manager_open_item
@@ -610,6 +614,11 @@ class PathRenderService(QtCore.QObject):
             return 'No renderer set'
 
         return False
+
+    @staticmethod
+    def open_help():
+        link = QtCore.QUrl(Msg.APP_PATH_HELP_LINK)
+        QDesktopServices.openUrl(link)
 
 
 class AnimatedButton:

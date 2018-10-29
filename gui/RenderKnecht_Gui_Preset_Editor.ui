@@ -1893,6 +1893,38 @@
             </spacer>
            </item>
            <item>
+            <widget class="QPushButton" name="pathBtnHelp">
+             <property name="maximumSize">
+              <size>
+               <width>40</width>
+               <height>40</height>
+              </size>
+             </property>
+             <property name="statusTip">
+              <string>Verbindung zum Render Service beenden.</string>
+             </property>
+             <property name="text">
+              <string/>
+             </property>
+             <property name="icon">
+              <iconset resource="res/preset_editor_rsc.qrc">
+               <normaloff>:/main/help.png</normaloff>:/main/help.png</iconset>
+             </property>
+             <property name="iconSize">
+              <size>
+               <width>30</width>
+               <height>30</height>
+              </size>
+             </property>
+             <property name="checkable">
+              <bool>false</bool>
+             </property>
+             <property name="flat">
+              <bool>true</bool>
+             </property>
+            </widget>
+           </item>
+           <item>
             <widget class="QPushButton" name="pathConnectBtn">
              <property name="maximumSize">
               <size>
