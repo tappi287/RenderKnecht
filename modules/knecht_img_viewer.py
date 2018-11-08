@@ -11,6 +11,7 @@ from modules.app_globals import Itemstyle, TCP_IP, TCP_PORT
 from modules.gui_set_path import SetDirectoryPath
 from modules.knecht_log import init_logging
 from modules.knecht_socket import Ncat
+from modules.tree_overlay import InfoOverlay
 
 LOGGER = init_logging(__name__)
 
@@ -51,6 +52,53 @@ def pil_2_pixmap(im):
     return pixmap
 
 
+class ViewerShortcuts:
+    def __init__(self, viewer, control):
+        self.viewer, self.control = viewer, control
+
+    def set_shortcuts(self, parent):
+        toggle_view = QtWidgets.QShortcut(QKeySequence(Qt.Key_Space), parent)
+        toggle_view.activated.connect(self.viewer.toggle_viewer)
+        toggle_view_x = QtWidgets.QShortcut(QKeySequence(Qt.Key_X), parent)
+        toggle_view_x.activated.connect(self.viewer.toggle_viewer)
+
+        size_hi = QtWidgets.QShortcut(QKeySequence(Qt.Key_Plus), parent)
+        size_hi.activated.connect(self.viewer.increase_size)
+        size_hi_e = QtWidgets.QShortcut(QKeySequence(Qt.Key_E), parent)
+        size_hi_e.activated.connect(self.viewer.increase_size)
+
+        size_lo = QtWidgets.QShortcut(QKeySequence(Qt.Key_Minus), parent)
+        size_lo.activated.connect(self.viewer.decrease_size)
+        size_lo_q = QtWidgets.QShortcut(QKeySequence(Qt.Key_Q), parent)
+        size_lo_q.activated.connect(self.viewer.decrease_size)
+
+        opa_hi_w = QtWidgets.QShortcut(QKeySequence(Qt.Key_W), parent)
+        opa_hi_w.activated.connect(self.viewer.increase_window_opacity)
+        opa_hi = QtWidgets.QShortcut(QKeySequence('Ctrl++'), parent)
+        opa_hi.activated.connect(self.viewer.increase_window_opacity)
+
+        opa_lo_s = QtWidgets.QShortcut(QKeySequence(Qt.Key_S), parent)
+        opa_lo_s.activated.connect(self.viewer.decrease_window_opacity)
+        opa_lo = QtWidgets.QShortcut(QKeySequence('Ctrl+-'), parent)
+        opa_lo.activated.connect(self.viewer.decrease_window_opacity)
+
+        esc = QtWidgets.QShortcut(QKeySequence(Qt.Key_Escape), parent)
+        esc.activated.connect(self.viewer.close)
+
+        fwd = QtWidgets.QShortcut(QKeySequence(Qt.Key_Right), parent)
+        fwd.activated.connect(self.control.fwd_btn.animateClick)
+        fwd_d = QtWidgets.QShortcut(QKeySequence(Qt.Key_D), parent)
+        fwd_d.activated.connect(self.control.fwd_btn.animateClick)
+
+        bck = QtWidgets.QShortcut(QKeySequence(Qt.Key_Left), parent)
+        bck.activated.connect(self.control.bck_btn.animateClick)
+        bck_a = QtWidgets.QShortcut(QKeySequence(Qt.Key_A), parent)
+        bck_a.activated.connect(self.control.bck_btn.animateClick)
+
+        dg = QtWidgets.QShortcut(QKeySequence(Qt.Key_F), parent)
+        dg.activated.connect(self.viewer.dg_toggle_sync)
+
+
 class ControllerWidget(QtWidgets.QWidget):
     y_margin = 10
     height = 70
@@ -66,11 +114,16 @@ class ControllerWidget(QtWidgets.QWidget):
         self.setWindowTitle(f'{viewer.windowTitle()} - Controller')
         self.setWindowIcon(viewer.windowIcon())
         self.setStyleSheet("QWidget#not_me { background: rgba(100, 100, 100, 120); border-radius: 5px; }"
-                           "QLabel { background: rgba(0, 0, 0, 0); }"
-                           "QPushButton, QLineEdit {"
+                           "QPushButton, QLineEdit, QComboBox, QLabel {"
                            "    height: 26px; margin: 0 5px 0 5px;"
                            "    background-color: rgb(80, 80, 80); border: 1px solid rgb(50, 50, 50);"
                            "    border-radius: 5px; color: rgb(210, 210, 210);"
+                           "}"
+                           "QComboBox {"
+                           "    padding: 0 10px;"
+                           "}"
+                           "QLabel#grabber {"
+                           "    padding: 0 10px; text-align: center; max-height: 26px; margin-left: 0;"
                            "}"
                            "QPushButton:pressed {"
                            "    background-color: rgb(84, 92, 98);"
@@ -117,10 +170,18 @@ class ControllerWidget(QtWidgets.QWidget):
         self.path_row.setSpacing(0)
         self.layout().addLayout(self.path_row)
         self.layout().addLayout(self.btn_row)
-        self.spacer = QtWidgets.QSpacerItem(0, 0, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Expanding)
-        self.btn_row.addSpacerItem(self.spacer)
+
+        self.grabber = QtWidgets.QLabel('', self)
+        self.grabber.setObjectName('grabber')
+        self.grabber.setSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Expanding)
+        self.btn_row.addWidget(self.grabber)
 
         # Buttons
+        self.size_box = QtWidgets.QComboBox(self)
+        for s in range(25, 225, 25):
+            self.size_box.addItem(f'{s:02d}%', s * 0.01)
+        self.btn_row.addWidget(self.size_box)
+
         self.toggle_dg_btn = QtWidgets.QPushButton(
             QIcon(QPixmap(Itemstyle.ICON_PATH['compare'])), 'Sync DeltaGen Viewer', self)
         self.toggle_dg_btn.setObjectName('toggle_dg_btn')
@@ -166,6 +227,9 @@ class ControllerWidget(QtWidgets.QWidget):
         self.org_viewer_move_event = self.viewer.moveEvent
         self.viewer.moveEvent = self._viewer_move_wrapper
 
+        self.mouseMoveEvent = self.viewer.mouseMoveEvent
+        self.mousePressEvent = self.viewer.mousePressEvent
+
     def _viewer_move_wrapper(self, event):
         self.org_viewer_move_event(event)
         self._adapt_viewer_position()
@@ -203,9 +267,10 @@ class KnechtImageViewer(QtWidgets.QWidget):
     dg_poll_timer = QTimer()
     dg_poll_timer.setInterval(500)
 
-    DEFAULT_SIZE = (640, 360)
+    DEFAULT_SIZE = (800, 450)
     DEFAULT_POS = (150, 150)
     MAX_SIZE = QSize(4096, 4096)
+    SIZE_INCREMENT = 0.25
     ICON = Itemstyle.ICON_PATH['img']
 
     FILE_TYPES = ['.png', '.jpg', '.jpeg', '.tif', '.tga']
@@ -216,6 +281,8 @@ class KnechtImageViewer(QtWidgets.QWidget):
             )
         self.app, self.ui = app, ui
         self.setWindowIcon(QIcon(QPixmap(self.ICON)))
+        self.setAutoFillBackground(True)
+        self.setAttribute(Qt.WA_TranslucentBackground)
         self.setWindowTitle('Image Viewer')
         self.setStyleSheet("QWidget{background-color: darkgray;}")
 
@@ -229,13 +296,15 @@ class KnechtImageViewer(QtWidgets.QWidget):
         self.current_img = None
         self.img_list = list()
         self.img_index = 0
+        self.img_size_factor = 1.0
+        self.img_size = QSize(*self.DEFAULT_SIZE)
 
         # Save window position for drag
         self.oldPos = self.pos()
 
         self.setGeometry(*self.DEFAULT_POS, *self.DEFAULT_SIZE)
-        self.setWindowOpacity(0.5)
-        self.old_opacity = self.windowOpacity()
+        self.current_opacity = 1.0
+        self.setWindowOpacity(1.0)
 
         self.control = ControllerWidget(self)
 
@@ -247,6 +316,11 @@ class KnechtImageViewer(QtWidgets.QWidget):
         self.layout().addWidget(self.img_canvas)
         self.img_canvas.setSizePolicy(QtWidgets.QSizePolicy.Ignored, QtWidgets.QSizePolicy.Ignored)
         self.img_canvas.setScaledContents(True)
+        self.img_canvas.setStyleSheet('background: rgba(180, 180, 180, 180);')
+
+        # Overlay
+        self.overlay = InfoOverlay(self.img_canvas)
+        self.shortcuts_shown = False
 
         # App logic
         self.path_dlg = SetDirectoryPath(app, ui,
@@ -256,36 +330,33 @@ class KnechtImageViewer(QtWidgets.QWidget):
                                          parent=self)
         self.path_dlg.path_changed.connect(self.set_img_path)
 
+        self.control.size_box.currentIndexChanged.connect(self.combo_box_size)
+        self.set_combo_box_to_current_factor()
+
         self.control.bck_btn.pressed.connect(self.iterate_bck)
         self.control.fwd_btn.pressed.connect(self.iterate_fwd)
 
         self.control.toggle_btn.pressed.connect(self.toggle_viewer)
         self.control.toggle_dg_btn.pressed.connect(self.dg_toggle_sync)
 
-        # Shortcuts
-        toggle_view = QtWidgets.QShortcut(QKeySequence(Qt.Key_Space), self)
-        toggle_view.activated.connect(self.toggle_viewer)
+        self.shortcuts = ViewerShortcuts(self, self.control)
+        self.shortcuts.set_shortcuts(self)
+        self.shortcuts.set_shortcuts(self.control)
 
-        size_hi = QtWidgets.QShortcut(QKeySequence(Qt.Key_Plus), self)
-        size_hi.activated.connect(self.increase_size)
+    def display_shortcut_overlay(self):
+        if self.shortcuts_shown:
+            return
 
-        size_lo = QtWidgets.QShortcut(QKeySequence(Qt.Key_Minus), self)
-        size_lo.activated.connect(self.decrease_size)
+        self.overlay.display_confirm(
+            'Shortcuts<br>'
+            '+/&#45; oder Q/E &#45; Bildanzeige vergößern/verkleinern<br>'
+            '&lt;/&gt; oder A/D          &#45; Nächste/Vorherige Bilddatei im Ordner<br>'
+            'STRG+/STRG&#45; oder W/S  &#45; Transparenz erhöhen/verringern<br><br>'
+            'Leertaste oder X &#45; Bildanzeige ein&#45;/ausschalten<br>'
+            'F &#45; DeltaGen Viewer Sync ein&#45;/ausschalten<br>',
+            ('[X]', None), immediate=True)
 
-        opa_hi = QtWidgets.QShortcut(QKeySequence('Ctrl++'), self)
-        opa_hi.activated.connect(self.increase_window_opacity)
-
-        opa_lo = QtWidgets.QShortcut(QKeySequence('Ctrl+-'), self)
-        opa_lo.activated.connect(self.decrease_window_opacity)
-
-        esc = QtWidgets.QShortcut(QKeySequence(Qt.Key_Escape), self)
-        esc.activated.connect(self.close)
-
-        fwd = QtWidgets.QShortcut(QKeySequence(Qt.Key_Right), self)
-        fwd.activated.connect(self.control.fwd_btn.animateClick)
-
-        bck = QtWidgets.QShortcut(QKeySequence(Qt.Key_Left), self)
-        bck.activated.connect(self.control.bck_btn.animateClick)
+        self.shortcuts_shown = True
 
     # ------ DeltaGen Sync -------
     def dg_start_sync(self):
@@ -323,8 +394,9 @@ class KnechtImageViewer(QtWidgets.QWidget):
             LOGGER.error('Sending viewer size command failed. %s', e)
 
     def dg_close_connection(self):
-        self.dg_reset_viewer()
-        self.ncat.close()
+        if self.sync_dg:
+            self.dg_reset_viewer()
+            self.ncat.close()
 
     def dg_toggle_sync(self):
         self.sync_dg = not self.sync_dg
@@ -365,6 +437,9 @@ class KnechtImageViewer(QtWidgets.QWidget):
 
     def iterate_images(self):
         if not self.img_list or self.button_timeout.isActive():
+            if not self.img_list:
+                self.overlay.display('Kein unterstützen Bilddaten im Ordner gefunden oder '
+                                     'kein Bildordner gewählt.', 3000)
             return
 
         if self.img_index < 0:
@@ -379,26 +454,53 @@ class KnechtImageViewer(QtWidgets.QWidget):
             self.current_img = read_to_qpixmap(img_path)
         except Exception as e:
             LOGGER.error('Could not load image file: %s\n%s', img_path.asposix(), e)
+            self.overlay.display_exit()
+            self.overlay.display(f'<span style="font-size: 11pt;">'
+                                 f'Datei <b>{img_path.name}</b> konnt nicht geladen werden!'
+                                 f'</span>'
+                                 , 5000, immediate=True)
 
         if self.current_img:
+            self.img_canvas.setStyleSheet('background: rgba(0, 0, 0, 0);')
             self.img_canvas.setPixmap(self.current_img)
+            self.img_size = self.current_img.size()
+            self.change_viewer_size()
 
-        self.resize_image_viewer(self.current_img.size())
+            self.overlay.display_exit()
+            self.overlay.display(f'<span style="font-size: 11pt;">'
+                                 f'{self.img_index + 1:02d}/{len(self.img_list):02d} - '
+                                 f'<b>{img_path.name}</b> - '
+                                 f'{self.img_size.width()}x{self.img_size.height()}px'
+                                 f'</span>'
+                                 , 1200, immediate=True)
 
         self.button_timeout.start()
 
     # ------ RESIZE -------
+    def combo_box_size(self, idx):
+        data = self.control.size_box.currentData()
+        self.img_size_factor = data
+        self.change_viewer_size()
+
+    def set_combo_box_to_current_factor(self):
+        idx = self.control.size_box.findData(self.img_size_factor)
+        self.control.size_box.setCurrentIndex(idx)
+
     def increase_size(self):
-        self.change_viewer_size(0.25)
+        self.img_size_factor += 0.25
+        self.change_viewer_size()
 
     def decrease_size(self):
-        self.change_viewer_size(-0.25)
+        self.img_size_factor -= 0.25
+        self.change_viewer_size()
 
-    def change_viewer_size(self, factor):
-        # TODO: Save Resize factor and apply to next img
-        add_width = round(self.size().width() * factor)
-        add_height = round(self.size().height() * factor)
-        new_size = QSize(self.size().width() + add_width, self.size().height() + add_height)
+    def change_viewer_size(self):
+        self.img_size_factor = max(0.25, min(self.img_size_factor, 2.0))
+        self.set_combo_box_to_current_factor()
+
+        w = round(self.img_size.width() * self.img_size_factor)
+        h = round(self.img_size.height() * self.img_size_factor)
+        new_size = QSize(w, h)
 
         self.resize_image_viewer(new_size)
 
@@ -424,7 +526,7 @@ class KnechtImageViewer(QtWidgets.QWidget):
             return
 
         opacity = max(0.1, min(1.0, opacity))
-        self.old_opacity = opacity
+        self.current_opacity = opacity
         self.setWindowOpacity(opacity)
 
         self.shortcut_timeout.start()
@@ -436,7 +538,7 @@ class KnechtImageViewer(QtWidgets.QWidget):
 
         if self.windowOpacity() == 0.0:
             self.control.toggle_btn.setChecked(True)
-            self.setWindowOpacity(self.old_opacity)
+            self.setWindowOpacity(self.current_opacity)
         else:
             self.control.toggle_btn.setChecked(False)
             self.setWindowOpacity(0.0)
@@ -450,6 +552,7 @@ class KnechtImageViewer(QtWidgets.QWidget):
     def show_all(self):
         self.control.show()
         self.show()
+        self.display_shortcut_overlay()
 
     def closeEvent(self, QCloseEvent):
         self.dg_close_connection()

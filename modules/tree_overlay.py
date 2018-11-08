@@ -261,10 +261,13 @@ class InfoOverlay(QtWidgets.QWidget):
         self.widget = widget
 
         # Disable horizontal scrollbar
-        self.widget.setHorizontalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOff)
-
-        # Calc header margin
-        self.header_height = self.widget.header().height()
+        try:
+            self.widget.setHorizontalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOff)
+            # Calc header margin
+            self.header_height = self.widget.header().height()
+        except Exception as e:
+            LOGGER.info('Overlay widget has no scroll bar or header: %s', e)
+            self.header_height = 0
 
         # Make widget transparent
         self.setAttribute(QtCore.Qt.WA_TransparentForMouseEvents)

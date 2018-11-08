@@ -2782,6 +2782,9 @@ p, li { white-space: pre-wrap; }
    <property name="text">
     <string>DeltaGen Image Overlay Viewer</string>
    </property>
+   <property name="shortcut">
+    <string>Ctrl+E</string>
+   </property>
   </action>
  </widget>
  <customwidgets>
