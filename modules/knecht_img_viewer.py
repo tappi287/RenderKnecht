@@ -298,7 +298,7 @@ class KnechtImageViewer(QtWidgets.QWidget):
 
         position = f'{self.frameGeometry().x()} {self.frameGeometry().y()}'
         size = f'{self.size().width()} {self.size().height()}'
-        command = f'SIZE VIEWER {size};POSITION VIEWER {position};BORDERLESS VIEWER TRUE;UNFREEZE VIEWER;'
+        command = f'UNFREEZE VIEWER;BORDERLESS VIEWER TRUE;SIZE VIEWER {size};POSITION VIEWER {position};'
 
         try:
             self.ncat.send(command)
