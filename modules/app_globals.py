@@ -177,6 +177,7 @@ class Itemstyle:
         'viewset_mask': ':/type/viewset_mask.png',
         'empty': None,
         # Main icons
+        'eye-on': ':/main/eye.png', 'eye-off': ':/main/eye-disabled.png',
         'link_intact': ':/main/link-intact.png',
         'link_broken': ':/main/link-broken.png',
         'link_contained': ':/main/link-contained.png',
@@ -194,6 +195,7 @@ class Itemstyle:
         'c_grey': ':/ovr/c_grey.png',
         'c_darkgrey': ':/ovr/c_darkgrey.png',
         'close': ':/main/close.png',
+        'compare': ':/main/compare.png',
         'clip_copy': ':/main/clip_copy.png',
         'clip_paste': ':/main/clip_paste.png',
         'clip_cut': ':/main/clip_cut.png',

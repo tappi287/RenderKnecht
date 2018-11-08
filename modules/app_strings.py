@@ -37,6 +37,7 @@ class Msg:
            '<img src=":/main/social-github-b.png" width="24" height="24" ' \
            'style="float: left;vertical-align: middle;">Quellcode nun verfügbar auf Github!</a>' \
            '</li>' \
+           '<li>Datei > DeltaGen Image Overlay Viewer integriert</li>' \
            '<li>Auto-Save speichert nun Lokal die gesamte Session anstatt der aktuellen Datei.</li>' \
            '<li>POS Schnuffi prüft Xml auf fehlende actionList bzw. condition Elemente</li>' \
            '<li>PSD Erstellung erzwingen zum Kontextmenu des Job Managers hinzugefügt.</li>' \
@@ -343,6 +344,7 @@ class InfoMessage:
     icon_credits = (
         (":/type/pkg.png", "Box", "by Gregor Cresnar", "http://www.flaticon.com/", "Flaticon Basic License"),
         (":/type/checkmark.png", "Checkmark", "by Freepik", "http://www.flaticon.com/", "Flaticon Basic License"),
+        (":/main/compare.png", "Compare", "by Google", "https://www.shareicon.net/", "CC 3.0 BY"),
         (":/type/fakom.png", "Leather", "by Smashicons", "http://www.flaticon.com/", "Flaticon Basic License"),
         (":/main/dog.png", "Dog", "by Twitter", "http://www.flaticon.com/", "CC 3.0 BY"),
         (":/type/car.png", "Car front", "by Google", "http://www.flaticon.com/", "CC 3.0 BY"),

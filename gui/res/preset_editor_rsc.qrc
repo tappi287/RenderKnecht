@@ -1,5 +1,6 @@
 <RCC>
   <qresource prefix="main">
+    <file>compare.png</file>
     <file>dog.png</file>
     <file>social-github-b.png</file>
     <file>social-github.png</file>

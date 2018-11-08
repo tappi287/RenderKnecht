@@ -33,6 +33,7 @@ from modules.gui_splash_screen_movie import show_splash_screen_movie
 from modules.gui_widgets import FakomWindow, styleChooser, AboutBox
 from modules.gui_set_path import SetDirectoryPath
 from modules.gui_preset_wizard import PresetWizard
+from modules.knecht_img_viewer import KnechtImageViewer
 from modules.knecht_settings import knechtSettings
 from modules.knecht_deltagen import SendToDeltaGen
 from modules.knecht_threads import PngConvertThread
@@ -52,6 +53,7 @@ class MenuBar(QtCore.QObject):
     fakom_window = None
     preset_wizard_win = None
     png_convert = None
+    img_viewer = None
 
     def __init__(self, app, ui, log, tree_widget_source, tree_widget_dest, ui_action_open):
         super(MenuBar, self).__init__()
@@ -187,6 +189,15 @@ class MenuBar(QtCore.QObject):
         if img_list:
             self.png_convert = PngConvertThread(self.ui, self.ui.actionPNG_Konverter, img_list)
             self.png_convert.create_thread()
+
+    def start_image_viewer(self):
+        if not self.img_viewer:
+            self.img_viewer = KnechtImageViewer(self.app, self.ui)
+
+        if self.img_viewer.isHidden():
+            self.img_viewer.show_all()
+        else:
+            self.img_viewer.close()
 
     def set_render_path_text(self):
         render_path = Path(self.ui.lineEdit_currentRenderPath.text())

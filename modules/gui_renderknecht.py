@@ -176,6 +176,7 @@ class RenderKnechtGui(QtWidgets.QApplication):
         self.ui.action_fakom.triggered.connect(self.menu.ImportFakom)
         self.ui.actionPresetWizard.triggered.connect(self.menu.preset_wizard)
         self.ui.actionPNG_Konverter.triggered.connect(self.menu.png_converter)
+        self.ui.actionImage_Viewer.triggered.connect(self.menu.start_image_viewer)
         self.ui.actionSchnuffi.triggered.connect(self.start_pos_schnuffi)
         self.ui.actionSave.triggered.connect(self.menu.file_save)
         self.ui.actionSave_as.triggered.connect(partial(self.menu.file_save, True))

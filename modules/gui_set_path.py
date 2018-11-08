@@ -34,12 +34,17 @@ class SetDirectoryPath(QtCore.QObject):
                  line_edit=None,
                  tool_button=None,
                  dialog_args=(),
-                 reject_invalid_path_edits=False):
+                 reject_invalid_path_edits=False,
+                 parent=None):
         super(SetDirectoryPath, self).__init__()
         self.app, self.ui, self.line_edit, self.tool_button = app, ui, line_edit, tool_button
         self.mode = mode
 
         self.path = None
+
+        self.parent = self.ui
+        if parent is not None:
+            self.parent = parent
 
         if self.tool_button:
             self.dialog_args = dialog_args
@@ -70,13 +75,13 @@ class SetDirectoryPath(QtCore.QObject):
 
         if self.mode == 'dir':
             current_path = QtWidgets.QFileDialog.getExistingDirectory(
-                self.ui, caption=title, directory=current_path.as_posix()
+                self.parent, caption=title, directory=current_path.as_posix()
             )
             if not current_path:
                 return
         else:
             current_path, file_type = QtWidgets.QFileDialog.getOpenFileName(
-                self.ui, caption=title, directory=current_path.as_posix(), filter=file_filter
+                self.parent, caption=title, directory=current_path.as_posix(), filter=file_filter
             )
             if not file_type:
                 return
