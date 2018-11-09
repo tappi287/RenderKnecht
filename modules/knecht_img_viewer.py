@@ -237,6 +237,8 @@ class ControllerWidget(FileDropWidget):
 
         self.slider = QtWidgets.QSlider(Qt.Horizontal, self)
         self.slider.setObjectName('slider')
+        self.slider.setRange(1, 11)
+        self.slider.setValue(11)
         self.btn_row.addWidget(self.slider)
 
         self.size_box = QtWidgets.QComboBox(self)
@@ -337,6 +339,10 @@ class KnechtImageViewer(FileDropWidget):
     shortcut_timeout.setInterval(50)
     shortcut_timeout.setSingleShot(True)
 
+    slider_timeout = QTimer()
+    slider_timeout.setInterval(50)
+    slider_timeout.setSingleShot(True)
+
     dg_btn_timeout = QTimer()
     dg_btn_timeout.setInterval(1000)
     dg_btn_timeout.setSingleShot(True)
@@ -415,6 +421,10 @@ class KnechtImageViewer(FileDropWidget):
                                          tool_button=self.control.path_btn,
                                          parent=self)
         self.path_dlg.path_changed.connect(self.set_img_path)
+
+        self.control.slider.sliderMoved.connect(self.start_opacity_slider_timeout)
+        self.slider_timeout.timeout.connect(self.set_opacity_from_slider)
+        self.control.slider.sliderReleased.connect(self.set_opacity_from_slider)
 
         self.control.size_box.currentIndexChanged.connect(self.combo_box_size)
         self.set_combo_box_to_current_factor()
@@ -613,10 +623,23 @@ class KnechtImageViewer(FileDropWidget):
     # ------ OPACITY -------
     def increase_window_opacity(self):
         opacity = self.windowOpacity() + 0.15
+        self.update_opacity_slider()
         self.set_window_opacity(opacity)
 
     def decrease_window_opacity(self):
         opacity = self.windowOpacity() - 0.15
+        self.update_opacity_slider()
+        self.set_window_opacity(opacity)
+
+    def update_opacity_slider(self):
+        self.control.slider.setValue(round(self.windowOpacity() * self.control.slider.maximum()))
+
+    def start_opacity_slider_timeout(self):
+        if not self.slider_timeout.isActive():
+            self.slider_timeout.start()
+
+    def set_opacity_from_slider(self):
+        opacity = self.control.slider.value() * 0.095
         self.set_window_opacity(opacity)
 
     def set_window_opacity(self, opacity):
