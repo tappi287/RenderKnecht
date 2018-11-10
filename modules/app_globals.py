@@ -196,6 +196,7 @@ class Itemstyle:
         'c_darkgrey': ':/ovr/c_darkgrey.png',
         'close': ':/main/close.png',
         'compare': ':/main/compare.png',
+        'img_viewer': ':/main/img_viewer_bg.png',
         'clip_copy': ':/main/clip_copy.png',
         'clip_paste': ':/main/clip_paste.png',
         'clip_cut': ':/main/clip_cut.png',

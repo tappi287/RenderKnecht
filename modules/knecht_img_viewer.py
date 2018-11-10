@@ -2,10 +2,10 @@ from pathlib import Path
 
 import imageio
 import numpy as np
-from PIL import Image, ImageQt
+from PIL import Image
 from PyQt5 import QtWidgets
 from PyQt5.QtCore import Qt, QPoint, QTimer, QSize, QRect, pyqtSignal
-from PyQt5.QtGui import QIcon, QPixmap, QImage, QKeySequence, QPalette, QColor
+from PyQt5.QtGui import QIcon, QPixmap, QImage, QKeySequence
 
 from modules.app_globals import Itemstyle, TCP_IP, TCP_PORT
 from modules.gui_set_path import SetDirectoryPath
@@ -59,9 +59,9 @@ class ViewerShortcuts:
     def set_shortcuts(self, parent):
         # Viewer Image Canvas Display On/Off
         toggle_view = QtWidgets.QShortcut(QKeySequence(Qt.Key_Space), parent)
-        toggle_view.activated.connect(self.viewer.toggle_viewer)
+        toggle_view.activated.connect(self.control.toggle_btn.animateClick)
         toggle_view_x = QtWidgets.QShortcut(QKeySequence(Qt.Key_X), parent)
-        toggle_view_x.activated.connect(self.viewer.toggle_viewer)
+        toggle_view_x.activated.connect(self.control.toggle_btn.animateClick)
 
         # Increase Image Size
         size_hi = QtWidgets.QShortcut(QKeySequence(Qt.Key_Plus), parent)
@@ -130,7 +130,7 @@ class ControllerWidget(FileDropWidget):
     logo_row_height = 35
     logo_margin = 4
     y_margin = 8
-    height = 74
+    height = 88
 
     def __init__(self, viewer):
         super(ControllerWidget, self).__init__(
@@ -143,26 +143,30 @@ class ControllerWidget(FileDropWidget):
         self.setWindowTitle(f'{viewer.windowTitle()} - Controller')
         self.setWindowIcon(viewer.windowIcon())
         self.setStyleSheet("QWidget#not_me { background: rgba(100, 100, 100, 120); border-radius: 5px; }"
-                           "QPushButton, QLineEdit, QComboBox, QLabel {"
-                           "    max-height: 26px; margin: 5px;"
+                           "QPushButton, QLineEdit, QComboBox, QLabel, QToolButton {"
+                           "    max-height: 30px; height: 30px; margin: 5px;"
                            "    background-color: rgb(80, 80, 80); border: 1px solid rgb(50, 50, 50);"
                            "    border-radius: 5px; color: rgb(210, 210, 210);"
                            "}"
                            "QComboBox {"
                            "    padding: 0 10px;"
                            "}"
-                           "QLabel#grabber_top {"
-                           "    padding: 0; text-align: center; max-height: 35px; max-width: 35px; margin: 0;"
+                           "QLabel#logo_top {"
+                           "    padding: 0; text-align: center; max-height: 39px; max-width: 35px; margin: 0;"
+                           "    height: 39px; width: 35px;"
                            "    background: none; border: none;"
                            "}"
+                           "QLabel#grabber_top {"
+                           "    padding: 0; margin: 0; height: 26px;"
+                           "}"
                            "QLabel#grabber {"
-                           "    padding: 0; text-align: center; max-width: 120px; max-height: 26px; margin-left: 0;"
+                           "    padding: 0; text-align: center; max-width: 120px; max-height: 30px; margin-left: 0;"
                            "}"
                            "QPushButton:pressed {"
-                           "    background-color: rgb(84, 92, 98);"
+                           "    background-color: rgb(210, 210, 210);"
                            "}"
                            "QPushButton#exit_btn {"
-                           "    min-width: 26px; max-width: 26px; margin-right: 0;"
+                           "    min-width: 30px; max-width: 30px; margin-right: 0;"
                            "}"
                            "QPushButton#fwd_btn {"
                            "    min-width: 100px;"
@@ -176,28 +180,39 @@ class ControllerWidget(FileDropWidget):
                            "QPushButton#toggle_dg_btn {"
                            "    padding: 0 10px;"
                            "}"
-                           "QPushButton#toggle_dg_btn:checked, QPushButton#toggle_btn:checked {"
+                           "QPushButton#toggle_btn {"
+                           "    background-color: rgb(150, 150, 150);"
+                           "}"
+                           "QPushButton#toggle_btn:checked {"
+                           "    background-color: rgb(80, 80, 80);"
+                           "}"
+                           "QPushButton#toggle_dg_btn:checked {"
                            "    background-color: rgb(150, 150, 150);"
                            "}"
                            "QToolButton {"
-                           "    height: 22px; margin: 0 0 0 5px;"
-                           "    background-color: rgb(80, 80, 80); border: 1px solid rgb(50, 50, 50);"
-                           "    border-radius: 5px; color: rgb(210, 210, 210);"
+                           "    margin: 0 0 0 5px;"
                            "}"
                            "QSlider {"
-                           "    min-width: 100px; max-width: 120px; height: 26px; margin-right: 5px;"
-                           "    border-radius: 5px;"
+                           "    min-width: 100px; max-width: 120px; height: 30px; margin-right: 5px;"
+                           "    border-radius: 5px; border: none;"
                            "}"
                            "QSlider::groove:horizontal {"
-                           "    border: 1px solid #999999; border-radius: 5px;"
+                           "    border: none; border-radius: 5px;"
                            "    height: 26px;"
-                           "    background: qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:0 #B1B1B1, stop:1 #c4c4c4);"
+                           "    background: qlineargradient(x1:0, y1:0, x2:0, y2:1,"
+                           "                stop:0 rgb(120, 120, 120), stop:1 rgb(210, 210, 210));"
                            "}"
                            "QSlider::handle:horizontal {"
-                           "    background: rgb(80, 80, 80);"
+                           "    background: rgb(120, 120, 120);"
                            "    border: 1px solid rgb(50, 50, 50);"
                            "    width: 18px;"
                            "    margin: -2px 0;"
+                           "    border-radius: 5px;"
+                           "}"
+                           "QSlider::sub-page:horizontal {"
+                           "    background: qlineargradient(x1: 0, y1: 0,    x2: 0, y2: 1,"
+                           "                stop: 0 rgb(50, 50, 50), stop: 1 rgb(120, 120, 120));"
+                           "    border: none;"
                            "    border-radius: 5px;"
                            "}"
                            "QLineEdit {"
@@ -212,13 +227,17 @@ class ControllerWidget(FileDropWidget):
         self.widget_layout.setSpacing(0)
 
         # Widget Layout
-        self.top_layout = QtWidgets.QVBoxLayout(self)
+        self.top_layout = QtWidgets.QHBoxLayout(self)
         self.top_layout.setContentsMargins(0, 0, 0, 0)
         self.top_layout.setSpacing(0)
         self.grabber_top = QtWidgets.QLabel('', self)
-        self.grabber_top.setPixmap(QPixmap(Itemstyle.ICON_PATH['compare']))
-        self.grabber_top.setScaledContents(True)
         self.grabber_top.setObjectName('grabber_top')
+        self.grabber_top.setSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Expanding)
+        self.logo_top = QtWidgets.QLabel('', self)
+        self.logo_top.setPixmap(QPixmap(Itemstyle.ICON_PATH['compare']))
+        self.logo_top.setScaledContents(True)
+        self.logo_top.setObjectName('logo_top')
+        self.top_layout.addWidget(self.logo_top)
         self.top_layout.addWidget(self.grabber_top)
         self.widget_layout.addLayout(self.top_layout)
 
@@ -236,9 +255,11 @@ class ControllerWidget(FileDropWidget):
         self.widget_layout.addLayout(self.btn_row)
 
         self.slider = QtWidgets.QSlider(Qt.Horizontal, self)
+        self.slider.setFocusPolicy(Qt.StrongFocus)
         self.slider.setObjectName('slider')
-        self.slider.setRange(1, 11)
-        self.slider.setValue(11)
+        self.slider.setRange(1, 10)
+        self.slider.setValue(10)
+        self.slider.setSingleStep(1)
         self.btn_row.addWidget(self.slider)
 
         self.size_box = QtWidgets.QComboBox(self)
@@ -258,7 +279,10 @@ class ControllerWidget(FileDropWidget):
         self.toggle_dg_btn.setChecked(False)
         self.btn_row.addWidget(self.toggle_dg_btn)
 
-        self.toggle_btn = QtWidgets.QPushButton(QIcon(QPixmap(Itemstyle.ICON_PATH['eye-on'])), '', self)
+        toggle_icon = QIcon()
+        toggle_icon.addPixmap(QPixmap(Itemstyle.ICON_PATH['eye-off']), QIcon.Normal, QIcon.Off)
+        toggle_icon.addPixmap(QPixmap(Itemstyle.ICON_PATH['eye-on']), QIcon.Normal, QIcon.On)
+        self.toggle_btn = QtWidgets.QPushButton(toggle_icon, '', self)
         self.toggle_btn.setObjectName('toggle_btn')
         self.toggle_btn.setFlat(True)
         self.toggle_btn.setCheckable(True)
@@ -340,7 +364,7 @@ class KnechtImageViewer(FileDropWidget):
     shortcut_timeout.setSingleShot(True)
 
     slider_timeout = QTimer()
-    slider_timeout.setInterval(50)
+    slider_timeout.setInterval(20)
     slider_timeout.setSingleShot(True)
 
     dg_btn_timeout = QTimer()
@@ -351,7 +375,6 @@ class KnechtImageViewer(FileDropWidget):
     dg_poll_timer.setInterval(500)
 
     DEFAULT_SIZE = (800, 450)
-    DEFAULT_POS = (150, 150)
 
     MAX_SIZE = QSize(4096, 4096)
 
@@ -391,7 +414,6 @@ class KnechtImageViewer(FileDropWidget):
         # Save window position for drag
         self.oldPos = self.pos()
 
-        self.setGeometry(*self.DEFAULT_POS, *self.DEFAULT_SIZE)
         self.current_opacity = 1.0
         self.setWindowOpacity(1.0)
 
@@ -406,9 +428,7 @@ class KnechtImageViewer(FileDropWidget):
         self.img_canvas.setSizePolicy(QtWidgets.QSizePolicy.Ignored, QtWidgets.QSizePolicy.Ignored)
         self.img_canvas.setScaledContents(True)
         self.img_canvas.setObjectName('img_canvas')
-        self.img_canvas.setStyleSheet('QLabel#img_canvas {'
-                                      'background: rgba(180, 180, 180, 180); border-radius: 5px;'
-                                      '}')
+        self.set_default_image()
 
         # Overlay
         self.overlay = InfoOverlay(self.img_canvas)
@@ -422,9 +442,9 @@ class KnechtImageViewer(FileDropWidget):
                                          parent=self)
         self.path_dlg.path_changed.connect(self.set_img_path)
 
-        self.control.slider.sliderMoved.connect(self.start_opacity_slider_timeout)
         self.slider_timeout.timeout.connect(self.set_opacity_from_slider)
-        self.control.slider.sliderReleased.connect(self.set_opacity_from_slider)
+        self.control.slider.sliderReleased.connect(self.slider_timeout.start)
+        self.control.slider.valueChanged.connect(self.slider_timeout.start)
 
         self.control.size_box.currentIndexChanged.connect(self.combo_box_size)
         self.set_combo_box_to_current_factor()
@@ -442,6 +462,8 @@ class KnechtImageViewer(FileDropWidget):
         self.file_dropped.connect(self.path_dropped)
         self.control.file_dropped.connect(self.path_dropped)
 
+        self.place_in_screen_center()
+
     def display_shortcut_overlay(self):
         if self.shortcuts_shown:
             return
@@ -457,6 +479,14 @@ class KnechtImageViewer(FileDropWidget):
             ('[X]', None), immediate=True)
 
         self.shortcuts_shown = True
+
+    def set_default_image(self):
+        self.current_img = QPixmap(Itemstyle.ICON_PATH['img_viewer'])
+        self.img_canvas.setStyleSheet('background: rgba(0, 0, 0, 0);')
+        self.img_canvas.setPixmap(self.current_img)
+        self.img_size = self.current_img.size()
+        self.img_size_factor = 1.0
+        self.change_viewer_size()
 
     # ------ DeltaGen Sync -------
     def dg_start_sync(self):
@@ -546,6 +576,8 @@ class KnechtImageViewer(FileDropWidget):
     def iterate_images(self):
         if not self.img_list or self.button_timeout.isActive():
             if not self.img_list:
+                self.set_default_image()
+                self.overlay.display_exit()
                 self.overlay.display('Kein unterstützen Bilddaten im Ordner gefunden oder '
                                      'kein Bildordner gewählt.', 3000)
             return
@@ -562,11 +594,13 @@ class KnechtImageViewer(FileDropWidget):
             self.current_img = read_to_qpixmap(img_path)
         except Exception as e:
             LOGGER.error('Could not load image file: %s\n%s', img_path.asposix(), e)
+            self.set_default_image()
             self.overlay.display_exit()
             self.overlay.display(f'<span style="font-size: 11pt;">'
                                  f'Datei <b>{img_path.name}</b> konnt nicht geladen werden!'
                                  f'</span>'
                                  , 5000, immediate=True)
+            return
 
         if self.current_img:
             self.img_canvas.setStyleSheet('background: rgba(0, 0, 0, 0);')
@@ -634,12 +668,8 @@ class KnechtImageViewer(FileDropWidget):
     def update_opacity_slider(self):
         self.control.slider.setValue(round(self.windowOpacity() * self.control.slider.maximum()))
 
-    def start_opacity_slider_timeout(self):
-        if not self.slider_timeout.isActive():
-            self.slider_timeout.start()
-
     def set_opacity_from_slider(self):
-        opacity = self.control.slider.value() * 0.095
+        opacity = self.control.slider.value() * 0.1
         self.set_window_opacity(opacity)
 
     def set_window_opacity(self, opacity):
@@ -657,12 +687,10 @@ class KnechtImageViewer(FileDropWidget):
         if self.shortcut_timeout.isActive():
             return
 
-        if self.windowOpacity() == 0.0:
-            self.control.toggle_btn.setChecked(True)
-            self.setWindowOpacity(self.current_opacity)
-        else:
-            self.control.toggle_btn.setChecked(False)
+        if self.control.toggle_btn.isChecked():
             self.setWindowOpacity(0.0)
+        else:
+            self.setWindowOpacity(self.current_opacity)
 
         self.shortcut_timeout.start()
 
@@ -671,11 +699,60 @@ class KnechtImageViewer(FileDropWidget):
         self.hide()
 
     def show_all(self):
+        self.place_inside_screen()
         self.control.show()
         self.show()
         self.display_shortcut_overlay()
 
     # ------ OVERRIDES -------
+    def moveEvent(self, event):
+        limit = self.calculate_screen_limits()
+
+        if not self.is_inside_limit(limit, event.pos()):
+            self.move(limit.x(), limit.y())
+            event.ignore()
+            return
+
+        event.accept()
+
+    def resizeEvent(self, event):
+        limit = self.calculate_screen_limits()
+        pos = self.geometry().topLeft()
+
+        if not self.is_inside_limit(limit, pos):
+            self.move(limit.x(), limit.y())
+            event.ignore()
+            return
+
+        event.accept()
+
+    def place_inside_screen(self):
+        limit = self.calculate_screen_limits()
+        pos = self.geometry().topLeft()
+
+        if not self.is_inside_limit(limit, pos):
+            self.place_in_screen_center()
+
+    def place_in_screen_center(self):
+        screen = self.app.desktop().availableGeometry(self)
+        center_x = screen.center().x() - round(self.geometry().width() / 2)
+        center_y = screen.center().y() - round(self.geometry().height() / 2)
+        self.move(center_x, center_y)
+
+    def calculate_screen_limits(self):
+        screen = self.app.desktop().availableGeometry(self)
+        geo = self.geometry()
+
+        min_x = screen.x() - round(geo.width() / 2)
+        min_y = screen.y() - round(geo.height() / 2)
+        max_x = screen.width() - round(geo.width() / 2)
+        max_y = screen.height() - round(geo.height() / 2)
+
+        x = max(min_x, min(max_x, geo.x()))
+        y = max(min_y, min(max_y, geo.y()))
+
+        return QRect(x, y, geo.width(), geo.height())
+
     def closeEvent(self, QCloseEvent):
         self.dg_close_connection()
         self.control.close()
@@ -691,3 +768,12 @@ class KnechtImageViewer(FileDropWidget):
         self.oldPos = event.globalPos()
 
         self.dg_start_sync()
+
+    @staticmethod
+    def is_inside_limit(limit: QRect, pos: QPoint):
+        if pos.x() > limit.x() or pos.x() < limit.x():
+            return False
+        elif pos.y() > limit.y() or pos.y() < limit.y():
+            return False
+
+        return True
