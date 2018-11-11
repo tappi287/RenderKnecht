@@ -4,7 +4,7 @@ import imageio
 import numpy as np
 from PIL import Image
 from PyQt5 import QtWidgets
-from PyQt5.QtCore import Qt, pyqtSignal, QSize, QThread
+from PyQt5.QtCore import Qt, pyqtSignal, QSize, QThread, QTimer, QPropertyAnimation, QEasingCurve, QAbstractAnimation
 from PyQt5.QtGui import QImage, QPixmap, QKeySequence, QIcon
 from modules.app_globals import Itemstyle
 from modules.knecht_log import init_logging
@@ -33,21 +33,41 @@ class KnechtLoadImage(QThread):
 
 
 def read_to_qpixmap(image_path: Path):
-    """ Read an image using imageio and return as QPixmap """
-    # Read with imageio for format compatibility
-    img = imageio.imread(image_path.as_posix())
+    """ Read an image using imageio/pillow and return as QPixmap """
 
-    # Convert type to numpy array
-    img = np.array(img)
+    if f'{image_path.suffix}'.casefold() in ['.tif', '.tiff', '.png']:
+        # Read Tif/Png with native PIL support
+        pil_im = load_as_pil(image_path)
+    else:
+        # Read anything else with imageio
+        pil_im = load_imageio_2_pil(image_path)
+
+    pixmap = pil_2_pixmap(pil_im)
+    pil_im.close()
+
+    return pixmap
+
+
+def load_as_pil(image_path):
+    return Image.open(image_path.as_posix())
+
+
+def load_imageio_2_pil(image_path: Path):
+    with open(image_path.as_posix(), 'rb') as f:
+        # Read with imageio for format compatibility
+        img = imageio.imread(f)
+
+        # Convert type to numpy array
+        img = np.array(img)
 
     if img.dtype != np.uint8:
         # Convert to integer and rescale to 0 - 255
         # original values are float 0.0 - 1.0
         img = np.uint8(img * 255)
 
-    # Return as PIL Image
     pil_im = Image.fromarray(img)
-    return pil_2_pixmap(pil_im)
+
+    return pil_im
 
 
 def pil_2_pixmap(im):
@@ -148,6 +168,10 @@ class ControllerWidget(FileDropWidget):
     y_margin = 8
     control_height = 88
 
+    anim_timeout = QTimer()
+    anim_timeout.setInterval(10)
+    anim_timeout.setSingleShot(True)
+
     def __init__(self, viewer):
         super(ControllerWidget, self).__init__(
             flags=Qt.FramelessWindowHint |
@@ -161,82 +185,9 @@ class ControllerWidget(FileDropWidget):
         # Window
         self.setWindowTitle(f'{viewer.windowTitle()} - Controller')
         self.setWindowIcon(viewer.windowIcon())
-        self.setStyleSheet("QWidget#not_me { background: rgba(100, 100, 100, 120); border-radius: 5px; }"
-                           "QPushButton, QLineEdit, QComboBox, QLabel, QToolButton {"
-                           "    max-height: 30px; height: 30px; margin: 5px;"
-                           "    background-color: rgb(80, 80, 80); border: 1px solid rgb(50, 50, 50);"
-                           "    border-radius: 5px; color: rgb(210, 210, 210);"
-                           "}"
-                           "QComboBox {"
-                           "    padding: 0 10px;"
-                           "}"
-                           "QLabel#logo_top {"
-                           "    padding: 0; text-align: center; max-height: 39px; max-width: 35px; margin: 0;"
-                           "    height: 39px; width: 35px;"
-                           "    background: none; border: none;"
-                           "}"
-                           "QPushButton#exit_btn, QPushButton#help, QPushButton#min_btn {"
-                           "    width: 30px; height: 26px; margin: 0 0 0 5px;"
-                           "}"
-                           "QLabel#grabber_top {"
-                           "    padding: 0 0 2px 5px; margin: 0; height: 26px; font-weight: bold;"
-                           "}"
-                           "QLabel#grabber {"
-                           "    padding: 0; max-width: 120px; max-height: 30px; margin-left: 0;"
-                           "}"
-                           "QPushButton:pressed {"
-                           "    background-color: rgb(210, 210, 210);"
-                           "}"
-                           "QPushButton#fwd_btn {"
-                           "    min-width: 100px;"
-                           "}"
-                           "QPushButton#bck_btn {"
-                           "    min-width: 100px; margin: 5px 0 5px 5px;"
-                           "}"
-                           "QPushButton#toggle_btn {"
-                           "    min-width: 52px;"
-                           "}"
-                           "QPushButton#toggle_dg_btn {"
-                           "    padding: 0 10px;"
-                           "}"
-                           "QPushButton#toggle_btn {"
-                           "    background-color: rgb(150, 150, 150);"
-                           "}"
-                           "QPushButton#toggle_btn:checked {"
-                           "    background-color: rgb(80, 80, 80);"
-                           "}"
-                           "QPushButton#toggle_dg_btn:checked {"
-                           "    background-color: rgb(150, 150, 150);"
-                           "}"
-                           "QToolButton {"
-                           "    margin: 0 0 0 5px;"
-                           "}"
-                           "QSlider {"
-                           "    min-width: 100px; max-width: 120px; height: 30px; margin-right: 5px;"
-                           "    border-radius: 5px; border: none;"
-                           "}"
-                           "QSlider::groove:horizontal {"
-                           "    border: none; border-radius: 5px;"
-                           "    height: 26px;"
-                           "    background: qlineargradient(x1:0, y1:0, x2:0, y2:1,"
-                           "                stop:0 rgb(120, 120, 120), stop:1 rgb(210, 210, 210));"
-                           "}"
-                           "QSlider::handle:horizontal {"
-                           "    background: rgb(120, 120, 120);"
-                           "    border: 1px solid rgb(50, 50, 50);"
-                           "    width: 18px;"
-                           "    margin: -2px 0;"
-                           "    border-radius: 5px;"
-                           "}"
-                           "QSlider::sub-page:horizontal {"
-                           "    background: qlineargradient(x1: 0, y1: 0,    x2: 0, y2: 1,"
-                           "                stop: 0 rgb(50, 50, 50), stop: 1 rgb(120, 120, 120));"
-                           "    border: none;"
-                           "    border-radius: 5px;"
-                           "}"
-                           "QLineEdit {"
-                           "    margin: 0 5px 0 5px;"
-                           "}")
+        self.setFocusPolicy(Qt.StrongFocus)
+        self.apply_stylesheet()
+        self.animation = AnimateOpacity(self, 200)
 
         self.setAttribute(Qt.WA_TranslucentBackground)
         self.setAttribute(Qt.WA_AcceptDrops, True)
@@ -244,6 +195,8 @@ class ControllerWidget(FileDropWidget):
         self.widget_layout = QtWidgets.QVBoxLayout(self)
         self.widget_layout.setContentsMargins(0, 0, 0, 0)
         self.widget_layout.setSpacing(0)
+
+        self.had_focus = True
 
         # Widget Layout
         self.top_layout = QtWidgets.QHBoxLayout(self)
@@ -253,17 +206,20 @@ class ControllerWidget(FileDropWidget):
         self.exit_btn = QtWidgets.QPushButton(QIcon(QPixmap(Itemstyle.ICON_PATH['close'])), '', self)
         self.exit_btn.pressed.connect(self._close_viewer)
         self.exit_btn.setObjectName('exit_btn')
+        self.exit_btn.setFocusPolicy(Qt.NoFocus)
         self.exit_btn.setFlat(True)
 
         self.min_btn = QtWidgets.QPushButton(QIcon(QPixmap(Itemstyle.ICON_PATH['window_min'])), '', self)
         self.min_btn.setObjectName('min_btn')
+        self.min_btn.setFocusPolicy(Qt.NoFocus)
         self.min_btn.setIconSize(QSize(15, 19))
 
         self.help_btn = QtWidgets.QPushButton(QIcon(QPixmap(Itemstyle.ICON_PATH['window_help'])), '', self)
         self.help_btn.setObjectName('help')
+        self.help_btn.setFocusPolicy(Qt.NoFocus)
         self.help_btn.setIconSize(QSize(15, 19))
 
-        self.grabber_top = QtWidgets.QLabel('Knecht Image Viewer', self)
+        self.grabber_top = QtWidgets.QLabel(f'{self.viewer.windowTitle()}', self)
         self.grabber_top.setObjectName('grabber_top')
         self.grabber_top.setSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Expanding)
 
@@ -295,7 +251,7 @@ class ControllerWidget(FileDropWidget):
         self.widget_layout.addLayout(self.btn_row)
 
         self.slider = QtWidgets.QSlider(Qt.Horizontal, self)
-        self.slider.setFocusPolicy(Qt.StrongFocus)
+        self.slider.setFocusPolicy(Qt.NoFocus)
         self.slider.setObjectName('slider')
         self.slider.setRange(1, 10)
         self.slider.setValue(10)
@@ -304,6 +260,7 @@ class ControllerWidget(FileDropWidget):
         self.btn_row.addWidget(self.slider)
 
         self.size_box = QtWidgets.QComboBox(self)
+        self.size_box.setFocusPolicy(Qt.ClickFocus)
         min = round(viewer.MIN_SIZE_FACTOR * 100)
         max = round((viewer.MAX_SIZE_FACTOR + viewer.SIZE_INCREMENT) * 100)
         step = round(viewer.SIZE_INCREMENT * 100)
@@ -316,6 +273,7 @@ class ControllerWidget(FileDropWidget):
             QIcon(QPixmap(Itemstyle.ICON_PATH['compare'])), 'Sync DeltaGen Viewer', self)
         self.toggle_dg_btn.setObjectName('toggle_dg_btn')
         self.toggle_dg_btn.setFlat(True)
+        self.toggle_dg_btn.setFocusPolicy(Qt.NoFocus)
         self.toggle_dg_btn.setCheckable(True)
         self.toggle_dg_btn.setChecked(False)
         self.btn_row.addWidget(self.toggle_dg_btn)
@@ -326,17 +284,20 @@ class ControllerWidget(FileDropWidget):
         self.toggle_btn = QtWidgets.QPushButton(toggle_icon, '', self)
         self.toggle_btn.setObjectName('toggle_btn')
         self.toggle_btn.setFlat(True)
+        self.toggle_btn.setFocusPolicy(Qt.NoFocus)  # Avoid keyboard focus, space would fire event and click
         self.toggle_btn.setCheckable(True)
         self.toggle_btn.setChecked(True)
         self.btn_row.addWidget(self.toggle_btn)
 
         self.bck_btn = QtWidgets.QPushButton(QIcon(), '<<', self)
         self.bck_btn.setObjectName('fwd_btn')
+        self.bck_btn.setFocusPolicy(Qt.NoFocus)
         self.bck_btn.setFlat(True)
         self.btn_row.addWidget(self.bck_btn)
 
         self.fwd_btn = QtWidgets.QPushButton(QIcon(), '>>', self)
         self.fwd_btn.setObjectName('bck_btn')
+        self.fwd_btn.setFocusPolicy(Qt.NoFocus)
         self.fwd_btn.setFlat(True)
         self.btn_row.addWidget(self.fwd_btn)
 
@@ -345,8 +306,11 @@ class ControllerWidget(FileDropWidget):
         self.grabber.setObjectName('grabber')
         self.grabber.setSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Expanding)
         self.path_row.addWidget(self.grabber)
-        self.line_edit = QtWidgets.QLineEdit('Bildpfad', self)
+        self.line_edit = QtWidgets.QLineEdit('', self)
+        self.line_edit.setFocusPolicy(Qt.ClickFocus)
+        self.line_edit.setPlaceholderText('...Dateien/Ordner in das Fenster ziehen oder hier Pfad einfügen...')
         self.path_btn = QtWidgets.QToolButton(self)
+        self.path_btn.setFocusPolicy(Qt.NoFocus)
         self.path_btn.setObjectName('path_btn')
         self.path_btn.setText('...')
 
@@ -362,6 +326,34 @@ class ControllerWidget(FileDropWidget):
         # Allow window dragging with mouse press
         self.mouseMoveEvent = self.viewer.mouseMoveEvent
         self.mousePressEvent = self.viewer.mousePressEvent
+
+        # Indicate focus change
+        self.viewer.focusInEvent = self.focusInEvent
+        self.viewer.focusOutEvent = self.focusOutEvent
+        self.anim_timeout.timeout.connect(self.focus_animation)
+
+    def focusOutEvent(self, event):
+        if event.lostFocus():
+            # LOGGER.debug('Focus Out Event: %s', self.widgets_with_focus())
+            if True not in self.widgets_with_focus():
+                self.anim_timeout.start()
+
+    def focusInEvent(self, event):
+        if event.gotFocus():
+            # LOGGER.debug('Focus In Event: %s', self.widgets_with_focus())
+            if True in self.widgets_with_focus():
+                self.anim_timeout.start()
+
+    def focus_animation(self):
+        if True not in self.widgets_with_focus():
+            self.animation.fade_out()
+            return
+
+        if True in self.widgets_with_focus():
+            self.animation.fade_in()
+
+    def widgets_with_focus(self):
+        return self.hasFocus(), self.viewer.hasFocus(), self.line_edit.hasFocus(), self.size_box.hasFocus()
 
     def _viewer_move_wrapper(self, event):
         self.org_viewer_move_event(event)
@@ -387,3 +379,115 @@ class ControllerWidget(FileDropWidget):
     def _close_viewer(self):
         self.close()
         self.viewer.close()
+
+    def apply_stylesheet(self):
+        self.setStyleSheet('QPushButton, QLineEdit, QComboBox, QLabel, QToolButton {'
+                           '    max-height: 30px; height: 30px; margin: 5px;'
+                           '    border: 1px solid rgb(50, 50, 50); background: rgb(80, 80, 80);'
+                           '    border-radius: 5px; color: rgb(210, 210, 210);'
+                           '}'
+                           'QComboBox {'
+                           '    padding: 0 10px;'
+                           '}'
+                           'QLabel#logo_top {'
+                           '    padding: 0; text-align: center; max-height: 39px; max-width: 35px; margin: 0;'
+                           '    height: 39px; width: 35px;'
+                           '    background: none; border: none;'
+                           '}'
+                           'QPushButton#exit_btn, QPushButton#help, QPushButton#min_btn {'
+                           '    width: 30px; height: 26px; margin: 0 0 0 5px;'
+                           '}'
+                           'QLabel#grabber_top {'
+                           '    padding: 0 0 2px 5px; margin: 0; height: 26px; font-weight: bold;'
+                           '}'
+                           'QLabel#grabber {'
+                           '    padding: 0; max-width: 120px; max-height: 30px; margin-left: 0;'
+                           '}'
+                           'QPushButton:pressed {'
+                           '    background-color: rgb(210, 210, 210);'
+                           '}'
+                           'QPushButton#fwd_btn {'
+                           '    min-width: 100px;'
+                           '}'
+                           'QPushButton#bck_btn {'
+                           '    min-width: 100px; margin: 5px 0 5px 5px;'
+                           '}'
+                           'QPushButton#toggle_btn {'
+                           '    min-width: 52px;'
+                           '}'
+                           'QPushButton#toggle_dg_btn {'
+                           '    padding: 0 10px;'
+                           '}'
+                           'QPushButton#toggle_btn {'
+                           '    background-color: rgb(150, 150, 150);'
+                           '}'
+                           'QPushButton#toggle_btn:checked {'
+                           '    background-color: rgb(80, 80, 80);'
+                           '}'
+                           'QPushButton#toggle_dg_btn:checked {'
+                           '    background-color: rgb(150, 150, 150);'
+                           '}'
+                           'QToolButton {'
+                           '    margin: 0 0 0 5px;'
+                           '}'
+                           'QSlider {'
+                           '    min-width: 100px; max-width: 120px; height: 30px; margin-right: 5px;'
+                           '    border-radius: 5px; border: none;'
+                           '}'
+                           'QSlider::groove:horizontal {'
+                           '    border: none; border-radius: 5px;'
+                           '    height: 26px;'
+                           '    background: qlineargradient(x1:0, y1:0, x2:0, y2:1,'
+                           '                stop:0 rgb(120, 120, 120), stop:1 rgb(210, 210, 210));'
+                           '}'
+                           'QSlider::handle:horizontal {'
+                           '    background: rgb(120, 120, 120);'
+                           '    border: 1px solid rgb(50, 50, 50);'
+                           '    width: 18px;'
+                           '    margin: -2px 0;'
+                           '    border-radius: 5px;'
+                           '}'
+                           'QSlider::sub-page:horizontal {'
+                           '    background: qlineargradient(x1: 0, y1: 0,    x2: 0, y2: 1,'
+                           '                stop: 0 rgb(50, 50, 50), stop: 1 rgb(120, 120, 120));'
+                           '    border: none;'
+                           '    border-radius: 5px;'
+                           '}'
+                           'QLineEdit {'
+                           '    margin: 0 5px 0 5px;'
+                           '}')
+
+
+class AnimateOpacity:
+    def __init__(self, widget: ControllerWidget, duration):
+        self.widget = widget
+        self.duration = duration
+        self.animation = QPropertyAnimation(self.widget, b"windowOpacity")
+        self.setup_animation()
+
+    def setup_animation(self, start_value: float=0.0, end_value: float=1.0, duration: int=0):
+        if not duration:
+            duration = self.duration
+
+        self.animation.setDuration(duration)
+        self.animation.setKeyValueAt(0.0, start_value)
+        self.animation.setKeyValueAt(1.0, end_value)
+        self.animation.setEasingCurve(QEasingCurve.OutCubic)
+
+    def fade_in(self, duration: int=0):
+        if self.widget.windowOpacity() >= 1.0:
+            return
+
+        self.setup_animation(0.55, 1.0, duration)
+        self.play()
+
+    def fade_out(self, duration: int=0):
+        if self.widget.windowOpacity() <= 0.55:
+            return
+
+        self.setup_animation(1.0, 0.55, duration)
+        self.play()
+
+    def play(self):
+        if self.animation.state() != QAbstractAnimation.Running:
+            self.animation.start()

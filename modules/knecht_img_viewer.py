@@ -1,13 +1,12 @@
 from pathlib import Path
 
 from PyQt5 import QtWidgets
-from PyQt5.QtCore import Qt, QPoint, QTimer, QSize, QRect, QEvent, QThread, pyqtSignal
+from PyQt5.QtCore import Qt, QPoint, QTimer, QSize, QRect, QEvent, pyqtSignal
 from PyQt5.QtGui import QIcon, QPixmap
 
 from modules.app_globals import Itemstyle, TCP_IP, TCP_PORT
 from modules.gui_set_path import SetDirectoryPath
-from modules.knecht_img_viewer_control import read_to_qpixmap, ViewerShortcuts, FileDropWidget, ControllerWidget, \
-    KnechtLoadImage
+from modules.knecht_img_viewer_control import ViewerShortcuts, FileDropWidget, ControllerWidget, KnechtLoadImage, AnimateOpacity
 from modules.knecht_log import init_logging
 from modules.knecht_socket import Ncat
 from modules.tree_overlay import InfoOverlay
@@ -63,6 +62,9 @@ class KnechtImageViewer(FileDropWidget):
         self.setAttribute(Qt.WA_AcceptDrops, True)
         self.setWindowTitle('Image Viewer')
         self.setStyleSheet("QWidget{background-color: darkgray;}")
+        self.setFocusPolicy(Qt.StrongFocus)
+
+        self.animation = AnimateOpacity(self, 200)
 
         # Dg
         self.sync_dg = False
@@ -138,9 +140,14 @@ class KnechtImageViewer(FileDropWidget):
     def changeEvent(self, event):
         if event.type() == QEvent.WindowStateChange:
             if event.oldState() and Qt.WindowMinimized:
-                self.control.showNormal()
+                self.restore()
             elif event.oldState() == Qt.WindowNoState:
                 LOGGER.debug('Image Viewer minimized.')
+
+    def restore(self):
+        self.showNormal()
+        self.control.showNormal()
+        self.activateWindow()  # Gain window focus
 
     def minimize(self):
         self.showMinimized()
@@ -165,6 +172,10 @@ class KnechtImageViewer(FileDropWidget):
         self.img_canvas.setPixmap(self.current_img)
         self.img_size = self.current_img.size()
         self.img_size_factor = 1.0
+
+        self.control.line_edit.setText('')
+        self.control.grabber_top.setText(self.windowTitle())
+
         self.change_viewer_size()
 
     # ------ DeltaGen Sync -------
@@ -219,7 +230,8 @@ class KnechtImageViewer(FileDropWidget):
 
     # ------ IMAGES -------
     def path_dropped(self, file_url):
-        self.set_img_path(Path(file_url))
+        self.path_dlg.set_path(Path(file_url))
+        self.restore()  # Gain window focus on file drop
 
     def set_img_path(self, file_path: Path):
         if file_path.is_file():
@@ -355,6 +367,7 @@ class KnechtImageViewer(FileDropWidget):
                              f'{self.img_size.width()}x{self.img_size.height()}px'
                              f'</span>', 1200, immediate=True)
         self.img_loader = None
+        self.control.grabber_top.setText(f'{self.windowTitle()} - {img_path.name}')
         self.load_timeout.stop()
 
     # ------ RESIZE -------
@@ -443,6 +456,11 @@ class KnechtImageViewer(FileDropWidget):
         self.show()
         self.display_shortcut_overlay()
 
+        self.control.animation.setup_animation(duration=800)
+        self.control.animation.play()
+        self.animation.setup_animation(duration=800)
+        self.animation.play()
+
     # ------ OVERRIDES -------
     def moveEvent(self, event):
         limit = self.calculate_screen_limits()
@@ -473,15 +491,13 @@ class KnechtImageViewer(FileDropWidget):
             self.place_in_screen_center()
 
     def place_in_screen_center(self):
-        # screen = self.app.desktop().availableGeometry(self)
-        screen = QRect(0, 0, 2560, 1440)
+        screen = self.app.desktop().availableGeometry(self)
         center_x = screen.center().x() - round(self.geometry().width() / 2)
         center_y = screen.center().y() - round(self.geometry().height() / 2)
         self.move(center_x, center_y)
 
     def calculate_screen_limits(self):
-        # screen = self.app.desktop().availableGeometry(self)
-        screen = QRect(0, 0, 2560, 1440)
+        screen = self.app.desktop().availableGeometry(self)
         geo = self.geometry()
 
         min_x = screen.x() - round(geo.width() / 2)
