@@ -190,13 +190,18 @@ class MenuBar(QtCore.QObject):
             self.png_convert = PngConvertThread(self.ui, self.ui.actionPNG_Konverter, img_list)
             self.png_convert.create_thread()
 
-    def start_image_viewer(self):
+    def start_image_viewer(self, dropped_file=None):
         if not self.img_viewer:
             self.img_viewer = KnechtImageViewer(self.app, self.ui)
 
+        if dropped_file:
+            self.img_viewer.path_dropped(dropped_file)
+            if not self.img_viewer.isHidden():
+                return
+
         if self.img_viewer.isHidden():
             self.img_viewer.show_all()
-        else:
+        elif not dropped_file:
             self.img_viewer.close()
 
     def set_render_path_text(self):

@@ -1,5 +1,7 @@
 <RCC>
   <qresource prefix="main">
+    <file>window_help.png</file>
+    <file>window_min.png</file>
     <file>img_viewer_bg.png</file>
     <file>compare.png</file>
     <file>dog.png</file>

@@ -19,12 +19,15 @@ Copyright (C) 2017 Stefan Tapper, All rights reserved.
     along with RenderKnecht Strink Kerker.  If not, see <http://www.gnu.org/licenses/>.
 
 """
-from PyQt5.QtWidgets import QTreeWidget, QApplication
+from pathlib import Path
+
+from PyQt5.QtWidgets import QTreeWidget
 from PyQt5.QtWidgets import QTreeWidgetItem
 from PyQt5 import QtCore
 
+from modules.knecht_img_viewer import KnechtImageViewer
 from modules.knecht_log import init_logging
-from modules.app_globals import ItemColumn, Msg
+from modules.app_globals import ItemColumn
 from modules.tree_methods import add_selected_childs_as_top_level, add_top_level_item
 from modules.tree_methods import get_column_values, AddRemoveItemsCommand, swap_item_order, re_order_items
 from modules.tree_methods import update_tree_ids, VAR_LEVEL_ITEM_FLAGS, object_is_tree_widget
@@ -143,6 +146,10 @@ class WidgetToWidgetDrop(QtCore.QObject):
             src = event.source()
             LOGGER.debug('Widget to Widget Drop_event')
 
+            mime = event.mimeData()
+            if self.file_drop(mime):
+                return True
+
             # Drop to destination
             if obj is self.ui_tree_widget_dest:
                 event.setDropAction(QtCore.Qt.CopyAction)
@@ -228,6 +235,22 @@ class WidgetToWidgetDrop(QtCore.QObject):
             if object_is_tree_widget(dest):
                 self.first_drop = False
                 tree_setup_header_format(dest)
+
+    def file_drop(self, mime):
+        if not mime.hasUrls():
+            return False
+
+        if not mime.urls()[0].isLocalFile():
+            return False
+
+        file_url = mime.urls()[0].toLocalFile()
+
+        if Path(file_url).suffix.casefold() in KnechtImageViewer.FILE_TYPES:
+            # Start image viewer
+            self.ui.app_class.menu.start_image_viewer(file_url)
+            return True
+
+        return False
 
 
 class InternalDragDrop(QtCore.QObject):
