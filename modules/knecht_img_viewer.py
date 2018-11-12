@@ -459,6 +459,8 @@ class KnechtImageViewer(FileDropWidget):
         self.control.animation.setup_animation(duration=800)
         self.control.animation.play()
         self.animation.setup_animation(duration=800)
+        self.current_opacity = 1.0
+        self.control.slider.setValue(self.control.slider.maximum())
         self.animation.play()
 
     # ------ OVERRIDES -------

@@ -164,9 +164,8 @@ class FileDropWidget(QtWidgets.QWidget):
 
 class ControllerWidget(FileDropWidget):
     logo_row_height = 35
-    logo_margin = 4
-    y_margin = 8
-    control_height = 88
+    logo_margin = 5
+    control_height = 83
 
     anim_timeout = QTimer()
     anim_timeout.setInterval(10)
@@ -187,7 +186,7 @@ class ControllerWidget(FileDropWidget):
         self.setWindowIcon(viewer.windowIcon())
         self.setFocusPolicy(Qt.StrongFocus)
         self.apply_stylesheet()
-        self.animation = AnimateOpacity(self, 200)
+        self.animation = AnimateOpacity(self, 450)
 
         self.setAttribute(Qt.WA_TranslucentBackground)
         self.setAttribute(Qt.WA_AcceptDrops, True)
@@ -383,7 +382,7 @@ class ControllerWidget(FileDropWidget):
     def apply_stylesheet(self):
         self.setStyleSheet('QPushButton, QLineEdit, QComboBox, QLabel, QToolButton {'
                            '    max-height: 30px; height: 30px; margin: 5px;'
-                           '    border: 1px solid rgb(50, 50, 50); background: rgb(80, 80, 80);'
+                           '    border: none; background: rgb(80, 80, 80);'
                            '    border-radius: 5px; color: rgb(210, 210, 210);'
                            '}'
                            'QComboBox {'
