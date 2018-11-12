@@ -37,6 +37,7 @@ class KnechtImageViewer(FileDropWidget):
     load_timeout.setSingleShot(True)
 
     DEFAULT_SIZE = (800, 450)
+    MARGIN = 400
 
     MAX_SIZE = QSize(4096, 4096)
 
@@ -468,7 +469,7 @@ class KnechtImageViewer(FileDropWidget):
         limit = self.calculate_screen_limits()
 
         if not self.is_inside_limit(limit, event.pos()):
-            self.move(limit.x(), limit.y())
+            self.limit_movement(limit)
             event.ignore()
             return
 
@@ -479,11 +480,17 @@ class KnechtImageViewer(FileDropWidget):
         pos = self.geometry().topLeft()
 
         if not self.is_inside_limit(limit, pos):
-            self.move(limit.x(), limit.y())
+            self.limit_movement(limit)
             event.ignore()
             return
 
         event.accept()
+
+    def limit_movement(self, limit):
+        x = min(limit.x(), max(limit.width(), self.geometry().x()))
+        y = min(limit.y(), max(limit.height(), self.geometry().y()))
+
+        self.move(x, y)
 
     def place_inside_screen(self):
         limit = self.calculate_screen_limits()
@@ -502,15 +509,17 @@ class KnechtImageViewer(FileDropWidget):
         screen = self.app.desktop().availableGeometry(self)
         geo = self.geometry()
 
-        min_x = screen.x() - round(geo.width() / 2)
-        min_y = screen.y() - round(geo.height() / 2)
-        max_x = screen.width() - round(geo.width() / 2)
-        max_y = screen.height() - round(geo.height() / 2)
+        width_margin = round(geo.width() / 2)
+        height_margin = round(geo.height() / 2)
 
-        x = max(min_x, min(max_x, geo.x()))
-        y = max(min_y, min(max_y, geo.y()))
+        min_x = screen.x() - width_margin
+        min_y = screen.y() - height_margin
+        max_x = screen.width() - width_margin
+        max_y = screen.height() - height_margin
 
-        return QRect(x, y, geo.width(), geo.height())
+        LOGGER.debug('MinX %s MinY %s MaxX %s MaxY %s', min_x, min_y, max_x, max_y)
+
+        return QRect(min_x, min_y, max_x, max_y)
 
     def closeEvent(self, QCloseEvent):
         self.dg_close_connection()
@@ -530,9 +539,9 @@ class KnechtImageViewer(FileDropWidget):
 
     @staticmethod
     def is_inside_limit(limit: QRect, pos: QPoint):
-        if pos.x() > limit.x() or pos.x() < limit.x():
+        if pos.x() < limit.x() or pos.x() > limit.width():
             return False
-        elif pos.y() > limit.y() or pos.y() < limit.y():
+        elif pos.y() < limit.y() or pos.y() > limit.height():
             return False
 
         return True
