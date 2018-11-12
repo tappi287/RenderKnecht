@@ -203,7 +203,7 @@ class ControllerWidget(FileDropWidget):
         self.top_layout.setSpacing(0)
 
         self.exit_btn = QtWidgets.QPushButton(QIcon(QPixmap(Itemstyle.ICON_PATH['close'])), '', self)
-        self.exit_btn.pressed.connect(self._close_viewer)
+        self.exit_btn.released.connect(self._close_viewer)
         self.exit_btn.setObjectName('exit_btn')
         self.exit_btn.setFocusPolicy(Qt.NoFocus)
         self.exit_btn.setFlat(True)

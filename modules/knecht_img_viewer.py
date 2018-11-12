@@ -466,31 +466,30 @@ class KnechtImageViewer(FileDropWidget):
 
     # ------ OVERRIDES -------
     def moveEvent(self, event):
-        limit = self.calculate_screen_limits()
-
-        if not self.is_inside_limit(limit, event.pos()):
-            self.limit_movement(limit)
+        if self.moved_out_of_limit():
             event.ignore()
             return
 
         event.accept()
 
     def resizeEvent(self, event):
-        limit = self.calculate_screen_limits()
-        pos = self.geometry().topLeft()
-
-        if not self.is_inside_limit(limit, pos):
-            self.limit_movement(limit)
+        if self.moved_out_of_limit():
             event.ignore()
             return
 
         event.accept()
 
-    def limit_movement(self, limit):
-        x = min(limit.x(), max(limit.width(), self.geometry().x()))
-        y = min(limit.y(), max(limit.height(), self.geometry().y()))
+    def moved_out_of_limit(self):
+        limit = self.calculate_screen_limits()
+        pos = self.geometry().topLeft()
 
-        self.move(x, y)
+        if not self.is_inside_limit(limit, pos):
+            x = min(limit.width(), max(limit.x(), self.geometry().x()))
+            y = min(limit.height(), max(limit.y(), self.geometry().y()))
+            self.move(x, y)
+            return True
+
+        return False
 
     def place_inside_screen(self):
         limit = self.calculate_screen_limits()
@@ -501,24 +500,25 @@ class KnechtImageViewer(FileDropWidget):
 
     def place_in_screen_center(self):
         screen = self.app.desktop().availableGeometry(self)
-        center_x = screen.center().x() - round(self.geometry().width() / 2)
-        center_y = screen.center().y() - round(self.geometry().height() / 2)
+
+        center_x = screen.center().x() - self.geometry().width() / 2
+        center_y = screen.center().y() - self.geometry().height() / 2
+
         self.move(center_x, center_y)
 
     def calculate_screen_limits(self):
-        screen = self.app.desktop().availableGeometry(self)
-        geo = self.geometry()
+        screen = QRect(self.app.desktop().x(), self.app.desktop().y(),
+                       self.app.desktop().width(), self.app.desktop().availableGeometry().height())
 
-        width_margin = round(geo.width() / 2)
-        height_margin = round(geo.height() / 2)
+        width_margin = self.geometry().width() / 2
+        height_margin = self.geometry().height() / 2
 
         min_x = screen.x() - width_margin
         min_y = screen.y() - height_margin
         max_x = screen.width() - width_margin
         max_y = screen.height() - height_margin
 
-        LOGGER.debug('MinX %s MinY %s MaxX %s MaxY %s', min_x, min_y, max_x, max_y)
-
+        # LOGGER.debug('MinX %s MinY %s MaxX %s MaxY %s', min_x, min_y, max_x, max_y)
         return QRect(min_x, min_y, max_x, max_y)
 
     def closeEvent(self, QCloseEvent):
