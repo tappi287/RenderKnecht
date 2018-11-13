@@ -57,6 +57,7 @@ class KnechtImageViewer(FileDropWidget):
         LOGGER = init_logging(__name__)
 
         self.app, self.ui = app, ui
+
         self.setWindowIcon(QIcon(QPixmap(self.ICON)))
         self.setAutoFillBackground(True)
         self.setAttribute(Qt.WA_TranslucentBackground)
@@ -484,8 +485,8 @@ class KnechtImageViewer(FileDropWidget):
         pos = self.geometry().topLeft()
 
         if not self.is_inside_limit(limit, pos):
-            x = min(limit.width(), max(limit.x(), self.geometry().x()))
-            y = min(limit.height(), max(limit.y(), self.geometry().y()))
+            x = min(limit.width(), max(limit.x(), pos.x()))
+            y = min(limit.height(), max(limit.y(), pos.y()))
             self.move(x, y)
             return True
 
@@ -513,12 +514,14 @@ class KnechtImageViewer(FileDropWidget):
         width_margin = self.geometry().width() / 2
         height_margin = self.geometry().height() / 2
 
+        # Case where secondary screen has negative values
+        desktop_width = screen.x() + screen.width()
+
         min_x = screen.x() - width_margin
         min_y = screen.y() - height_margin
-        max_x = screen.width() - width_margin
+        max_x = desktop_width - width_margin
         max_y = screen.height() - height_margin
 
-        # LOGGER.debug('MinX %s MinY %s MaxX %s MaxY %s', min_x, min_y, max_x, max_y)
         return QRect(min_x, min_y, max_x, max_y)
 
     def closeEvent(self, QCloseEvent):
