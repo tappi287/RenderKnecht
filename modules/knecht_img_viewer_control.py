@@ -4,10 +4,11 @@ import imageio
 import numpy as np
 from PIL import Image
 from PyQt5 import QtWidgets
-from PyQt5.QtCore import Qt, pyqtSignal, QSize, QThread, QTimer, QPropertyAnimation, QEasingCurve, QAbstractAnimation
+from PyQt5.QtCore import Qt, pyqtSignal, QSize, QThread, QTimer
 from PyQt5.QtCore import QEvent
 from PyQt5.QtGui import QImage, QPixmap, QKeySequence, QIcon
 from modules.app_globals import Itemstyle
+from modules.knecht_animation import AnimateWindowOpacity, BgrAnimationGroup
 from modules.knecht_log import init_logging
 
 LOGGER = init_logging(__name__)
@@ -187,7 +188,8 @@ class ControllerWidget(FileDropWidget):
         self.setWindowIcon(viewer.windowIcon())
         self.setFocusPolicy(Qt.StrongFocus)
         self.apply_stylesheet()
-        self.animation = AnimateOpacity(self, 450)
+        self.animation = AnimateWindowOpacity(self, 450)
+        self.btn_anim = BgrAnimationGroup((80, 80, 80), (150, 150, 150), 250)
 
         self.setAttribute(Qt.WA_TranslucentBackground)
         self.setAttribute(Qt.WA_AcceptDrops, True)
@@ -222,6 +224,7 @@ class ControllerWidget(FileDropWidget):
         self.grabber_top = QtWidgets.QLabel(f'{self.viewer.windowTitle()}', self)
         self.grabber_top.setObjectName('grabber_top')
         self.grabber_top.setSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Expanding)
+        self.btn_anim.add_widget(self.grabber_top)
 
         self.logo_top = QtWidgets.QLabel('', self)
         self.logo_top.setPixmap(QPixmap(Itemstyle.ICON_PATH['compare']))
@@ -358,11 +361,13 @@ class ControllerWidget(FileDropWidget):
 
     def focus_animation(self):
         if True not in self.widgets_with_focus():
-            self.animation.fade_out()
+            # self.animation.fade_out()
+            self.btn_anim.fade_end()
             return
 
         if True in self.widgets_with_focus():
-            self.animation.fade_in()
+            # self.animation.fade_in()
+            self.btn_anim.fade_start()
 
     def widgets_with_focus(self):
         return self.hasFocus(), self.viewer.hasFocus(), self.line_edit.hasFocus(), self.size_box.hasFocus()
@@ -468,38 +473,3 @@ class ControllerWidget(FileDropWidget):
                            'QLineEdit {'
                            '    margin: 0 5px 0 5px;'
                            '}')
-
-
-class AnimateOpacity:
-    def __init__(self, widget: ControllerWidget, duration):
-        self.widget = widget
-        self.duration = duration
-        self.animation = QPropertyAnimation(self.widget, b"windowOpacity")
-        self.setup_animation()
-
-    def setup_animation(self, start_value: float=0.0, end_value: float=1.0, duration: int=0):
-        if not duration:
-            duration = self.duration
-
-        self.animation.setDuration(duration)
-        self.animation.setKeyValueAt(0.0, start_value)
-        self.animation.setKeyValueAt(1.0, end_value)
-        self.animation.setEasingCurve(QEasingCurve.OutCubic)
-
-    def fade_in(self, duration: int=0):
-        if self.widget.windowOpacity() >= 1.0:
-            return
-
-        self.setup_animation(0.55, 1.0, duration)
-        self.play()
-
-    def fade_out(self, duration: int=0):
-        if self.widget.windowOpacity() <= 0.55:
-            return
-
-        self.setup_animation(1.0, 0.55, duration)
-        self.play()
-
-    def play(self):
-        if self.animation.state() != QAbstractAnimation.Running:
-            self.animation.start()

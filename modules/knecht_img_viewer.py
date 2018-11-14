@@ -6,7 +6,8 @@ from PyQt5.QtGui import QIcon, QPixmap
 
 from modules.app_globals import Itemstyle, TCP_IP, TCP_PORT
 from modules.gui_set_path import SetDirectoryPath
-from modules.knecht_img_viewer_control import ViewerShortcuts, FileDropWidget, ControllerWidget, KnechtLoadImage, AnimateOpacity
+from modules.knecht_img_viewer_control import ViewerShortcuts, FileDropWidget, ControllerWidget, KnechtLoadImage
+from modules.knecht_animation import AnimateWindowOpacity
 from modules.knecht_log import init_logging
 from modules.knecht_socket import Ncat
 from modules.tree_overlay import InfoOverlay
@@ -66,7 +67,7 @@ class KnechtImageViewer(FileDropWidget):
         self.setStyleSheet("QWidget{background-color: darkgray;}")
         self.setFocusPolicy(Qt.StrongFocus)
 
-        self.animation = AnimateOpacity(self, 200)
+        self.animation = AnimateWindowOpacity(self, 200)
 
         # Dg
         self.sync_dg = False

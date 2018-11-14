@@ -35,7 +35,8 @@ from modules.knecht_log import init_logging
 from modules.app_globals import UI_FILE_PRESET_WIZARD, PACKAGE_FILTER
 from modules.app_globals import Itemstyle, HELPER_DIR
 from modules.tree_overlay import Overlay
-from modules.tree_filter_thread import TreeFilterThread, BgrAnimation
+from modules.tree_filter_thread import TreeFilterThread
+from modules.knecht_animation import BgrAnimation
 from modules.knecht_xml import XML
 from modules.gui_widgets import load_ui_file
 from modules.app_strings import QobMsg

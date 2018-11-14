@@ -20,13 +20,11 @@ Copyright (C) 2017 Stefan Tapper, All rights reserved.
 
 """
 import re
-import time
 from PyQt5 import QtCore, QtWidgets
-from PyQt5.QtGui import QColor, QPalette
 
+from modules.knecht_animation import BgrAnimation
 from modules.knecht_log import init_logging
 from modules.app_globals import ItemColumn
-from modules.tree_methods import iterate_item_childs
 
 LOGGER = init_logging(__name__)
 
@@ -324,65 +322,3 @@ class tree_worker_thread(QtCore.QObject):
         self.item_idx.emit(index, widget, hide, expand)
 
 
-class BgrAnimation(QtCore.QObject):
-
-    def __init__(self, parent, bg_color: tuple=None):
-        super(BgrAnimation, self).__init__(parent)
-        self.parent = parent
-        self._color = QColor()
-
-        self.bg_color = self.parent.palette().color(QPalette.Background)
-
-        if bg_color:
-            self.bg_color = QColor(*bg_color)
-
-        self.color_anim = QtCore.QPropertyAnimation(self, b'backColor')
-        self.color_anim.setEasingCurve(QtCore.QEasingCurve.InOutSine)
-        self.setup_blink()
-
-        self.pulsate_anim = QtCore.QPropertyAnimation(self, b'backColor')
-        self.pulsate_anim.setEasingCurve(QtCore.QEasingCurve.InOutQuint)
-        self.setup_pulsate()
-
-    def setup_blink(self, anim_color: tuple=(26, 118, 255)):
-        start_color = self.bg_color
-        anim_color = QColor(*anim_color)
-
-        self.color_anim.setStartValue(start_color)
-        self.color_anim.setKeyValueAt(0.5, anim_color)
-        self.color_anim.setEndValue(start_color)
-
-        self.color_anim.setDuration(600)
-
-    def blink(self, num: int=1):
-        self.pulsate_anim.stop()
-        self.color_anim.setLoopCount(num)
-        self.color_anim.start()
-
-    def setup_pulsate(self, anim_color: tuple=(255, 80, 50)):
-        start_color = self.bg_color
-        anim_color = QColor(*anim_color)
-
-        self.pulsate_anim.setStartValue(start_color)
-        self.pulsate_anim.setKeyValueAt(0.5, anim_color)
-        self.pulsate_anim.setEndValue(start_color)
-
-        self.pulsate_anim.setDuration(4000)
-
-    def active_pulsate(self, num: int=-1):
-        self.pulsate_anim.setLoopCount(num)
-        self.pulsate_anim.start()
-
-    def get_back_color(self):
-        return self._color
-
-    def set_back_color(self, color):
-        self._color = color
-
-        qss_color = f'rgb({color.red()}, {color.green()}, {color.blue()})'
-        try:
-            self.parent.setStyleSheet('background-color: ' + qss_color + ';')
-        except AttributeError as e:
-            LOGGER.debug('Error setting widget background color: %s', e)
-
-    backColor = QtCore.pyqtProperty(QColor, get_back_color, set_back_color)

@@ -30,6 +30,7 @@ from datetime import datetime, timedelta
 from functools import partial
 
 from modules.gui_set_path import SetDirectoryPath
+from modules.knecht_animation import AnimatedButton
 from modules.tree_overlay import InfoOverlay, Overlay
 from modules.tree_context_menus import JobManagerContextMenu
 from modules.knecht_threads import GetPfadAeffchenService
@@ -619,46 +620,6 @@ class PathRenderService(QtCore.QObject):
     def open_help():
         link = QtCore.QUrl(Msg.APP_PATH_HELP_LINK)
         QDesktopServices.openUrl(link)
-
-
-class AnimatedButton:
-    def __init__(self, btn, duration):
-        self.btn = btn
-        self.duration = duration
-
-        self.animation = QtCore.QPropertyAnimation(self.btn, b"iconSize")
-
-        self.setup_animation()
-
-    def setup_animation(self):
-        size = self.btn.iconSize()
-        start_value = QtCore.QSize(round(size.width() * 0.2), round(size.height() * 0.2))
-        end_value = size
-
-        self.animation.setDuration(self.duration)
-        self.animation.setKeyValueAt(0.0, end_value)
-        self.animation.setKeyValueAt(0.5, start_value)
-        self.animation.setKeyValueAt(1.0, end_value)
-        self.animation.setEasingCurve(QtCore.QEasingCurve.OutElastic)
-
-    def play_highlight(self):
-        self.animation.setDuration(self.duration)
-        self.animation.setEasingCurve(QtCore.QEasingCurve.OutElastic)
-        self.play()
-
-    def play_on(self):
-        self.animation.setDuration(round(self.duration * 0.3))
-        self.animation.setEasingCurve(QtCore.QEasingCurve.InCirc)
-        self.play()
-
-    def play_off(self):
-        self.animation.setDuration(round(self.duration * 0.3))
-        self.animation.setEasingCurve(QtCore.QEasingCurve.OutCirc)
-        self.play()
-
-    def play(self, event=None):
-        if self.animation.state() != QtCore.QAbstractAnimation.Running:
-            self.animation.start()
 
 
 class SocketSendMessage(QtCore.QThread):
