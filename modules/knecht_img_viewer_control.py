@@ -5,6 +5,7 @@ import numpy as np
 from PIL import Image
 from PyQt5 import QtWidgets
 from PyQt5.QtCore import Qt, pyqtSignal, QSize, QThread, QTimer, QPropertyAnimation, QEasingCurve, QAbstractAnimation
+from PyQt5.QtCore import QEvent
 from PyQt5.QtGui import QImage, QPixmap, QKeySequence, QIcon
 from modules.app_globals import Itemstyle
 from modules.knecht_log import init_logging
@@ -330,6 +331,18 @@ class ControllerWidget(FileDropWidget):
         self.viewer.focusInEvent = self.focusInEvent
         self.viewer.focusOutEvent = self.focusOutEvent
         self.anim_timeout.timeout.connect(self.focus_animation)
+
+    def changeEvent(self, event):
+        if event.type() == QEvent.WindowStateChange:
+            if event.oldState() and Qt.WindowMinimized:
+                self.restore()
+            elif event.oldState() == Qt.WindowNoState:
+                LOGGER.debug('Image Viewer minimized.')
+
+    def restore(self):
+        self.showNormal()
+        self.viewer.showNormal()
+        self.viewer.activateWindow()
 
     def focusOutEvent(self, event):
         if event.lostFocus():
