@@ -131,6 +131,7 @@ class Ncat:
         # Send data
         # LOGGER.info('sending %s', msg)
         total_sent = 0
+        sent = 0
         msg_len = len(msg)
 
         # Send loop
