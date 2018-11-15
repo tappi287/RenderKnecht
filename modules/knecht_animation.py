@@ -143,11 +143,12 @@ class AnimatedButton:
 
 
 class AnimateWindowOpacity:
-    def __init__(self, widget: QtWidgets.QWidget, duration: int):
+    def __init__(self, widget: QtWidgets.QWidget, duration: int, start_value: float=0.8, end_value: float=1.0):
         self.widget = widget
         self.duration = duration
         self.animation = QPropertyAnimation(self.widget, b"windowOpacity")
-        self.setup_animation()
+        self.start_value, self.end_value = start_value, end_value
+        self.setup_animation(self.start_value, self.end_value)
 
     def setup_animation(self, start_value: float=0.0, end_value: float=1.0, duration: int=0):
         if not duration:
@@ -159,18 +160,20 @@ class AnimateWindowOpacity:
         self.animation.setEasingCurve(QEasingCurve.OutCubic)
 
     def fade_in(self, duration: int=0):
-        if self.widget.windowOpacity() >= 1.0:
-            return
+        if self.widget.windowOpacity() >= self.end_value:
+            return False
 
-        self.setup_animation(0.55, 1.0, duration)
+        self.setup_animation(self.start_value, self.end_value, duration)
         self.play()
+        return True
 
     def fade_out(self, duration: int=0):
-        if self.widget.windowOpacity() <= 0.55:
-            return
+        if self.widget.windowOpacity() <= self.start_value:
+            return False
 
-        self.setup_animation(1.0, 0.55, duration)
+        self.setup_animation(self.end_value, self.start_value, duration)
         self.play()
+        return True
 
     def play(self):
         if self.animation.state() != QAbstractAnimation.Running:

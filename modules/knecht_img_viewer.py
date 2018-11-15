@@ -370,7 +370,12 @@ class KnechtImageViewer(FileDropWidget):
                              f'{self.img_size.width()}x{self.img_size.height()}px'
                              f'</span>', 1200, immediate=True)
         self.img_loader = None
-        self.control.grabber_top.setText(f'{self.windowTitle()} - {img_path.name}')
+
+        img_name = img_path.name
+        if len(img_name) >= 85:
+            img_name = f'{img_name[:65]}~{img_name[-20:]}'
+
+        self.control.grabber_top.setText(f'{self.windowTitle()} - {img_name}')
         self.load_timeout.stop()
 
     # ------ RESIZE -------
@@ -459,8 +464,8 @@ class KnechtImageViewer(FileDropWidget):
         self.show()
         self.display_shortcut_overlay()
 
-        self.control.animation.setup_animation(duration=800)
-        self.control.animation.play()
+        self.control.opacity_animation.setup_animation(duration=800)
+        self.control.opacity_animation.play()
         self.animation.setup_animation(duration=800)
         self.current_opacity = 1.0
         self.control.slider.setValue(self.control.slider.maximum())

@@ -188,8 +188,8 @@ class ControllerWidget(FileDropWidget):
         self.setWindowIcon(viewer.windowIcon())
         self.setFocusPolicy(Qt.StrongFocus)
         self.apply_stylesheet()
-        self.animation = AnimateWindowOpacity(self, 450)
-        self.btn_anim = BgrAnimationGroup((80, 80, 80), (150, 150, 150), 250)
+        self.opacity_animation = AnimateWindowOpacity(self, 450, start_value=0.8, end_value=1.0)
+        self.bg_animation = BgrAnimationGroup((80, 80, 80), (112, 114, 116), 300)
 
         self.setAttribute(Qt.WA_TranslucentBackground)
         self.setAttribute(Qt.WA_AcceptDrops, True)
@@ -210,21 +210,24 @@ class ControllerWidget(FileDropWidget):
         self.exit_btn.setObjectName('exit_btn')
         self.exit_btn.setFocusPolicy(Qt.NoFocus)
         self.exit_btn.setFlat(True)
+        self.bg_animation.add_widget(self.exit_btn)
 
         self.min_btn = QtWidgets.QPushButton(QIcon(QPixmap(Itemstyle.ICON_PATH['window_min'])), '', self)
         self.min_btn.setObjectName('min_btn')
         self.min_btn.setFocusPolicy(Qt.NoFocus)
         self.min_btn.setIconSize(QSize(15, 19))
+        self.bg_animation.add_widget(self.min_btn)
 
         self.help_btn = QtWidgets.QPushButton(QIcon(QPixmap(Itemstyle.ICON_PATH['window_help'])), '', self)
         self.help_btn.setObjectName('help')
         self.help_btn.setFocusPolicy(Qt.NoFocus)
         self.help_btn.setIconSize(QSize(15, 19))
+        self.bg_animation.add_widget(self.help_btn)
 
         self.grabber_top = QtWidgets.QLabel(f'{self.viewer.windowTitle()}', self)
         self.grabber_top.setObjectName('grabber_top')
         self.grabber_top.setSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Expanding)
-        self.btn_anim.add_widget(self.grabber_top)
+        self.bg_animation.add_widget(self.grabber_top)
 
         self.logo_top = QtWidgets.QLabel('', self)
         self.logo_top.setPixmap(QPixmap(Itemstyle.ICON_PATH['compare']))
@@ -271,6 +274,7 @@ class ControllerWidget(FileDropWidget):
             self.size_box.addItem(f'{s:02d}%', s * 0.01)
 
         self.btn_row.addWidget(self.size_box)
+        self.bg_animation.add_widget(self.size_box)
 
         self.toggle_dg_btn = QtWidgets.QPushButton(
             QIcon(QPixmap(Itemstyle.ICON_PATH['compare'])), 'Sync DeltaGen Viewer', self)
@@ -280,6 +284,7 @@ class ControllerWidget(FileDropWidget):
         self.toggle_dg_btn.setCheckable(True)
         self.toggle_dg_btn.setChecked(False)
         self.btn_row.addWidget(self.toggle_dg_btn)
+        self.bg_animation.add_widget(self.toggle_dg_btn)
 
         toggle_icon = QIcon()
         toggle_icon.addPixmap(QPixmap(Itemstyle.ICON_PATH['eye-off']), QIcon.Normal, QIcon.Off)
@@ -291,24 +296,30 @@ class ControllerWidget(FileDropWidget):
         self.toggle_btn.setCheckable(True)
         self.toggle_btn.setChecked(True)
         self.btn_row.addWidget(self.toggle_btn)
+        self.bg_animation.add_widget(self.toggle_btn)
 
         self.bck_btn = QtWidgets.QPushButton(QIcon(), '<<', self)
         self.bck_btn.setObjectName('fwd_btn')
         self.bck_btn.setFocusPolicy(Qt.NoFocus)
         self.bck_btn.setFlat(True)
         self.btn_row.addWidget(self.bck_btn)
+        self.bg_animation.add_widget(self.bck_btn)
 
         self.fwd_btn = QtWidgets.QPushButton(QIcon(), '>>', self)
         self.fwd_btn.setObjectName('bck_btn')
         self.fwd_btn.setFocusPolicy(Qt.NoFocus)
         self.fwd_btn.setFlat(True)
         self.btn_row.addWidget(self.fwd_btn)
+        self.bg_animation.add_widget(self.fwd_btn)
 
         # Path Row
         self.grabber = QtWidgets.QLabel('', self)
         self.grabber.setObjectName('grabber')
         self.grabber.setSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Expanding)
+
         self.path_row.addWidget(self.grabber)
+        self.bg_animation.add_widget(self.grabber)
+
         self.line_edit = QtWidgets.QLineEdit('', self)
         self.line_edit.setFocusPolicy(Qt.ClickFocus)
         self.line_edit.setPlaceholderText('...Dateien/Ordner in das Fenster ziehen oder hier Pfad einfügen...')
@@ -318,7 +329,9 @@ class ControllerWidget(FileDropWidget):
         self.path_btn.setText('...')
 
         self.path_row.addWidget(self.line_edit)
+        self.bg_animation.add_widget(self.line_edit)
         self.path_row.addWidget(self.path_btn)
+        self.bg_animation.add_widget(self.path_btn)
 
         # Install viewer move and resize wrapper
         self.org_viewer_resize_event = self.viewer.resizeEvent
@@ -361,13 +374,13 @@ class ControllerWidget(FileDropWidget):
 
     def focus_animation(self):
         if True not in self.widgets_with_focus():
-            # self.animation.fade_out()
-            self.btn_anim.fade_end()
+            if self.opacity_animation.fade_out():
+                self.bg_animation.fade_end()
             return
 
         if True in self.widgets_with_focus():
-            # self.animation.fade_in()
-            self.btn_anim.fade_start()
+            if self.opacity_animation.fade_in():
+                self.bg_animation.fade_start()
 
     def widgets_with_focus(self):
         return self.hasFocus(), self.viewer.hasFocus(), self.line_edit.hasFocus(), self.size_box.hasFocus()
