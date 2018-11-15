@@ -284,7 +284,6 @@ class ControllerWidget(FileDropWidget):
         self.toggle_dg_btn.setCheckable(True)
         self.toggle_dg_btn.setChecked(False)
         self.btn_row.addWidget(self.toggle_dg_btn)
-        self.bg_animation.add_widget(self.toggle_dg_btn)
 
         toggle_icon = QIcon()
         toggle_icon.addPixmap(QPixmap(Itemstyle.ICON_PATH['eye-off']), QIcon.Normal, QIcon.Off)
@@ -296,7 +295,6 @@ class ControllerWidget(FileDropWidget):
         self.toggle_btn.setCheckable(True)
         self.toggle_btn.setChecked(True)
         self.btn_row.addWidget(self.toggle_btn)
-        self.bg_animation.add_widget(self.toggle_btn)
 
         self.bck_btn = QtWidgets.QPushButton(QIcon(), '<<', self)
         self.bck_btn.setObjectName('fwd_btn')
