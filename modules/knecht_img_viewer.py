@@ -1,106 +1,19 @@
 from pathlib import Path
 
 from PyQt5 import QtWidgets
-from PyQt5.QtCore import Qt, QPoint, QTimer, QSize, QRect, QEvent, pyqtSignal, QThread
+from PyQt5.QtCore import Qt, QPoint, QTimer, QSize, QRect, QEvent, pyqtSignal
 from PyQt5.QtGui import QIcon, QPixmap
 
-from modules.app_globals import Itemstyle, TCP_IP, TCP_PORT
+from modules.app_globals import Itemstyle
 from modules.gui_set_path import SetDirectoryPath
 from modules.knecht_img_viewer_control import ViewerShortcuts, FileDropWidget, ControllerWidget, KnechtLoadImage
 from modules.knecht_animation import AnimateWindowOpacity
+from modules.knecht_img_viewer_send import KnechtImageViewerSendController
 from modules.knecht_log import init_logging
-from modules.knecht_socket import Ncat
 from modules.tree_overlay import InfoOverlay
 
 
-class KnechtImageViewerSendThread(QThread):
-    set_btn_enabled_signal = pyqtSignal(bool)
-    set_btn_checked_signal = pyqtSignal(bool)
-
-    def __init__(self, viewer):
-        """
-
-        :param KnechtImageViewer viewer: Image viewer parent
-        """
-        super(KnechtImageViewerSendThread, self).__init__(viewer)
-        self.viewer = viewer
-
-        self.dg_btn_timeout = QTimer()
-        self.dg_btn_timeout.setInterval(1000)
-        self.dg_btn_timeout.setSingleShot(True)
-        self.dg_btn_timeout.timeout.connect(self.dg_reset_btn)
-
-        self.dg_poll_timer = QTimer()
-        self.dg_poll_timer.setInterval(200)
-        self.dg_poll_timer.timeout.connect(self.dg_set_viewer)
-
-        self.sync_dg = False
-
-        self.set_btn_enabled_signal.connect(self.viewer.dg_toggle_btn)
-        self.set_btn_checked_signal.connect(self.viewer.dg_check_btn)
-
-        self.ncat = Ncat(TCP_IP, TCP_PORT)
-
-        self.finished.connect(self.dg_close_connection)
-
-    def run(self):
-        self.exec()
-
-    def dg_reset_btn(self):
-        self.set_btn_enabled_signal.emit(True)
-
-    def dg_start_sync(self):
-        """ Image Viewer Window <> DeltaGen Viewer sync requested """
-        if self.sync_dg:
-            self.dg_poll_timer.start()
-
-    def dg_set_viewer(self):
-        self.ncat.check_connection()
-
-        position = f'{self.viewer.frameGeometry().x()} {self.viewer.frameGeometry().y()}'
-        size = f'{self.viewer.size().width()} {self.viewer.size().height()}'
-        command = f'UNFREEZE VIEWER;BORDERLESS VIEWER TRUE;SIZE VIEWER {size};POSITION VIEWER {position};'
-
-        try:
-            self.ncat.send(command)
-        except Exception as e:
-            LOGGER.error('Sending viewer size command failed. %s', e)
-
-        self.dg_reset_btn()
-        self.dg_poll_timer.stop()
-
-    def dg_reset_viewer(self):
-        self.dg_poll_timer.stop()
-        self.dg_btn_timeout.stop()
-        self.dg_reset_btn()
-
-        self.ncat.check_connection()
-        try:
-            self.ncat.send('BORDERLESS VIEWER FALSE;')
-        except Exception as e:
-            LOGGER.error('Sending viewer size command failed. %s', e)
-
-    def dg_close_connection(self):
-        if self.sync_dg:
-            self.dg_reset_viewer()
-            self.ncat.close()
-
-    def dg_toggle_sync(self):
-        self.sync_dg = not self.sync_dg
-        self.set_btn_checked_signal.emit(self.sync_dg)
-        self.set_btn_enabled_signal.emit(False)
-
-        if self.sync_dg:
-            self.dg_start_sync()
-            self.dg_btn_timeout.start()
-        else:
-            self.dg_reset_viewer()
-
-
 class KnechtImageViewer(FileDropWidget):
-    dg_toogle_sync_signal = pyqtSignal()
-    dg_request_sync_signal = pyqtSignal()
-
     button_timeout = QTimer()
     button_timeout.setInterval(100)
     button_timeout.setSingleShot(True)
@@ -166,6 +79,9 @@ class KnechtImageViewer(FileDropWidget):
 
         self.control = ControllerWidget(self)
 
+        # DG Send thread controller
+        self.dg_thread = KnechtImageViewerSendController(self)
+
         # Image canvas
         self.setLayout(QtWidgets.QHBoxLayout())
         self.layout().setContentsMargins(0, 0, 0, 0)
@@ -176,11 +92,6 @@ class KnechtImageViewer(FileDropWidget):
         self.img_canvas.setScaledContents(True)
         self.img_canvas.setObjectName('img_canvas')
         self.set_default_image()
-
-        # DG Send thread
-        self.dg_thread = KnechtImageViewerSendThread(self)
-        self.dg_toogle_sync_signal.connect(self.dg_thread.dg_toggle_sync)
-        self.dg_request_sync_signal.connect(self.dg_thread.dg_start_sync)
 
         # Overlay
         self.overlay = InfoOverlay(self.img_canvas)
@@ -206,6 +117,7 @@ class KnechtImageViewer(FileDropWidget):
 
         self.control.toggle_btn.pressed.connect(self.toggle_img_canvas)
         self.control.toggle_dg_btn.pressed.connect(self.dg_toggle_sync)
+        self.control.toggle_pull_btn.pressed.connect(self.dg_toggle_pull)
 
         self.control.help_btn.pressed.connect(self.display_shortcut_overlay)
 
@@ -243,7 +155,10 @@ class KnechtImageViewer(FileDropWidget):
             '&lt;/&gt; oder A/D          &#45; Nächste/Vorherige Bilddatei im Ordner<br>'
             'STRG+/STRG&#45; oder W/S  &#45; Transparenz erhöhen/verringern<br><br>'
             'Leertaste oder X &#45; Bildanzeige ein&#45;/ausschalten<br>'
-            'F &#45; DeltaGen Viewer Sync ein&#45;/ausschalten<br><br>'
+            'F &#45; DeltaGen Viewer Sync ein&#45;/ausschalten<br>'
+            '<img src=":/type/img_free.png" width="24" height="24" style="float: left;'
+            'vertical-align: middle;" />'
+            '- DeltaGen Viewer Fenster periodisch fokussieren. Experimentell!<br><br>'
             'Pfad auswählen oder Dateien in das Fenster ziehen.',
             duration=6000,
             immediate=True)
@@ -271,10 +186,16 @@ class KnechtImageViewer(FileDropWidget):
         """ Called by thread signal """
         self.control.toggle_dg_btn.setChecked(checked)
 
+    def dg_toggle_pull(self):
+        """ Toggles pulling of the viewer window in front on/off """
+        self.dg_thread.toggle_pull()
+
     def dg_toggle_sync(self):
-        if not self.dg_thread.isRunning():
-            self.dg_thread.start()
-        self.dg_toogle_sync_signal.emit()
+        if not self.control.toggle_dg_btn.isEnabled():
+            return
+
+        self.dg_thread.start()
+        self.dg_thread.toggle_sync()
 
     # ------ IMAGES -------
     def path_dropped(self, file_url):
@@ -463,7 +384,7 @@ class KnechtImageViewer(FileDropWidget):
         height = max(50, min(new_size.height(), self.MAX_SIZE.height()))
         new_size = QSize(width, height)
 
-        self.dg_request_sync_signal.emit()
+        self.dg_thread.request_sync()
         self.resize(new_size)
 
     # ------ OPACITY -------
@@ -583,8 +504,7 @@ class KnechtImageViewer(FileDropWidget):
         return QRect(min_x, min_y, max_x, max_y)
 
     def closeEvent(self, QCloseEvent):
-        if self.dg_thread.isRunning():
-            self.dg_thread.exit()
+        self.dg_thread.exit()
 
         self.control.close()
         QCloseEvent.accept()
@@ -598,7 +518,7 @@ class KnechtImageViewer(FileDropWidget):
         self.move(self.x() + delta.x(), self.y() + delta.y())
         self.oldPos = event.globalPos()
 
-        self.dg_request_sync_signal.emit()
+        self.dg_thread.request_sync()
 
     @staticmethod
     def is_inside_limit(limit: QRect, pos: QPoint):

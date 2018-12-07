@@ -289,6 +289,16 @@ class ControllerWidget(FileDropWidget):
         self.toggle_dg_btn.setChecked(False)
         self.btn_row.addWidget(self.toggle_dg_btn)
 
+        self.toggle_pull_btn = QtWidgets.QPushButton(
+            QIcon(QPixmap(Itemstyle.ICON_PATH['img_free'])), '', self)
+        self.toggle_pull_btn.setObjectName('toggle_pull_btn')
+        self.toggle_pull_btn.setToolTip('DeltaGen Viewer Window Fokus periodisch erzwingen. Obacht!')
+        self.toggle_pull_btn.setFlat(True)
+        self.toggle_pull_btn.setFocusPolicy(Qt.NoFocus)
+        self.toggle_pull_btn.setCheckable(True)
+        self.toggle_pull_btn.setChecked(False)
+        self.btn_row.addWidget(self.toggle_pull_btn)
+
         toggle_icon = QIcon()
         toggle_icon.addPixmap(QPixmap(Itemstyle.ICON_PATH['eye-off']), QIcon.Normal, QIcon.Off)
         toggle_icon.addPixmap(QPixmap(Itemstyle.ICON_PATH['eye-on']), QIcon.Normal, QIcon.On)
@@ -456,7 +466,7 @@ class ControllerWidget(FileDropWidget):
                            'QPushButton#toggle_btn:checked {'
                            '    background-color: rgb(80, 80, 80);'
                            '}'
-                           'QPushButton#toggle_dg_btn:checked {'
+                           'QPushButton#toggle_dg_btn:checked, QPushButton#toggle_pull_btn:checked {'
                            '    background-color: rgb(150, 150, 150);'
                            '}'
                            'QToolButton {'
