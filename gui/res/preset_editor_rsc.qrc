@@ -45,28 +45,6 @@
     <file>sad.png</file>
   </qresource>
   <qresource prefix="font">
-    <file>Lato-Black.ttf</file>
-    <file>Lato-BlackItalic.ttf</file>
-    <file>Lato-Bold.ttf</file>
-    <file>Lato-BoldItalic.ttf</file>
-    <file>Lato-Hairline.ttf</file>
-    <file>Lato-HairlineItalic.ttf</file>
-    <file>Lato-Italic.ttf</file>
-    <file>Lato-Light.ttf</file>
-    <file>Lato-LightItalic.ttf</file>
-    <file>Lato-Regular.ttf</file>
-    <file>SourceSansPro-Black.ttf</file>
-    <file>SourceSansPro-BlackItalic.ttf</file>
-    <file>SourceSansPro-Bold.ttf</file>
-    <file>SourceSansPro-BoldItalic.ttf</file>
-    <file>SourceSansPro-ExtraLight.ttf</file>
-    <file>SourceSansPro-ExtraLightItalic.ttf</file>
-    <file>SourceSansPro-Italic.ttf</file>
-    <file>SourceSansPro-Light.ttf</file>
-    <file>SourceSansPro-LightItalic.ttf</file>
-    <file>SourceSansPro-Regular.ttf</file>
-    <file>SourceSansPro-SemiBold.ttf</file>
-    <file>SourceSansPro-SemiBoldItalic.ttf</file>
     <file>Inconsolata-Regular.ttf</file>
   </qresource>
   <qresource prefix="ovr">
