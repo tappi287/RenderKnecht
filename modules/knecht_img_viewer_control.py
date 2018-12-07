@@ -271,6 +271,10 @@ class ControllerWidget(FileDropWidget):
         max = round((viewer.MAX_SIZE_FACTOR + viewer.SIZE_INCREMENT) * 100)
         step = round(viewer.SIZE_INCREMENT * 100)
         for s in range(min, max, step):
+            if viewer.EXTRA_SIZE_FACTORS:
+                if s * 0.01 > viewer.EXTRA_SIZE_FACTORS[0]:
+                    xs = viewer.EXTRA_SIZE_FACTORS.pop(0)
+                    self.size_box.addItem(f'{xs * 100:.2f}%', float(xs))
             self.size_box.addItem(f'{s:02d}%', s * 0.01)
 
         self.btn_row.addWidget(self.size_box)
