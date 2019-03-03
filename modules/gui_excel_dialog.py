@@ -204,12 +204,12 @@ class VplusWindow(QtWidgets.QDialog):
 
         if int:
             pr_fam_msg = 'Interior scope'
-            # Filter Interior scope Status: 09/01/2017 - Stefan Vidal (I/VX-13)
+            # Filter Interior scope Status: 09/01/2017 (I/VX-13)
             btn_pr_fam_filter.update(PR_FAM_INT)
 
         if ext:
             pr_fam_msg += ' and Exterior scope'
-            # Filter Exterior scope Status: 09/01/2017 - Stefan Vidal (I/VX-13)
+            # Filter Exterior scope Status: 09/01/2017 (I/VX-13)
             btn_pr_fam_filter.update(PR_FAM_EXT)
 
         if all:
