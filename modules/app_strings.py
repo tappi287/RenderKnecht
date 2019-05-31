@@ -37,6 +37,7 @@ class Msg:
            '<img src=":/main/social-github-b.png" width="24" height="24" ' \
            'style="float: left;vertical-align: middle;">Quellcode nun verfügbar auf Github!</a>' \
            '</li>' \
+           '<li>Pfad Äffchen use_scene_settings GUI Schalter hinzugefügt</li>' \
            '<li>FaKom Suchmuster aktualisiert</li>' \
            '<li>Datei > DeltaGen Image Overlay Viewer integriert</li>' \
            '<li>Auto-Save speichert nun Lokal die gesamte Session anstatt der aktuellen Datei.</li>' \

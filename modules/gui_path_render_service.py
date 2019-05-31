@@ -96,8 +96,10 @@ class PathRenderService(QtCore.QObject):
         # --------- Job Options ---------
         self.ui.checkBoxCsbIgnoreHidden.toggled.connect(self.update_csb_import_option)
         self.ui.checkBoxMayaDeleteHidden.toggled.connect(self.update_maya_delete_hidden_option)
+        self.ui.checkBoxUseSceneSettings.toggled.connect(self.update_use_scene_settings)
         self.csb_ignore_hidden = '1'
         self.maya_delete_hidden = '1'
+        self.use_scene_settings = '0'
 
         # --------- Set scene file ---------
         self.scene_file = Path('.')
@@ -250,7 +252,7 @@ class PathRenderService(QtCore.QObject):
 
         self.service_host = result
         self.ovr.display('Render Service erfolgreich verbunden.', 2000)
-        self.send_message('GREETINGS_1')
+        self.send_message('GREETINGS_2')
         self.send_message('GET_RENDERER')
 
     def update_scene_file(self, scene_path: Path):
@@ -298,6 +300,15 @@ class PathRenderService(QtCore.QObject):
         LOGGER.debug('Toggled Maya delete hidden option: %s, set value to %s',
                      maya_delete_hidden, self.maya_delete_hidden)
 
+    def update_use_scene_settings(self, use_scene_settings):
+        if use_scene_settings:
+            self.use_scene_settings = '1'
+        else:
+            self.use_scene_settings = '0'
+        self.update_status(f'Maya Prozess Option gesetzt: <i>use_scene_settings={self.use_scene_settings}</i>', 2)
+        LOGGER.debug('Toggled Maya use scene settings option: %s, set value to %s',
+                     use_scene_settings, self.use_scene_settings)
+
     def create_job(self):
         self.ui.pathJobSendBtn.setEnabled(False)
 
@@ -321,7 +332,8 @@ class PathRenderService(QtCore.QObject):
 
         msg = 'ADD_JOB '
 
-        for __s in [job_title, scene_file, render_dir, renderer, self.csb_ignore_hidden, self.maya_delete_hidden]:
+        for __s in [job_title, scene_file, render_dir, renderer,
+                    self.csb_ignore_hidden, self.maya_delete_hidden, self.use_scene_settings]:
             msg += __s + ';'
 
         # Remove trailing semicolon
